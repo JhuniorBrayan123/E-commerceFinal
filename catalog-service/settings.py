@@ -3,6 +3,7 @@ Django settings for lab08 project.
 """
 
 from pathlib import Path
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -10,13 +11,13 @@ SECRET_KEY = 'django-insecure-#zvzk4+1y(&ssrx0e@gtk+a#j+rap9!dv_=g3+bj)nbz7svb6_
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']  # Cambiar para permitir todos en Docker
 
 # Application definition
 INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
-    'sensores.apps.SensoresConfig',
+    'sensores',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -26,7 +27,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # ← Debe ir PRIMERO
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -36,7 +37,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'lab08.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATES = [
     {
@@ -53,12 +54,17 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'lab08.wsgi.application'
+WSGI_APPLICATION = 'wsgi.application'
 
+# ✅ BASE DE DATOS POSTGRESQL PARA DOCKER
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB', 'ecommerce_db'),
+        'USER': os.getenv('POSTGRES_USER', 'ecommerce_user'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'password'),
+        'HOST': os.getenv('POSTGRES_HOST', 'postgres'),
+        'PORT': os.getenv('POSTGRES_PORT', '5432'),
     }
 }
 
@@ -78,20 +84,16 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 STATIC_URL = 'static/'
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CONFIGURACIÓN DE CORS (agregar al final)
+# CONFIGURACIÓN DE CORS
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
-ALLOWED_HOSTS =["127.0.0.1","10.0.2.2"]
+CORS_ALLOW_ALL_ORIGINS = True  # Para desarrollo
