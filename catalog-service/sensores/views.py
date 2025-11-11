@@ -3,9 +3,8 @@ from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from rest_framework import status
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
-from django.db.models import Q
+from django.db.models import Q, Avg  # ← Agregar Avg
+from django.db import models  # ← Agregar este import
 
 from .models import Sensor
 from .serializers import SensorSerializer
@@ -24,7 +23,7 @@ class SensoresView(APIView):
         marca_filter = request.GET.get('marca', None)
         disponible_filter = request.GET.get('disponible', None)
         search_query = request.GET.get('search', None)
-        ordering = request.GET.get('ordering', '-fecha_creacion')
+        ordering = request.GET.get('ordering', 'id')  # ← Cambiar por 'id' o 'nombre'
         
         # Base queryset
         sensores = Sensor.objects.all()
@@ -46,11 +45,12 @@ class SensoresView(APIView):
                 Q(descripcion__icontains=search_query)
             )
         
-        # Aplicar ordenamiento
-        if ordering in ['nombre', 'precio', 'fecha_creacion', '-nombre', '-precio', '-fecha_creacion']:
+        # Aplicar ordenamiento - usar campos que SÍ existen
+        valid_ordering_fields = ['id', 'nombre', 'precio', 'marca', 'tipo', 'stock']
+        if ordering.lstrip('-') in valid_ordering_fields:
             sensores = sensores.order_by(ordering)
         else:
-            sensores = sensores.order_by('-fecha_creacion')  # Orden por defecto
+            sensores = sensores.order_by('id')  # Orden por defecto
         
         # Serializar y retornar
         serializer = SensorSerializer(sensores, many=True)
@@ -140,8 +140,8 @@ class SensorStatsView(APIView):
             'sensores_agotados': Sensor.objects.filter(stock=0).count(),
             'por_tipo': {
                 tipo: Sensor.objects.filter(tipo=tipo).count() 
-                for tipo in ['humedad', 'temperatura', 'ph', 'luz', 'nutrientes', 'co2']
-            },
-            'precio_promedio': Sensor.objects.aggregate(models.Avg('precio'))['precio__avg']
+                for tipo in Sensor.objects.values_list('tipo', flat=True).distinct()
+            },  # ← Tipos dinámicos en lugar de fijos
+            'precio_promedio': Sensor.objects.aggregate(Avg('precio'))['precio__avg']
         }
         return Response(stats)

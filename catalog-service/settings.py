@@ -96,4 +96,23 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
-CORS_ALLOW_ALL_ORIGINS = True  # Para desarrollo
+CORS_ALLOW_ALL_ORIGINS = True
+# O para desarrollo, permitir todos los orígenes:
+
+
+# Permitir métodos HTTP
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS'
+]
+  # Para desarrollo
+  # Permitir headers
+CORS_ALLOW_HEADERS = [
+    'content-type',
+    'authorization',
+    'x-requested-with',
+]
