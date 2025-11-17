@@ -145,7 +145,7 @@ const Productos: React.FC = () => {
                 </p>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-2xl font-bold text-primary-600">
-                    ${producto.precio}
+                    S/.{producto.precio}
                   </span>
                   <span
                     className={`px-2 py-1 rounded text-xs ${

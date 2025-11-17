@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./SensorList.css";
-
+import { carritoService } from "../services/api";
+import { useNavigate } from "react-router-dom";
 interface Sensor {
   id: number;
   nombre: string;
@@ -20,6 +21,7 @@ interface Sensor {
 }
 
 const SensorList: React.FC = () => {
+  const navigate = useNavigate(); // ← AQUÍ
   const [sensores, setSensores] = useState<Sensor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,11 +44,16 @@ const SensorList: React.FC = () => {
     marcas: [],
   });
 
+  const handleAddToCart = (sensor: Sensor) => {
+    carritoService.add(sensor, 1);
+    navigate("/carrito");
+  };
+
   // Cargar opciones de filtros
   useEffect(() => {
     const fetchFilters = async () => {
       try {
-        const response = await fetch("http://localhost:8001/sensores/filters/");
+        const response = await fetch("http://localhost:8000/api/filters/");
         if (!response.ok) {
           throw new Error("Error al cargar filtros");
         }
@@ -71,7 +78,7 @@ const SensorList: React.FC = () => {
         if (filters.search) params.append("search", filters.search);
 
         const response = await fetch(
-          `http://localhost:8001/sensores/sensores/?${params.toString()}`
+          `http://localhost:8000/api/sensores/?${params.toString()}`
         );
         if (!response.ok) {
           throw new Error("Error al cargar sensores");
@@ -109,7 +116,7 @@ const SensorList: React.FC = () => {
 
   return (
     <div className="sensor-list">
-      <h2>🌱 Catálogo de Sensores Agrícolas</h2>
+      <h2> Catálogo de Sensores Agrícolas</h2>
 
       {/* Filtros */}
       <div className="filters-section">
@@ -235,6 +242,7 @@ const SensorList: React.FC = () => {
               <button
                 className="add-to-cart-btn"
                 disabled={!sensor.disponible || sensor.stock === 0}
+                onClick={() => handleAddToCart(sensor)}
               >
                 {sensor.disponible && sensor.stock > 0
                   ? "Agregar al carrito"
