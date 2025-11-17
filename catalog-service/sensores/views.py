@@ -3,19 +3,34 @@ from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from rest_framework import status
-from django.db.models import Q, Avg  # ← Agregar Avg
-from django.db import models  # ← Agregar este import
+from django.db.models import Q, Avg, Min, Max, Count
+from django.db import models
 
 from .models import Sensor
 from .serializers import SensorSerializer
 
 class IndexView(APIView):
+    """Endpoint raíz para verificar que el servidor está activo"""
     def get(self, request):
-        context = {'mensaje': 'Servidor de Sensores Agrícolas activo', 'version': '1.0'}
+        context = {
+            'mensaje': 'Servidor de Sensores Agrícolas activo',
+            'version': '1.0',
+            'endpoints': {
+                'sensores': '/sensores/',
+                'detalle': '/sensores/<id>/',
+                'stats': '/stats/',
+                'filtros': '/sensores/?tipo=humedad&marca=DHT&disponible=true&search=query&ordering=-precio'
+            }
+        }
         return Response(context)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SensoresView(APIView):
+    """
+    Vista para listar y crear sensores
+    GET: Lista sensores con filtros opcionales
+    POST: Crear un nuevo sensor
+    """
     
     def get(self, request):
         # Obtener parámetros de filtro, búsqueda y ordenamiento
@@ -23,7 +38,7 @@ class SensoresView(APIView):
         marca_filter = request.GET.get('marca', None)
         disponible_filter = request.GET.get('disponible', None)
         search_query = request.GET.get('search', None)
-        ordering = request.GET.get('ordering', 'id')  # ← Cambiar por 'id' o 'nombre'
+        ordering = request.GET.get('ordering', '-fecha_creacion')
         
         # Base queryset
         sensores = Sensor.objects.all()
@@ -32,7 +47,7 @@ class SensoresView(APIView):
         if tipo_filter:
             sensores = sensores.filter(tipo=tipo_filter)
         if marca_filter:
-            sensores = sensores.filter(marca=marca_filter)
+            sensores = sensores.filter(marca__icontains=marca_filter)
         if disponible_filter is not None:
             sensores = sensores.filter(disponible=disponible_filter.lower() == 'true')
         
@@ -45,12 +60,12 @@ class SensoresView(APIView):
                 Q(descripcion__icontains=search_query)
             )
         
-        # Aplicar ordenamiento - usar campos que SÍ existen
-        valid_ordering_fields = ['id', 'nombre', 'precio', 'marca', 'tipo', 'stock']
+        # Aplicar ordenamiento
+        valid_ordering_fields = ['id', 'nombre', 'precio', 'marca', 'tipo', 'stock', 'fecha_creacion']
         if ordering.lstrip('-') in valid_ordering_fields:
             sensores = sensores.order_by(ordering)
         else:
-            sensores = sensores.order_by('id')  # Orden por defecto
+            sensores = sensores.order_by('-fecha_creacion')
         
         # Serializar y retornar
         serializer = SensorSerializer(sensores, many=True)
@@ -71,19 +86,27 @@ class SensoresView(APIView):
         return Response(response_data)
     
     def post(self, request):
-        print("📦 Datos recibidos para crear sensor:", request.data)
+        """Crear un nuevo sensor"""
         serializer = SensorSerializer(data=request.data)
         
         if serializer.is_valid():
             sensor = serializer.save()
-            print(f"✅ Sensor creado exitosamente: {sensor.nombre}")
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(
+                {'mensaje': 'Sensor creado exitosamente', 'sensor': serializer.data},
+                status=status.HTTP_201_CREATED
+            )
         else:
-            print("❌ Errores de validación:", serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SensorDetailView(APIView):
+    """
+    Vista para obtener, actualizar y eliminar un sensor específico
+    GET: Obtener detalles de un sensor
+    PUT: Actualizar un sensor
+    PATCH: Actualización parcial
+    DELETE: Eliminar un sensor
+    """
     
     def get(self, request, sensor_id):
         try:
@@ -97,16 +120,39 @@ class SensorDetailView(APIView):
             )
     
     def put(self, request, sensor_id):
+        """Actualización completa"""
         try:
             sensor = Sensor.objects.get(pk=sensor_id)
             serializer = SensorSerializer(sensor, data=request.data)
             
             if serializer.is_valid():
                 serializer.save()
-                print(f"✅ Sensor {sensor_id} actualizado exitosamente")
-                return Response(serializer.data)
+                return Response({
+                    'mensaje': 'Sensor actualizado exitosamente',
+                    'sensor': serializer.data
+                })
             else:
-                print("❌ Errores de validación:", serializer.errors)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                
+        except Sensor.DoesNotExist:
+            return Response(
+                {'error': f'Sensor con ID {sensor_id} no encontrado'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+    def patch(self, request, sensor_id):
+        """Actualización parcial"""
+        try:
+            sensor = Sensor.objects.get(pk=sensor_id)
+            serializer = SensorSerializer(sensor, data=request.data, partial=True)
+            
+            if serializer.is_valid():
+                serializer.save()
+                return Response({
+                    'mensaje': 'Sensor actualizado parcialmente',
+                    'sensor': serializer.data
+                })
+            else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
                 
         except Sensor.DoesNotExist:
@@ -118,11 +164,10 @@ class SensorDetailView(APIView):
     def delete(self, request, sensor_id):
         try:
             sensor = Sensor.objects.get(pk=sensor_id)
-            serializer = SensorSerializer(sensor)  # Serializar antes de eliminar
+            serializer = SensorSerializer(sensor)
             sensor.delete()
-            print(f"✅ Sensor {sensor_id} eliminado exitosamente")
             return Response(
-                {'mensaje': f'Sensor {sensor_id} eliminado correctamente', 'sensor_eliminado': serializer.data},
+                {'mensaje': f'Sensor eliminado correctamente', 'sensor_eliminado': serializer.data},
                 status=status.HTTP_200_OK
             )
         except Sensor.DoesNotExist:
@@ -131,17 +176,41 @@ class SensorDetailView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-# Vista adicional para estadísticas de sensores
+@method_decorator(csrf_exempt, name='dispatch')
 class SensorStatsView(APIView):
+    """Vista para obtener estadísticas de sensores"""
+    
     def get(self, request):
+        total_sensores = Sensor.objects.count()
+        
         stats = {
-            'total_sensores': Sensor.objects.count(),
+            'total_sensores': total_sensores,
             'sensores_disponibles': Sensor.objects.filter(disponible=True).count(),
             'sensores_agotados': Sensor.objects.filter(stock=0).count(),
-            'por_tipo': {
-                tipo: Sensor.objects.filter(tipo=tipo).count() 
-                for tipo in Sensor.objects.values_list('tipo', flat=True).distinct()
-            },  # ← Tipos dinámicos en lugar de fijos
-            'precio_promedio': Sensor.objects.aggregate(Avg('precio'))['precio__avg']
+            'sensores_con_stock': Sensor.objects.filter(stock__gt=0).count(),
+            'precio_promedio': Sensor.objects.aggregate(Avg('precio'))['precio__avg'],
+            'precio_minimo': Sensor.objects.aggregate(Min('precio'))['precio__min'],
+            'precio_maximo': Sensor.objects.aggregate(Max('precio'))['precio__max'],
+            'stock_total': Sensor.objects.aggregate(models.Sum('stock'))['stock__sum'] or 0,
+            'por_tipo': dict(
+                Sensor.objects.values('tipo').annotate(count=Count('id')).values_list('tipo', 'count')
+            ),
+            'por_marca': dict(
+                Sensor.objects.values('marca').annotate(count=Count('id')).values_list('marca', 'count')
+            ),
         }
         return Response(stats)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SensorFilterView(APIView):
+    """Vista para obtener opciones disponibles de filtrado"""
+    
+    def get(self, request):
+        tipos = [{'value': t[0], 'label': t[1]} for t in Sensor.TIPO_SENSOR]
+        marcas = list(Sensor.objects.values_list('marca', flat=True).distinct())
+        
+        filters = {
+            'tipos': tipos,
+            'marcas': sorted(marcas),
+        }
+        return Response(filters)

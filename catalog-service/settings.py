@@ -1,9 +1,13 @@
 """
-Django settings for lab08 project.
+Django settings for ecommerce project.
 """
 
 from pathlib import Path
 import os
+import pymysql
+
+# Usar PyMySQL como driver MySQL
+pymysql.install_as_MySQLdb()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -11,13 +15,18 @@ SECRET_KEY = 'django-insecure-#zvzk4+1y(&ssrx0e@gtk+a#j+rap9!dv_=g3+bj)nbz7svb6_
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']  # Cambiar para permitir todos en Docker
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
+    'django_filters',
     'sensores',
+    'categorias',
+    'productos',
+    'inventario',
+    'orders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,15 +65,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'wsgi.application'
 
-# ✅ BASE DE DATOS POSTGRESQL PARA DOCKER
+# ✅ BASE DE DATOS MYSQL
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'ecommerce_db'),
-        'USER': os.getenv('POSTGRES_USER', 'ecommerce_user'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'password'),
-        'HOST': os.getenv('POSTGRES_HOST', 'postgres'),
-        'PORT': os.getenv('POSTGRES_PORT', '5432'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('MYSQL_DB', 'ecommerce_db'),
+        'USER': os.getenv('MYSQL_USER', 'root'),
+        'PASSWORD': os.getenv('MYSQL_PASSWORD', ''),
+        'HOST': os.getenv('MYSQL_HOST', 'localhost'),
+        'PORT': os.getenv('MYSQL_PORT', '3306'),
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4',
+        },
     }
 }
 
@@ -89,7 +102,24 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Media files (imágenes de productos)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Django REST Framework configuration
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
+}
 
 # CONFIGURACIÓN DE CORS
 CORS_ALLOWED_ORIGINS = [
