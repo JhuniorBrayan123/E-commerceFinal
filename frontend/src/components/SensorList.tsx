@@ -256,7 +256,7 @@ const SensorList: React.FC = () => {
       {sensores.length === 0 && !loading && (
         <div className="no-sensors">
           <p>No hay sensores disponibles con los filtros seleccionados.</p>
-          <p>💡 Intenta cambiar los filtros o limpia tu búsqueda.</p>
+          <p>Intenta cambiar los filtros o limpia tu búsqueda.</p>
         </div>
       )}
 
