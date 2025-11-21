@@ -5,3 +5,7 @@ mysqlclient==2.2.0
 Pillow==10.0.1
 python-dotenv==1.0.0
 django-filter==23.3
+
+#Esto es para el spring boot de pagos
+PyJWT==2.8.0
+cryptography==41.0.7

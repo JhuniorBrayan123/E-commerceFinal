@@ -44,9 +44,8 @@ const SensorList: React.FC = () => {
     marcas: [],
   });
 
-  const handleAddToCart = (sensor: Sensor) => {
+  const handleActualizarCantidad = (sensor: Sensor) => {
     carritoService.add(sensor, 1);
-    navigate("/carrito");
   };
 
   // Cargar opciones de filtros
@@ -116,8 +115,6 @@ const SensorList: React.FC = () => {
 
   return (
     <div className="sensor-list">
-      <h2> Catálogo de Sensores Agrícolas</h2>
-
       {/* Filtros */}
       <div className="filters-section">
         <h3>Filtros</h3>
@@ -242,7 +239,7 @@ const SensorList: React.FC = () => {
               <button
                 className="add-to-cart-btn"
                 disabled={!sensor.disponible || sensor.stock === 0}
-                onClick={() => handleAddToCart(sensor)}
+                onClick={() => handleActualizarCantidad(sensor)}
               >
                 {sensor.disponible && sensor.stock > 0
                   ? "Agregar al carrito"
