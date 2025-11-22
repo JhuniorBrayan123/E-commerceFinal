@@ -88,7 +88,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
                 <span>{user.first_name}</span>
                 <button
                   onClick={onLogout}
-                  className="px-3 py-2 rounded-md text-sm font-medium bg-red-600 hover:bg-red-700 transition"
+                  className="px-3 py-2 rounded-md text-sm font-medium to-blue-500 hover: bg-green-500 transition"
                 >
                   Cerrar sesión
                 </button>
