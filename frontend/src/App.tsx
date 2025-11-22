@@ -21,6 +21,9 @@ import Inventario from "./pages/Inventario";
 import CRUDProductos from "./pages/CRUDProductos";
 import CRUDCategorias from "./pages/CRUDCategorias";
 
+// 👇👇 NUEVO IMPORT QUE TE PEDÍ 👇👇
+import SupportPage from "./pages/SupportPage";
+
 interface User {
   id: number;
   email: string;
@@ -35,7 +38,6 @@ function App() {
     "login"
   );
 
-  // Verificar autenticación al cargar
   useEffect(() => {
     checkAuth();
   }, []);
@@ -50,7 +52,6 @@ function App() {
         if (result.success && result.data) {
           setUser(result.data.user);
         } else {
-          // Token inválido, limpiar localStorage
           localStorage.removeItem("access_token");
           localStorage.removeItem("refresh_token");
           localStorage.removeItem("user");
@@ -87,7 +88,6 @@ function App() {
     setCurrentAuthView("login");
   };
 
-  // Componente protegido
   const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     if (!user) {
       return <Navigate to="/auth" replace />;
@@ -95,7 +95,6 @@ function App() {
     return <>{children}</>;
   };
 
-  // Layout para páginas autenticadas
   const AuthenticatedLayout = ({ children }: { children: React.ReactNode }) => {
     return (
       <div className="min-h-screen flex flex-col">
@@ -108,7 +107,6 @@ function App() {
     );
   };
 
-  // Componente de autenticación
   const AuthPage = () => {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -140,13 +138,11 @@ function App() {
   return (
     <Router>
       {!user ? (
-        // Sin usuario autenticado - mostrar solo auth
         <Routes>
           <Route path="/auth" element={<AuthPage />} />
           <Route path="*" element={<Navigate to="/auth" replace />} />
         </Routes>
       ) : (
-        // Con usuario autenticado - mostrar aplicación completa
         <Routes>
           {/* Rutas públicas */}
           <Route
@@ -157,6 +153,7 @@ function App() {
               </AuthenticatedLayout>
             }
           />
+
           <Route
             path="/productos"
             element={
@@ -165,6 +162,7 @@ function App() {
               </AuthenticatedLayout>
             }
           />
+
           <Route
             path="/productos/:id"
             element={
@@ -173,6 +171,7 @@ function App() {
               </AuthenticatedLayout>
             }
           />
+
           <Route
             path="/categorias"
             element={
@@ -181,6 +180,7 @@ function App() {
               </AuthenticatedLayout>
             }
           />
+
           <Route
             path="/categorias/:id"
             element={
@@ -190,7 +190,17 @@ function App() {
             }
           />
 
-          {/* Rutas protegidas - solo para usuarios autenticados */}
+          {/* 👇👇 NUEVA RUTA /soporte 👇👇 */}
+          <Route
+            path="/soporte"
+            element={
+              <AuthenticatedLayout>
+                <SupportPage />
+              </AuthenticatedLayout>
+            }
+          />
+
+          {/* Rutas protegidas */}
           <Route
             path="/carrito"
             element={
@@ -201,6 +211,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/sensores"
             element={
@@ -211,6 +222,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/inventario"
             element={
@@ -221,6 +233,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/admin/productos"
             element={
@@ -231,6 +244,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/admin/categorias"
             element={
@@ -242,7 +256,7 @@ function App() {
             }
           />
 
-          {/* Redirección por defecto */}
+          {/* Redirecciones */}
           <Route path="/auth" element={<Navigate to="/" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

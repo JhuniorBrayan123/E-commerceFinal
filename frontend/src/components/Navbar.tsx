@@ -24,11 +24,14 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
     <nav className="bg-primary-700 text-white shadow-lg">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
+
+          {/* LOGO */}
           <Link to="/" className="flex items-center space-x-2">
             <img src="/agrocodeLogo.svg" alt="logo" className="w-32 h-32" />
           </Link>
 
-          <div className="flex items-center space-x-4">
+          {/* ENLACES CENTRALES — AHORA MAS COMPACTOS */}
+          <div className="flex items-center space-x-2">
             <Link
               to="/categorias"
               className="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-600 transition"
@@ -44,6 +47,13 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
             </Link>
 
             <Link
+              to="/soporte"
+              className="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-600 transition"
+            >
+              Soporte
+            </Link>
+
+            <Link
               to="/sensores"
               className="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-600 transition"
             >
@@ -56,7 +66,12 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
             >
               Inventario
             </Link>
+          </div>
 
+          {/* CARRITO + USUARIO */}
+          <div className="flex items-center space-x-2">
+
+            {/* Carrito */}
             <button
               onClick={() => navigate("/carrito")}
               className="relative px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-600 transition"
@@ -82,10 +97,13 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
               )}
             </button>
 
-            {/* SECCIÓN DE USUARIO */}
+            {/* Usuario */}
             {user && (
-              <div className="flex items-center space-x-3">
-                <span>{user.first_name}</span>
+              <div className="flex items-center space-x-2">
+                <span className="font-semibold text-sm">
+                  {user.first_name} {user.last_name}
+                </span>
+
                 <button
                   onClick={onLogout}
                   className="px-3 py-2 rounded-md text-sm font-medium bg-red-600 hover:bg-red-700 transition"
@@ -95,6 +113,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
               </div>
             )}
           </div>
+
         </div>
       </div>
     </nav>
