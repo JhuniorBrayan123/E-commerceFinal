@@ -39,13 +39,6 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
             </Link>
 
             <Link
-              to="/productos"
-              className="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-600 transition"
-            >
-              Productos
-            </Link>
-
-            <Link
               to="/sensores"
               className="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-600 transition"
             >

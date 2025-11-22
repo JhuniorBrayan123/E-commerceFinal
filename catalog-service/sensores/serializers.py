@@ -4,6 +4,7 @@ from .models import Sensor
 class SensorSerializer(serializers.ModelSerializer):
     # Campo para obtener el nombre legible del tipo
     tipo_display = serializers.CharField(source='get_tipo_display', read_only=True)
+    imagen_url = serializers.SerializerMethodField()
     
     class Meta:
         model = Sensor
@@ -21,11 +22,21 @@ class SensorSerializer(serializers.ModelSerializer):
             'alimentacion',
             'protocolo_comunicacion',
             'imagen',
+            'imagen_url',
             'stock',
             'disponible',
             'fecha_creacion',
             'fecha_actualizacion'
         ]
+    
+    def get_imagen_url(self, obj):
+        """Genera la URL completa de la imagen"""
+        if obj.imagen:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.imagen.url)
+            return obj.imagen.url
+        return None
     
     def validate_precio(self, value):
         """Validar que el precio sea positivo"""

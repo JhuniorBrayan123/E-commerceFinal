@@ -1,9 +1,8 @@
 package com.example.payment_service.controller;
 
-import com.example.payment_service.dto.PaymentRequest;
-import com.example.payment_service.dto.PaymentResponse;
-import com.example.payment_service.dto.RefundRequest;
+import com.example.payment_service.dto.*;
 import com.example.payment_service.exception.PaymentException;
+import com.example.payment_service.service.OrderService;
 import com.example.payment_service.service.PaymentService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
@@ -19,15 +18,56 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/payments")
+@RequestMapping("/payment")
 @CrossOrigin(origins = "*")
 public class PaymentController {
 
     private final PaymentService paymentService;
+    private final OrderService orderService;
 
-    public PaymentController(PaymentService paymentService) {
+    public PaymentController(PaymentService paymentService, OrderService orderService) {
         this.paymentService = paymentService;
+        this.orderService = orderService;
     }
+
+    /**
+     * Crea una nueva orden de pago
+     * POST /payment/order
+     */
+    @PostMapping("/order")
+    public ResponseEntity<OrderResponse> createOrder(
+            @Valid @RequestBody OrderRequest request,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        OrderResponse response = orderService.createOrder(request, extractToken(authorization));
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    /**
+     * Confirma y procesa el pago de una orden
+     * POST /payment/confirm
+     */
+    @PostMapping("/confirm")
+    public ResponseEntity<ConfirmPaymentResponse> confirmPayment(
+            @Valid @RequestBody ConfirmPaymentRequest request,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        ConfirmPaymentResponse response = orderService.confirmPayment(request, extractToken(authorization));
+        HttpStatus status = response.getSuccess() ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
+        return ResponseEntity.status(status).body(response);
+    }
+
+    /**
+     * Obtiene el estado de una orden
+     * GET /payment/status/{orderId}
+     */
+    @GetMapping("/status/{orderId}")
+    public ResponseEntity<OrderResponse> getOrderStatus(
+            @PathVariable Long orderId,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        OrderResponse response = orderService.getOrderStatus(orderId, extractToken(authorization));
+        return ResponseEntity.ok(response);
+    }
+
+    // ====== Endpoints originales del PaymentService (mantener compatibilidad) ======
 
     @PostMapping("/process")
     public ResponseEntity<PaymentResponse> processPayment(

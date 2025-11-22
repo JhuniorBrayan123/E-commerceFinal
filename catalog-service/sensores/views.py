@@ -36,7 +36,13 @@ class SensoresView(APIView):
         # Obtener parámetros de filtro, búsqueda y ordenamiento
         tipo_filter = request.GET.get('tipo', None)
         marca_filter = request.GET.get('marca', None)
+        rango_filter = request.GET.get('rango', None)
+        precio_min = request.GET.get('precio_min', None)
+        precio_max = request.GET.get('precio_max', None)
         disponible_filter = request.GET.get('disponible', None)
+        stock_min = request.GET.get('stock_min', None)
+        modelo_filter = request.GET.get('modelo', None)
+        protocolo_filter = request.GET.get('protocolo', None)
         search_query = request.GET.get('search', None)
         ordering = request.GET.get('ordering', '-fecha_creacion')
         
@@ -48,8 +54,32 @@ class SensoresView(APIView):
             sensores = sensores.filter(tipo=tipo_filter)
         if marca_filter:
             sensores = sensores.filter(marca__icontains=marca_filter)
+        if rango_filter:
+            sensores = sensores.filter(rango_medicion__icontains=rango_filter)
+        if precio_min:
+            try:
+                precio_min_decimal = float(precio_min)
+                sensores = sensores.filter(precio__gte=precio_min_decimal)
+            except (ValueError, TypeError):
+                pass  # Ignorar si el valor no es válido
+        if precio_max:
+            try:
+                precio_max_decimal = float(precio_max)
+                sensores = sensores.filter(precio__lte=precio_max_decimal)
+            except (ValueError, TypeError):
+                pass  # Ignorar si el valor no es válido
         if disponible_filter is not None:
             sensores = sensores.filter(disponible=disponible_filter.lower() == 'true')
+        if stock_min:
+            try:
+                stock_min_int = int(stock_min)
+                sensores = sensores.filter(stock__gte=stock_min_int)
+            except (ValueError, TypeError):
+                pass  # Ignorar si el valor no es válido
+        if modelo_filter:
+            sensores = sensores.filter(modelo__icontains=modelo_filter)
+        if protocolo_filter:
+            sensores = sensores.filter(protocolo_comunicacion__icontains=protocolo_filter)
         
         # Aplicar búsqueda
         if search_query:
@@ -57,7 +87,9 @@ class SensoresView(APIView):
                 Q(nombre__icontains=search_query) |
                 Q(marca__icontains=search_query) |
                 Q(modelo__icontains=search_query) |
-                Q(descripcion__icontains=search_query)
+                Q(descripcion__icontains=search_query) |
+                Q(rango_medicion__icontains=search_query) |
+                Q(protocolo_comunicacion__icontains=search_query)
             )
         
         # Aplicar ordenamiento
@@ -68,7 +100,7 @@ class SensoresView(APIView):
             sensores = sensores.order_by('-fecha_creacion')
         
         # Serializar y retornar
-        serializer = SensorSerializer(sensores, many=True)
+        serializer = SensorSerializer(sensores, many=True, context={'request': request})
         
         # Agregar metadata útil en la respuesta
         response_data = {
@@ -76,7 +108,13 @@ class SensoresView(APIView):
             'filters_applied': {
                 'tipo': tipo_filter,
                 'marca': marca_filter,
+                'rango': rango_filter,
+                'precio_min': precio_min,
+                'precio_max': precio_max,
                 'disponible': disponible_filter,
+                'stock_min': stock_min,
+                'modelo': modelo_filter,
+                'protocolo': protocolo_filter,
                 'search': search_query,
                 'ordering': ordering
             },
@@ -111,7 +149,7 @@ class SensorDetailView(APIView):
     def get(self, request, sensor_id):
         try:
             sensor = Sensor.objects.get(pk=sensor_id)
-            serializer = SensorSerializer(sensor)
+            serializer = SensorSerializer(sensor, context={'request': request})
             return Response(serializer.data)
         except Sensor.DoesNotExist:
             return Response(
@@ -208,9 +246,23 @@ class SensorFilterView(APIView):
     def get(self, request):
         tipos = [{'value': t[0], 'label': t[1]} for t in Sensor.TIPO_SENSOR]
         marcas = list(Sensor.objects.values_list('marca', flat=True).distinct())
+        rangos = list(Sensor.objects.values_list('rango_medicion', flat=True).distinct())
+        modelos = list(Sensor.objects.values_list('modelo', flat=True).distinct())
+        protocolos = list(Sensor.objects.values_list('protocolo_comunicacion', flat=True).distinct())
+        
+        # Obtener precio mínimo y máximo para los filtros
+        precio_min = Sensor.objects.aggregate(Min('precio'))['precio__min']
+        precio_max = Sensor.objects.aggregate(Max('precio'))['precio__max']
+        stock_max = Sensor.objects.aggregate(Max('stock'))['stock__max']
         
         filters = {
             'tipos': tipos,
             'marcas': sorted(marcas),
+            'rangos': sorted(set(rangos)) if rangos else [],
+            'modelos': sorted(set(modelos)) if modelos else [],
+            'protocolos': sorted(set(protocolos)) if protocolos else [],
+            'precio_min': float(precio_min) if precio_min else 0,
+            'precio_max': float(precio_max) if precio_max else 0,
+            'stock_max': int(stock_max) if stock_max else 0,
         }
         return Response(filters)
