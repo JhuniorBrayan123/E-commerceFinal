@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # MySQL Database para Payment Service
+  payment-mysql:
+    image: mysql:8.0
+    container_name: payment-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: payment_db
+      MYSQL_USER: payment_user
+      MYSQL_PASSWORD: payment_password
+    ports:
+      - "3307:3306" 
+    volumes:
+      - payment_mysql_data:/var/lib/mysql
+    networks:
+      - payment-net
+
+  # Spring Boot Payment Service
+  payment-service:
+    build: .
+    ports:
+      - "8085:8080"
+    environment:
+      # ✅ SOLUCIÓN APLICADA: Variable de entorno para notificaciones agregada correctamente
+      - NOTIFICATION_BASE_URL=http://notification-service:8081
+      
+      # Configuración de la DB con allowPublicKeyRetrieval=true para evitar errores de conexión
+      - SPRING_DATASOURCE_URL=jdbc:mysql://payment-mysql:3306/payment_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=payment_user
+      - SPRING_DATASOURCE_PASSWORD=payment_password
+      - JWT_SECRET=mi-clave-secreta-jwt-muy-segura-para-ecommerce
+    depends_on:
+      - payment-mysql
+    networks:
+      - payment-net
+
+volumes:
+  payment_mysql_data:
+
+networks:
+  payment-net:
+    driver: bridge

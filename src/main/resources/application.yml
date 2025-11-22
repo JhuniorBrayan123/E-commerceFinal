@@ -1,0 +1,83 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: payment-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/ecommerce_db?useSSL=false&serverTimezone=UTC
+    username: ecommerce_user
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+    show-sql: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret-key: mi-clave-secreta-jwt-muy-segura-para-ecommerce
+
+jwt:
+  secret: mi-clave-secreta-jwt-muy-segura-para-ecommerce
+  expiration: 3600000
+
+payment:
+  gateways:
+    yape:
+      api-key: ${YAPE_API_KEY}
+      secret-key: ${YAPE_SECRET_KEY}
+      merchant-id: ${YAPE_MERCHANT_ID}
+      base-url: https://api.yape.com/v1
+      simulated-delay-ms: 200
+      failure-threshold: 3000
+
+    stripe:
+      secret-key: ${STRIPE_SECRET_KEY:sk_test_...}
+      webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_...}
+      timeout: 30000
+      base-url: https://api.stripe.com/v1
+      simulated-delay-ms: 150
+
+    paypal:
+      client-id: ${PAYPAL_CLIENT_ID:...}
+      client-secret: ${PAYPAL_CLIENT_SECRET:...}
+      mode: sandbox
+      min-delay-ms: 100
+      max-delay-ms: 400
+
+  webhook:
+    timeout: 5000
+    retry-attempts: 3
+
+integration:
+  django:
+    jwt-secret: "mi-clave-secreta-jwt-muy-segura-para-ecommerce"
+    base-url: http://localhost:8000
+    timeout: 10000
+  react:
+    frontend-url: http://localhost:3000
+
+django:
+  service:
+    url: http://localhost:8000
+    endpoints:
+      producto: /api/productos/{id}/
+      sincronizar: /api/orders/sincronizar/
+
+logging:
+  level:
+    com.example.payment_service: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+
+notification:
+  base-url: ${NOTIFICATION_BASE_URL:http://localhost:8000}
+  retry-attempts: 3
+  retry-backoff-ms: 500
+

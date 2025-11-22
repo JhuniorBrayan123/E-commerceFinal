@@ -79,4 +79,32 @@ def crear_orden(request):
     # Retornar la orden creada
     orden_serializer = OrdenSerializer(orden)
     return Response(orden_serializer.data, status=status.HTTP_201_CREATED)
+@api_view(['POST'])
+def sincronizar_orden_pago(request):
+    """
+    Recibe la confirmación de un pago desde Spring Boot
+    (por ahora solo devuelve un mensaje para que Django no falle)
+    """
+    return Response({"message": "Sincronización de pago recibida"})
+@api_view(['GET'])
+def obtener_info_producto(request, producto_id):
+    """
+    Devuelve información básica de un producto para que Spring Boot pueda consultarla
+    """
+    try:
+        producto = Producto.objects.get(id=producto_id)
+    except Producto.DoesNotExist:
+        return Response(
+            {'error': 'Producto no encontrado'},
+            status=status.HTTP_404_NOT_FOUND
+        )
 
+    data = {
+        "id": producto.id,
+        "nombre": producto.nombre,
+        "precio": producto.precio,
+        "stock": producto.stock,
+        "categoria": producto.categoria.nombre if producto.categoria else None
+    }
+
+    return Response(data, status=status.HTTP_200_OK)

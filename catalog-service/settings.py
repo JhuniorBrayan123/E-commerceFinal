@@ -81,6 +81,7 @@ DATABASES = {
         },
     }
 }
+JWT_SECRET_KEY = 'mi-clave-secreta-jwt-muy-segura-para-ecommerce'
 
 AUTH_PASSWORD_VALIDATORS = [
     {

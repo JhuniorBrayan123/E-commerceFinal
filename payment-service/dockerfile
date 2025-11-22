@@ -1,0 +1,31 @@
+# Primera Etapa: Construcción (Build Stage)
+# Utilizamos una imagen que contiene Java 17 y Maven para compilar el código.
+FROM maven:3.9.6-eclipse-temurin-17 AS build
+WORKDIR /app
+
+# Copia los archivos de configuración de Maven y el código fuente
+COPY pom.xml .
+COPY src ./src
+
+# Compila la aplicación y empaqueta el JAR. 
+# Si tu configuración de base de datos estaba en src/main/resources, 
+# esta etapa asegura que el JAR contenga la versión corregida de la URL.
+RUN mvn -DskipTests package
+
+# Segunda Etapa: Ejecución (Runtime Stage)
+# Utilizamos una imagen mucho más ligera (solo JRE) para la ejecución.
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+
+# Copia el JAR compilado desde la etapa de construcción a la imagen final.
+COPY --from=build /app/target/*.jar paymentservice.jar
+
+# Expone el puerto por defecto de Spring Boot (8080)
+EXPOSE 8080
+
+# Establece el perfil activo de Spring Boot (importante para que se cargue 
+# tu archivo application-docker.yml o .properties)
+ENV SPRING_PROFILES_ACTIVE=docker
+
+# Comando para iniciar la aplicación
+CMD ["java", "-jar", "paymentservice.jar"]
