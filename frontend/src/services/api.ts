@@ -1,17 +1,16 @@
 import axios from "axios";
+import { SERVICES } from "../config/services";
 
-const API_BASE_URL =
-  process.env.REACT_APP_API_URL || "http://localhost:8000/api";
-
+// Cliente Axios para CatalogService (Django)
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: SERVICES.CATALOG,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 // ------------------------------------------------------------
-// DJANGO SERVICES (TU CÓDIGO ORIGINAL - NO SE TOCA)
+// DJANGO SERVICES (TU CÓDIGO ORIGINAL)
 // ------------------------------------------------------------
 
 // Categorías
@@ -30,26 +29,14 @@ export const productosService = {
   getById: (id: number) => api.get(`/productos/${id}/`),
   create: (data: any) => {
     const formData = new FormData();
-    Object.keys(data).forEach((key) => {
-      if (key === "imagen" && data[key]) {
-        formData.append(key, data[key]);
-      } else {
-        formData.append(key, data[key]);
-      }
-    });
+    Object.keys(data).forEach((key) => formData.append(key, data[key]));
     return api.post("/productos/", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
   update: (id: number, data: any) => {
     const formData = new FormData();
-    Object.keys(data).forEach((key) => {
-      if (key === "imagen" && data[key]) {
-        formData.append(key, data[key]);
-      } else {
-        formData.append(key, data[key]);
-      }
-    });
+    Object.keys(data).forEach((key) => formData.append(key, data[key]));
     return api.put(`/productos/${id}/`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
@@ -75,40 +62,30 @@ export const inventarioService = {
     api.get(`/inventario/stock_actual/?producto_id=${productoId}`),
 };
 
-// Carrito localStorage (tu código original)
+// Carrito local
 export const carritoService = {
-  get: (): any[] => {
-    const carrito = localStorage.getItem("carrito");
-    return carrito ? JSON.parse(carrito) : [];
-  },
+  get: (): any[] => JSON.parse(localStorage.getItem("carrito") || "[]"),
   add: (producto: any, cantidad: number = 1) => {
     const carrito = carritoService.get();
-    const existente = carrito.find((item: any) => item.id === producto.id);
+    const existente = carrito.find((item) => item.id === producto.id);
 
-    if (existente) {
-      existente.cantidad += cantidad;
-    } else {
-      carrito.push({ ...producto, cantidad });
-    }
+    if (existente) existente.cantidad += cantidad;
+    else carrito.push({ ...producto, cantidad });
 
     localStorage.setItem("carrito", JSON.stringify(carrito));
     return carrito;
   },
   remove: (productoId: number) => {
-    const carrito = carritoService
-      .get()
-      .filter((item: any) => item.id !== productoId);
+    const carrito = carritoService.get().filter((i) => i.id !== productoId);
     localStorage.setItem("carrito", JSON.stringify(carrito));
     return carrito;
   },
   update: (productoId: number, cantidad: number) => {
     const carrito = carritoService.get();
-    const item = carrito.find((item: any) => item.id === productoId);
+    const item = carrito.find((i) => i.id === productoId);
 
     if (item) {
-      if (cantidad <= 0) {
-        return carritoService.remove(productoId);
-      }
+      if (cantidad <= 0) return carritoService.remove(productoId);
       item.cantidad = cantidad;
     }
 
@@ -121,80 +98,77 @@ export const carritoService = {
   },
   getTotal: () => {
     const carrito = carritoService.get();
-    return carrito.reduce((total: number, item: any) => {
-      return total + parseFloat(item.precio) * item.cantidad;
-    }, 0);
+    return carrito.reduce(
+      (total, item) => total + parseFloat(item.precio) * item.cantidad,
+      0
+    );
   },
 };
 
 export default api;
 
 // ------------------------------------------------------------
-// SPRING BOOT SERVICES (NUEVO - SE AGREGA SIN MODIFICAR NADA)
+// SPRING BOOT SERVICES (Pago & Carrito Remoto)
 // ------------------------------------------------------------
 
-// Base URL para microservicio de pagos
-const PAYMENT_API_BASE_URL = "http://localhost:8080/api";
+const PAYMENT_API = SERVICES.PAYMENT;
 
-// Carrito manejado por Spring Boot
 export const cartService = {
   addToCart: async (productId: number, quantity: number) => {
-    const response = await fetch(`${PAYMENT_API_BASE_URL}/cart/add`, {
+    const res = await fetch(`${PAYMENT_API}/cart/add`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ productId, quantity }),
     });
-    return response.json();
+    return res.json();
   },
 
   getCart: async () => {
-    const response = await fetch(`${PAYMENT_API_BASE_URL}/cart`);
-    return response.json();
+    const res = await fetch(`${PAYMENT_API}/cart`);
+    return res.json();
   },
 
   updateCartItem: async (itemId: string, quantity: number) => {
-    const response = await fetch(`${PAYMENT_API_BASE_URL}/cart/update`, {
+    const res = await fetch(`${PAYMENT_API}/cart/update`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ itemId, quantity }),
     });
-    return response.json();
+    return res.json();
   },
 
   removeFromCart: async (itemId: string) => {
-    const response = await fetch(`${PAYMENT_API_BASE_URL}/cart/remove`, {
+    const res = await fetch(`${PAYMENT_API}/cart/remove`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ itemId }),
     });
-    return response.json();
+    return res.json();
   },
 
   checkout: async (cartData: any) => {
-    const response = await fetch(`${PAYMENT_API_BASE_URL}/checkout`, {
+    const res = await fetch(`${PAYMENT_API}/checkout`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(cartData),
     });
-    return response.json();
+    return res.json();
   },
 };
 
-// Servicios de Pagos desde Spring Boot
+// Payment
 export const paymentService = {
   processPayment: async (paymentData: any) => {
-    const response = await fetch(`${PAYMENT_API_BASE_URL}/payment/process`, {
+    const res = await fetch(`${PAYMENT_API}/payment/process`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(paymentData),
     });
-    return response.json();
+    return res.json();
   },
 
   getPaymentStatus: async (paymentId: string) => {
-    const response = await fetch(
-      `${PAYMENT_API_BASE_URL}/payment/status/${paymentId}`
-    );
-    return response.json();
+    const res = await fetch(`${PAYMENT_API}/payment/status/${paymentId}`);
+    return res.json();
   },
 };
