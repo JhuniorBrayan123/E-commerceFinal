@@ -149,8 +149,7 @@ const Inventario: React.FC = () => {
             </div>
             <button
               type="submit"
-              className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition"
-            >
+              className="bg-primary-700 text-black px-6 py-2 rounded-lg hover:bg-primary-700 transition">
               Registrar Movimiento
             </button>
           </form>

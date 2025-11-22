@@ -35,13 +35,13 @@ const Home: React.FC = () => {
 
   return (
     <div>
-      <section className="bg-gradient-to-r from-primary-600 to-secondary-600 text-white py-20 mb-12 rounded-lg">
+      <section className="bg-gradient-to-r from-primary-900 to-secondary-800 text-white py-20 mb-12 rounded-lg">
         <div className="text-center">
-          <h1 className="text-5xl font-bold mb-4">Bienvenido a E-Commerce</h1>
-          <p className="text-xl mb-8">Encuentra los mejores productos al mejor precio</p>
+          <h1 className="text-5xl font-bold mb-4">Bienvenido a AGROCODE</h1>
+          <p className="text-xl mb-8">Encuentra los mejores sensores al mejor precio</p>
           <Link
             to="/productos"
-            className="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition inline-block"
+            className="bg-white text-primary-800  px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition inline-block"
           >
             Ver Productos
           </Link>
