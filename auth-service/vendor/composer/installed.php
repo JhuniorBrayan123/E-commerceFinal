@@ -3,7 +3,7 @@
         'name' => 'ecommerce/auth-service',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'e35ab3a71d81560fec2067ed64c2d9406abf8049',
+        'reference' => '4ecd410f4e0cd70d21243ddb371b614f463d5144',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'ecommerce/auth-service' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'e35ab3a71d81560fec2067ed64c2d9406abf8049',
+            'reference' => '4ecd410f4e0cd70d21243ddb371b614f463d5144',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

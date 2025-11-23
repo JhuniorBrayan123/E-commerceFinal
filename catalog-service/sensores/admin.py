@@ -3,14 +3,14 @@ from .models import Sensor
 
 @admin.register(Sensor)
 class SensorAdmin(admin.ModelAdmin):
-    list_display = ['nombre', 'tipo', 'marca', 'precio', 'stock', 'disponible']
-    list_filter = ['tipo', 'marca', 'disponible']
+    list_display = ['nombre', 'categoria', 'marca', 'precio', 'stock', 'disponible']
+    list_filter = ['categoria', 'marca', 'disponible']
     search_fields = ['nombre', 'marca', 'modelo']
     readonly_fields = ['fecha_creacion', 'fecha_actualizacion']
     
     fieldsets = (
         ('Información Básica', {
-            'fields': ('nombre', 'tipo', 'marca', 'modelo', 'precio', 'descripcion', 'imagen')
+            'fields': ('nombre', 'categoria', 'marca', 'modelo', 'precio', 'descripcion', 'imagen')
         }),
         ('Especificaciones Técnicas', {
             'fields': ('rango_medicion', 'precision', 'alimentacion', 'protocolo_comunicacion')

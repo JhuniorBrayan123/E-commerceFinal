@@ -27,7 +27,7 @@ const ProductoDetalle: React.FC = () => {
 
   const handleAgregarCarrito = () => {
     if (producto && cantidad > 0 && cantidad <= producto.stock) {
-      carritoService.add(producto, cantidad);
+      carritoService.add(producto, cantidad, producto.stock);
       alert('Producto agregado al carrito');
       navigate('/carrito');
     } else {
@@ -144,7 +144,35 @@ const ProductoDetalle: React.FC = () => {
           </div>
         </div>
       </div>
+      <div className="mb-8 bg-gray-50 p-6 rounded-xl shadow-sm border border-gray-200">
+        <h2 className="text-2xl font-bold mb-4 text-gray-800">Especificaciones tecnicas</h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="p-4 bg-white rounded-lg shadow border">
+            <p className="font-semibold text-gray-700">Rango de medicion</p>
+            <p className="text-gray-600">{producto.rango_medicion}</p>
+          </div>
+
+          <div className="p-4 bg-white rounded-lg shadow border">
+            <p className="font-semibold text-gray-700">Precision</p>
+            <p className="text-gray-600">{producto.precision}</p>
+          </div>
+
+          <div className="p-4 bg-white rounded-lg shadow border">
+            <p className="font-semibold text-gray-700">Alimentacion</p>
+            <p className="text-gray-600">{producto.alimentacion}</p>
+          </div>
+
+          <div className="p-4 bg-white rounded-lg shadow border">
+            <p className="font-semibold text-gray-700">Protocolo de comunicacion</p>
+            <p className="text-gray-600">{producto.protocolo_comunicacion}</p>
+          </div>
+        </div>
+      </div>
     </div>
+
+    
+    
   );
 };
 

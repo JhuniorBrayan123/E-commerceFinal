@@ -95,6 +95,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 50px;
+  max-height: 240px; 
 }
 
 .sensor-card:hover {
@@ -128,43 +130,34 @@
   white-space: nowrap;
 }
 
-.tipo-badge.humedad {
-  background: #b3e5fc;
-  color: #01579b;
-}
 
-.tipo-badge.temperatura {
-  background: #ffccbc;
-  color: #bf360c;
-}
-
-.tipo-badge.ph {
-  background: #f8bbd0;
-  color: #880e4f;
-}
-
-.tipo-badge.luz {
-  background: #fff9c4;
-  color: #f57f17;
-}
-
-.tipo-badge.nutrientes {
-  background: #c8e6c9;
-  color: #1b5e20;
-}
-
-.tipo-badge.co2 {
-  background: #d1c4e9;
-  color: #311b92;
-}
+.tipo-badge.cat-1 { background: #b3e5fc; color: #01579b; }
+.tipo-badge.cat-2 { background: #ffccbc; color: #bf360c; }
+.tipo-badge.cat-3 { background: #c8e6c9; color: #1b5e20; }
+.tipo-badge.cat-4 { background: #fff9c4; color: #f57f17; }
+.tipo-badge.cat-5 { background: #d1c4e9; color: #4a148c; }
+.tipo-badge.cat-6 { background: #ffcdd2; color: #b71c1c; }
+.tipo-badge.cat-7 { background: #dcedc8; color: #33691e; }
+.tipo-badge.cat-8 { background: #b2dfdb; color: #004d40; }
+.tipo-badge.cat-9 { background: #ffe0b2; color: #e65100; }
+.tipo-badge.cat-10 { background: #f8bbd0; color: #880e4f; }
+.tipo-badge.cat-11 { background: #bbdefb; color: #0d47a1; }
+.tipo-badge.cat-12 { background: #e1bee7; color: #6a1b9a; }
+.tipo-badge.cat-13 { background: #f0f4c3; color: #827717; }
+.tipo-badge.cat-14 { background: #c5cae9; color: #1a237e; }
+.tipo-badge.cat-15 { background: #ffecb3; color: #ff6f00; }
+.tipo-badge.cat-16 { background: #b2ebf2; color: #006064; }
+.tipo-badge.cat-17 { background: #d7ccc8; color: #3e2723; }
+.tipo-badge.cat-18 { background: #f5f5f5; color: #424242; }
+.tipo-badge.cat-19 { background: #eeeeee; color: #212121; }
+.tipo-badge.cat-20 { background: #f1f8e9; color: #2e7d32; }
 
 .sensor-details {
-  margin-bottom: 15px;
-  flex-grow: 1;
+  margin-bottom: 10px;
 }
 
 .sensor-details p {
-  margin: 8px 0;
+  margin: 1px 0;
   color: #555;
   font-size: 0.9em;
 }
@@ -209,9 +202,9 @@
 }
 
 .sensor-price {
-  font-size: 1.3em;
-  font-weight: bold;
-  color: #2c5530;
+  font-size: 1.5em;
+
+  color: #000000;
   margin: 0;
 }
 

@@ -19,6 +19,8 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
+    'marketing',
+    'comentarios',
     'preferencias',
     'rest_framework',
     'corsheaders',

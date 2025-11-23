@@ -5,6 +5,7 @@ from django.utils.decorators import method_decorator
 from rest_framework import status
 from django.db.models import Q, Avg, Min, Max, Count
 from django.db import models
+from categorias.models import Categoria
 
 from .models import Sensor
 from .serializers import SensorSerializer
@@ -34,7 +35,7 @@ class SensoresView(APIView):
     
     def get(self, request):
         # Obtener parámetros de filtro, búsqueda y ordenamiento
-        tipo_filter = request.GET.get('tipo', None)
+        tipo_filter = request.GET.get('categoria', None)
         marca_filter = request.GET.get('marca', None)
         disponible_filter = request.GET.get('disponible', None)
         search_query = request.GET.get('search', None)
@@ -45,7 +46,7 @@ class SensoresView(APIView):
         
         # Aplicar filtros
         if tipo_filter:
-            sensores = sensores.filter(tipo=tipo_filter)
+            sensores = sensores.filter(categoria=tipo_filter)
         if marca_filter:
             sensores = sensores.filter(marca__icontains=marca_filter)
         if disponible_filter is not None:
@@ -61,7 +62,7 @@ class SensoresView(APIView):
             )
         
         # Aplicar ordenamiento
-        valid_ordering_fields = ['id', 'nombre', 'precio', 'marca', 'tipo', 'stock', 'fecha_creacion']
+        valid_ordering_fields = ['id', 'nombre', 'precio', 'marca', 'categoria', 'stock', 'fecha_creacion']
         if ordering.lstrip('-') in valid_ordering_fields:
             sensores = sensores.order_by(ordering)
         else:
@@ -74,7 +75,7 @@ class SensoresView(APIView):
         response_data = {
             'count': sensores.count(),
             'filters_applied': {
-                'tipo': tipo_filter,
+                'categoria': tipo_filter,
                 'marca': marca_filter,
                 'disponible': disponible_filter,
                 'search': search_query,
@@ -193,7 +194,7 @@ class SensorStatsView(APIView):
             'precio_maximo': Sensor.objects.aggregate(Max('precio'))['precio__max'],
             'stock_total': Sensor.objects.aggregate(models.Sum('stock'))['stock__sum'] or 0,
             'por_tipo': dict(
-                Sensor.objects.values('tipo').annotate(count=Count('id')).values_list('tipo', 'count')
+                Sensor.objects.values('categoria').annotate(count=Count('id')).values_list('categoria', 'count')
             ),
             'por_marca': dict(
                 Sensor.objects.values('marca').annotate(count=Count('id')).values_list('marca', 'count')
@@ -206,11 +207,14 @@ class SensorFilterView(APIView):
     """Vista para obtener opciones disponibles de filtrado"""
     
     def get(self, request):
-        tipos = [{'value': t[0], 'label': t[1]} for t in Sensor.TIPO_SENSOR]
+        categorias = [
+            {'value': c.id, 'label': c.nombre}
+            for c in Categoria.objects.all()
+        ]
         marcas = list(Sensor.objects.values_list('marca', flat=True).distinct())
         
         filters = {
-            'tipos': tipos,
+            'categorias': categorias,
             'marcas': sorted(marcas),
         }
         return Response(filters)

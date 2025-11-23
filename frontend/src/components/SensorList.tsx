@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import "./SensorList.css";
 import { carritoService } from "../services/api";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 interface Sensor {
   id: number;
   nombre: string;
-  tipo: string;
-  tipo_display: string;
+  categoria_nombre: string;
+  categoria: number;
   marca: string;
+  imagen: string | null;
   modelo: string;
   precio: string;
   descripcion: string;
@@ -26,27 +27,24 @@ const SensorList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<{
-    tipo: string;
+    categoria_nombre: string;
     marca: string;
     disponible: string;
     search: string;
   }>({
-    tipo: "",
+    categoria_nombre: "",
     marca: "",
     disponible: "",
     search: "",
   });
   const [filterOptions, setFilterOptions] = useState<{
-    tipos: { value: string; label: string }[];
+    categorias: { value: string; label: string }[];
     marcas: string[];
   }>({
-    tipos: [],
+    categorias: [],
     marcas: [],
   });
 
-  const handleActualizarCantidad = (sensor: Sensor) => {
-    carritoService.add(sensor, 1);
-  };
 
   // Cargar opciones de filtros
   useEffect(() => {
@@ -71,7 +69,7 @@ const SensorList: React.FC = () => {
     const fetchSensores = async () => {
       try {
         const params = new URLSearchParams();
-        if (filters.tipo) params.append("tipo", filters.tipo);
+        if (filters.categoria_nombre) params.append("categoria", filters.categoria_nombre);
         if (filters.marca) params.append("marca", filters.marca);
         if (filters.disponible) params.append("disponible", filters.disponible);
         if (filters.search) params.append("search", filters.search);
@@ -103,7 +101,7 @@ const SensorList: React.FC = () => {
 
   const handleClearFilters = () => {
     setFilters({
-      tipo: "",
+      categoria_nombre: "",
       marca: "",
       disponible: "",
       search: "",
@@ -132,17 +130,17 @@ const SensorList: React.FC = () => {
           </div>
 
           <div className="filter-group">
-            <label htmlFor="tipo">Tipo de Sensor:</label>
+            <label htmlFor="categoria_nombre">Tipo de Sensor:</label>
             <select
-              id="tipo"
-              value={filters.tipo}
-              onChange={(e) => handleFilterChange("tipo", e.target.value)}
+              id="categoria_nombre"
+              value={filters.categoria_nombre}
+              onChange={(e) => handleFilterChange("categoria_nombre", e.target.value)}
               className="filter-select"
             >
               <option value="">Todos</option>
-              {filterOptions.tipos.map((tipo) => (
-                <option key={tipo.value} value={tipo.value}>
-                  {tipo.label}
+              {filterOptions.categorias.map((categoria_nombre) => (
+                <option key={categoria_nombre.value} value={categoria_nombre.value}>
+                  {categoria_nombre.label}
                 </option>
               ))}
             </select>
@@ -188,65 +186,53 @@ const SensorList: React.FC = () => {
       {/* Grid de sensores */}
       <div className="sensors-grid">
         {sensores.map((sensor) => (
-          <div key={sensor.id} className="sensor-card">
-            <div className="sensor-header">
-              <h3>{sensor.nombre}</h3>
-              <span className={`tipo-badge ${sensor.tipo}`}>
-                {sensor.tipo_display}
-              </span>
-            </div>
+          <Link
+            key={sensor.id}
+            to={`/sensores/${sensor.id}`}
+            className="bg-white rounded-lg shadow-md hover:shadow-lg transition"
+          >
+            {sensor.imagen ? (
+                <img
+                  src={sensor.imagen}
+                  alt={sensor.nombre}
+                  className="w-full h-48 object-cove"
+                />
+              ) : (
+                <div className="w-full h-48 bg-gray-200 flex items-center justify-center ">
+                  <span className="text-gray-400">Sin imagen</span>
+                </div>
+            )}
+            <div className="sensor-card">
+              <div className="sensor-header">
+                <h3>{sensor.nombre}</h3>
+                <span className={`tipo-badge cat-${sensor.categoria}`}>
+                  {sensor.categoria_nombre}
+                </span>
+              </div>
 
-            <div className="sensor-details">
-              <p>
-                <strong>Marca:</strong> {sensor.marca}
-              </p>
-              <p>
-                <strong>Modelo:</strong> {sensor.modelo}
-              </p>
-              <p className="sensor-description">
-                <strong>Descripción:</strong> {sensor.descripcion}
-              </p>
-            </div>
+              <div className="sensor-details">
+                <p>
+                  <strong>Marca:</strong> {sensor.marca}
+                </p>
+                <p>
+                  <strong>Modelo:</strong> {sensor.modelo}
+                </p>
+                <p className="sensor-description line-clamp-2">
+                  <strong>Descripción:</strong> {sensor.descripcion}
+                </p>
+              </div>
 
-            <div className="sensor-specs">
-              <div className="spec">
-                <small>
-                  <strong>Rango:</strong> {sensor.rango_medicion}
-                </small>
+              <div className="sensor-footer">
+                <div className="price-stock">
+                  <p className="sensor-price">S/. {sensor.precio}</p>
+                  <p className="sensor-stock">Stock: {sensor.stock}</p>
+                </div>
               </div>
-              <div className="spec">
-                <small>
-                  <strong>Precisión:</strong> {sensor.precision}
-                </small>
-              </div>
-              <div className="spec">
-                <small>
-                  <strong>Alimentación:</strong> {sensor.alimentacion}
-                </small>
-              </div>
-              <div className="spec">
-                <small>
-                  <strong>Comunicación:</strong> {sensor.protocolo_comunicacion}
-                </small>
-              </div>
-            </div>
 
-            <div className="sensor-footer">
-              <div className="price-stock">
-                <p className="sensor-price">${sensor.precio}</p>
-                <p className="sensor-stock">Stock: {sensor.stock}</p>
-              </div>
-              <button
-                className="add-to-cart-btn"
-                disabled={!sensor.disponible || sensor.stock === 0}
-                onClick={() => handleActualizarCantidad(sensor)}
-              >
-                {sensor.disponible && sensor.stock > 0
-                  ? "Agregar al carrito"
-                  : "No disponible"}
-              </button>
             </div>
-          </div>
+              
+          </Link>
+          
         ))}
       </div>
 

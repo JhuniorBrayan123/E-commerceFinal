@@ -7,11 +7,13 @@ const Carrito: React.FC = () => {
   const [carrito, setCarrito] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
 
+
   useEffect(() => {
     const actualizarCarrito = () => {
       const items = carritoService.get();
       setCarrito(items);
       setTotal(carritoService.getTotal());
+      
     };
     actualizarCarrito();
   }, []);
@@ -22,8 +24,11 @@ const Carrito: React.FC = () => {
     setTotal(carritoService.getTotal());
   };
 
-  const handleActualizarCantidad = (productoId: number, cantidad: number) => {
-    carritoService.update(productoId, cantidad);
+  const handleActualizarCantidad = (productoId: number, cantidad: number, oper: string, stock: number) => {
+    if (oper === '+') {
+      cantidad = Math.min(stock, cantidad);
+    }
+    carritoService.update(productoId, cantidad, stock);
     actualizarCarrito();
   };
 
@@ -95,14 +100,14 @@ const Carrito: React.FC = () => {
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
                     <button
-                      onClick={() => handleActualizarCantidad(item.id, item.cantidad - 1)}
+                      onClick={() => handleActualizarCantidad(item.id, item.cantidad - 1, '-', item.stock)}
                       className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
                     >
                       -
                     </button>
                     <span className="w-12 text-center">{item.cantidad}</span>
                     <button
-                      onClick={() => handleActualizarCantidad(item.id, item.cantidad + 1)}
+                      onClick={() => handleActualizarCantidad(item.id, item.cantidad + 1, '+', item.stock)}
                       className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
                     >
                       +

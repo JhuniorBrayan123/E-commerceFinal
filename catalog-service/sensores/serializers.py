@@ -2,30 +2,11 @@ from rest_framework import serializers
 from .models import Sensor
 
 class SensorSerializer(serializers.ModelSerializer):
-    # Campo para obtener el nombre legible del tipo
-    tipo_display = serializers.CharField(source='get_tipo_display', read_only=True)
+    categoria_nombre = serializers.CharField(source='categoria.nombre', read_only=True)
     
     class Meta:
         model = Sensor
-        fields = [
-            'id',
-            'nombre',
-            'tipo',
-            'tipo_display',
-            'marca',
-            'modelo',
-            'precio',
-            'descripcion',
-            'rango_medicion',
-            'precision',
-            'alimentacion',
-            'protocolo_comunicacion',
-            'imagen',
-            'stock',
-            'disponible',
-            'fecha_creacion',
-            'fecha_actualizacion'
-        ]
+        fields = '__all__'
     
     def validate_precio(self, value):
         """Validar que el precio sea positivo"""
