@@ -21,9 +21,9 @@ public class NotificationService {
     private final Retry retrySpec;
 
     public NotificationService(WebClient.Builder webClientBuilder,
-                               @Value("${notification.base-url}") String baseUrl,
-                               @Value("${notification.retry-attempts:3}") int retryAttempts,
-                               @Value("${notification.retry-backoff-ms:500}") long backoffMillis) {
+            @Value("${notification.base-url}") String baseUrl,
+            @Value("${notification.retry-attempts:3}") int retryAttempts,
+            @Value("${notification.retry-backoff-ms:500}") long backoffMillis) {
         this.webClient = webClientBuilder.baseUrl(baseUrl).build();
         this.retrySpec = Retry.backoff(retryAttempts, Duration.ofMillis(backoffMillis));
     }
@@ -43,8 +43,11 @@ public class NotificationService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .retryWhen(retrySpec)
-                .doOnSuccess(body -> log.info("Notificacion enviada {}", uri))
-                .doOnError(error -> log.error("Error notificando {}", uri, error));
+                .doOnSuccess(body -> log.info("Notificación enviada {}", uri))
+                .onErrorResume(error -> {
+                    log.error("Error notificando {}. Se ignora para no detener el flujo.", uri, error);
+                    return Mono.just("notification_failed");
+                });
     }
 
     private Map<String, Object> buildNotificationPayload(Payment payment) {

@@ -1,5 +1,9 @@
 package com.example.payment_service.model;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -7,20 +11,36 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDateTime;
+import java.util.List;
+import com.example.payment_service.model.OrderItem;
+import jakarta.persistence.CascadeType;
+
 
 @Entity
 @Table(name = "payments",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_payment_order_method", columnNames = {"order_id", "payment_method"})
+            @UniqueConstraint(name = "uk_payment_order_method", columnNames = {"order_id", "payment_method"})
         })
 public class Payment {
+
+    @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> items;
+
+    public List<OrderItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<OrderItem> items) {
+        this.items = items;
+        if (items != null) {
+            items.forEach(i -> i.setPayment(this)); // Enlazar ambos lados
+        }
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

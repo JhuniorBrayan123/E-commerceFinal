@@ -266,3 +266,106 @@ class SensorFilterView(APIView):
             'stock_max': int(stock_max) if stock_max else 0,
         }
         return Response(filters)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class DeductStockView(APIView):
+    """
+    Vista para descontar stock de sensores después de un pago exitoso
+    POST: Recibe una lista de items con sensor_id y cantidad para descontar
+    """
+    
+    def post(self, request):
+        
+
+        try:
+            print("\n===== DEDUCT STOCK DEBUG =====")
+            print("RAW BODY:", request.body.decode('utf-8'))
+            print("CONTENT TYPE:", request.content_type)
+            print("PARSED DATA:", request.data)
+            print("================================\n")
+            items = request.data
+
+            if not isinstance(items, list):
+                return Response(
+                    {'error': 'Se requiere una lista JSON de items'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            
+            results = []
+            errors = []
+            
+            for item in items:
+                sensor_id = item.get('sensor_id')
+                cantidad = item.get('cantidad')
+                
+                if not sensor_id or not cantidad:
+                    errors.append({
+                        'item': item,
+                        'error': 'sensor_id y cantidad son requeridos'
+                    })
+                    continue
+                
+                try:
+                    sensor = Sensor.objects.get(pk=sensor_id)
+                    
+                    # Verificar que hay suficiente stock
+                    if sensor.stock < cantidad:
+                        errors.append({
+                            'sensor_id': sensor_id,
+                            'error': f'Stock insuficiente. Disponible: {sensor.stock}, Solicitado: {cantidad}'
+                        })
+                        continue
+                    
+                    # Descontar el stock
+                    sensor.stock -= cantidad
+                    
+                    # Si el stock llega a 0, marcar como no disponible
+                    if sensor.stock == 0:
+                        sensor.disponible = False
+                    
+                    sensor.save()
+                    
+                    results.append({
+                        'sensor_id': sensor_id,
+                        'nombre': sensor.nombre,
+                        'cantidad_descontada': cantidad,
+                        'stock_restante': sensor.stock
+                    })
+                    
+                except Sensor.DoesNotExist:
+                    errors.append({
+                        'sensor_id': sensor_id,
+                        'error': f'Sensor con ID {sensor_id} no encontrado'
+                    })
+                except Exception as e:
+                    errors.append({
+                        'sensor_id': sensor_id,
+                        'error': f'Error al descontar stock: {str(e)}'
+                    })
+            
+            response_data = {
+                'success': len(errors) == 0,
+                'message': f'Stock descontado para {len(results)} sensores',
+                'results': results
+            }
+            
+            if errors:
+                response_data['errors'] = errors
+                response_data['message'] += f', {len(errors)} errores'
+            
+            # Si hay errores pero también resultados, retornar 207 (Multi-Status)
+            # Si solo hay errores, retornar 400
+            # Si todo está bien, retornar 200
+            if errors and not results:
+                return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+            elif errors and results:
+                return Response(response_data, status=status.HTTP_207_MULTI_STATUS)
+            else:
+                return Response(response_data, status=status.HTTP_200_OK)
+                
+        except Exception as e:
+            return Response(
+                {'error': f'Error al procesar la solicitud: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

@@ -196,12 +196,16 @@ const getAuthHeaders = () => {
 export const orderService = {
   createOrder: async (orderData: any) => {
     try {
-      console.log('orderService.createOrder - Enviando petición a:', `${PAYMENT_API}/payment/order`);
-      console.log('orderService.createOrder - Headers:', getAuthHeaders());
+      const url = `${PAYMENT_API}/payment/order`;
+      const headers = getAuthHeaders();
       
-      const res = await fetch(`${PAYMENT_API}/payment/order`, {
+      console.log('orderService.createOrder - Enviando petición a:', url);
+      console.log('orderService.createOrder - Headers:', headers);
+      console.log('orderService.createOrder - Body:', JSON.stringify(orderData, null, 2));
+      
+      const res = await fetch(url, {
         method: "POST",
-        headers: getAuthHeaders(),
+        headers: headers,
         body: JSON.stringify(orderData),
       });
       
@@ -213,11 +217,11 @@ export const orderService = {
       
       let data;
       try {
-        data = JSON.parse(text);
+        data = text ? JSON.parse(text) : {};
         console.log('orderService.createOrder - Parsed data:', data);
       } catch (parseError) {
         console.error('orderService.createOrder - Error parsing JSON:', parseError);
-        throw new Error(`Error al parsear la respuesta: ${text.substring(0, 100)}`);
+        throw new Error(`Error al parsear la respuesta del servidor: ${text.substring(0, 200)}`);
       }
       
       if (!res.ok) {
@@ -231,10 +235,17 @@ export const orderService = {
       return data;
     } catch (error: any) {
       console.error('orderService.createOrder - Exception caught:', error);
+      
+      // Manejar errores de red específicos
+      if (error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError')) {
+        throw new Error("No se pudo conectar con el servicio de pagos. Verifica que el servicio esté corriendo en el puerto 8085.");
+      }
+      
       // Si ya es un Error, re-lanzarlo
       if (error instanceof Error) {
         throw error;
       }
+      
       // Si no, crear un nuevo Error
       throw new Error("Error de conexión al crear la orden: " + (error.message || String(error)));
     }
