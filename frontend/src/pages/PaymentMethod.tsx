@@ -82,90 +82,110 @@ const PaymentMethod: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Selección de método de pago */}
         <div className="lg:col-span-2 space-y-4">
-          <h2 className="text-2xl font-semibold mb-4">Métodos de Pago Disponibles</h2>
+          <h2 className="text-2xl font-semibold mb-4">
+            Métodos de Pago Disponibles
+          </h2>
 
           {/* Método: Stripe (Tarjeta) */}
           <div
             className={`border-2 rounded-lg p-6 cursor-pointer transition ${
-              selectedMethod === 'STRIPE'
-                ? 'border-primary-600 bg-primary-50'
-                : 'border-gray-300 hover:border-gray-400'
+              selectedMethod === "STRIPE"
+                ? "border-primary-600 bg-primary-50"
+                : "border-gray-300 hover:border-gray-400"
             }`}
-            onClick={() => handleMethodSelect('STRIPE')}
+            onClick={() => handleMethodSelect("STRIPE")}
           >
             <div className="flex items-center space-x-4">
               <input
                 type="radio"
                 name="paymentMethod"
                 value="STRIPE"
-                checked={selectedMethod === 'STRIPE'}
-                onChange={() => handleMethodSelect('STRIPE')}
+                checked={selectedMethod === "STRIPE"}
+                onChange={() => handleMethodSelect("STRIPE")}
                 className="w-5 h-5 text-primary-600"
               />
               <div>
-                <h3 className="text-xl font-semibold">Tarjeta de Crédito/Débito (Stripe)</h3>
+                <h3 className="text-xl font-semibold">
+                  Tarjeta de Crédito/Débito (Stripe)
+                </h3>
                 <p className="text-gray-600 text-sm mt-1">
                   Pago seguro con tarjeta Visa, Mastercard, American Express
                 </p>
               </div>
             </div>
 
-            {selectedMethod === 'STRIPE' && (
+            {selectedMethod === "STRIPE" && (
               <div className="mt-4 space-y-4 border-t pt-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Número de Tarjeta</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Número de Tarjeta
+                  </label>
                   <input
                     type="text"
                     placeholder="4242 4242 4242 4242"
                     maxLength={19}
-                    value={paymentData.cardNumber || ''}
+                    value={paymentData.cardNumber || ""}
                     onChange={(e) => {
-                      const value = e.target.value.replace(/\s/g, '').replace(/\D/g, '');
-                      const formatted = value.replace(/(.{4})/g, '$1 ').trim();
-                      handlePaymentDataChange('cardNumber', formatted);
+                      const value = e.target.value
+                        .replace(/\s/g, "")
+                        .replace(/\D/g, "");
+                      const formatted = value.replace(/(.{4})/g, "$1 ").trim();
+                      handlePaymentDataChange("cardNumber", formatted);
                     }}
                     className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
                   />
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Mes</label>
+                    <label className="block text-sm font-medium mb-2">
+                      Mes
+                    </label>
                     <input
                       type="text"
                       placeholder="12"
                       maxLength={2}
-                      value={paymentData.expMonth || ''}
+                      value={paymentData.expMonth || ""}
                       onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, '').slice(0, 2);
-                        handlePaymentDataChange('expMonth', value);
+                        const value = e.target.value
+                          .replace(/\D/g, "")
+                          .slice(0, 2);
+                        handlePaymentDataChange("expMonth", value);
                       }}
                       className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Año</label>
+                    <label className="block text-sm font-medium mb-2">
+                      Año
+                    </label>
                     <input
                       type="text"
                       placeholder="2025"
                       maxLength={4}
-                      value={paymentData.expYear || ''}
+                      value={paymentData.expYear || ""}
                       onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, '').slice(0, 4);
-                        handlePaymentDataChange('expYear', value);
+                        const value = e.target.value
+                          .replace(/\D/g, "")
+                          .slice(0, 4);
+                        handlePaymentDataChange("expYear", value);
                       }}
                       className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">CVV</label>
+                    <label className="block text-sm font-medium mb-2">
+                      CVV
+                    </label>
                     <input
                       type="text"
                       placeholder="123"
                       maxLength={4}
-                      value={paymentData.cvv || ''}
+                      value={paymentData.cvv || ""}
                       onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, '').slice(0, 4);
-                        handlePaymentDataChange('cvv', value);
+                        const value = e.target.value
+                          .replace(/\D/g, "")
+                          .slice(0, 4);
+                        handlePaymentDataChange("cvv", value);
                       }}
                       className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
                     />
@@ -181,19 +201,19 @@ const PaymentMethod: React.FC = () => {
           {/* Método: Yape */}
           <div
             className={`border-2 rounded-lg p-6 cursor-pointer transition ${
-              selectedMethod === 'YAPE'
-                ? 'border-primary-600 bg-primary-50'
-                : 'border-gray-300 hover:border-gray-400'
+              selectedMethod === "YAPE"
+                ? "border-primary-600 bg-primary-50"
+                : "border-gray-300 hover:border-gray-400"
             }`}
-            onClick={() => handleMethodSelect('YAPE')}
+            onClick={() => handleMethodSelect("YAPE")}
           >
             <div className="flex items-center space-x-4">
               <input
                 type="radio"
                 name="paymentMethod"
                 value="YAPE"
-                checked={selectedMethod === 'YAPE'}
-                onChange={() => handleMethodSelect('YAPE')}
+                checked={selectedMethod === "YAPE"}
+                onChange={() => handleMethodSelect("YAPE")}
                 className="w-5 h-5 text-primary-600"
               />
               <div>
@@ -208,19 +228,19 @@ const PaymentMethod: React.FC = () => {
           {/* Método: PayPal */}
           <div
             className={`border-2 rounded-lg p-6 cursor-pointer transition ${
-              selectedMethod === 'PAYPAL'
-                ? 'border-primary-600 bg-primary-50'
-                : 'border-gray-300 hover:border-gray-400'
+              selectedMethod === "PAYPAL"
+                ? "border-primary-600 bg-primary-50"
+                : "border-gray-300 hover:border-gray-400"
             }`}
-            onClick={() => handleMethodSelect('PAYPAL')}
+            onClick={() => handleMethodSelect("PAYPAL")}
           >
             <div className="flex items-center space-x-4">
               <input
                 type="radio"
                 name="paymentMethod"
                 value="PAYPAL"
-                checked={selectedMethod === 'PAYPAL'}
-                onChange={() => handleMethodSelect('PAYPAL')}
+                checked={selectedMethod === "PAYPAL"}
+                onChange={() => handleMethodSelect("PAYPAL")}
                 className="w-5 h-5 text-primary-600"
               />
               <div>
@@ -240,7 +260,9 @@ const PaymentMethod: React.FC = () => {
             <div className="space-y-2 mb-4">
               <div className="flex justify-between">
                 <span>Total:</span>
-                <span className="font-bold text-xl">${orderData.total.toFixed(2)}</span>
+                <span className="font-bold text-xl">
+                  ${orderData.total ? orderData.total.toFixed(2) : "0.00"}
+                </span>
               </div>
             </div>
             <button
@@ -248,8 +270,8 @@ const PaymentMethod: React.FC = () => {
                 try {
                   handleContinue();
                 } catch (err) {
-                  console.error('Error en handleContinue:', err);
-                  setError('Error al continuar. Por favor intenta nuevamente.');
+                  console.error("Error en handleContinue:", err);
+                  setError("Error al continuar. Por favor intenta nuevamente.");
                 }
               }}
               disabled={!selectedMethod || loading}
@@ -260,9 +282,9 @@ const PaymentMethod: React.FC = () => {
             <button
               onClick={() => {
                 try {
-                  navigate('/checkout');
+                  navigate("/checkout");
                 } catch (err) {
-                  console.error('Error al navegar:', err);
+                  console.error("Error al navegar:", err);
                 }
               }}
               className="w-full mt-3 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition"

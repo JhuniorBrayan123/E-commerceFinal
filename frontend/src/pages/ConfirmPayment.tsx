@@ -1,15 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { paymentService } from '../services/api';
+import { ConfirmPaymentProps } from "../types/cart";
 
-interface ConfirmPaymentProps {
-  orderId: number;
-  paymentToken: string;
-  total: number;
-  currency: string;
-  paymentMethod: string;
-  paymentData: any;
-}
+
 
 const ConfirmPayment: React.FC = () => {
   const navigate = useNavigate();
@@ -18,11 +12,52 @@ const ConfirmPayment: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
 
-  const paymentInfo = location.state as ConfirmPaymentProps | null;
+  const paymentInfo = location.state as {
+    orderId: number;
+    paymentToken: string;
+    total: number;
+    currency: string;
+    paymentMethod: string;
+    items: any[];
+    paymentData?: {
+      cardNumber?: string;
+      expMonth?: string | number;
+      expYear?: string | number;
+    };
+  };
+
+
+
+  // Función helper para obtener un total válido
+  const getValidTotal = (total: any): number => {
+    if (total === null || total === undefined) {
+      return 0;
+    }
+    const numTotal = typeof total === 'string' ? parseFloat(total) : Number(total);
+    return isNaN(numTotal) ? 0 : numTotal;
+  };
 
   useEffect(() => {
     if (!paymentInfo) {
       navigate('/carrito');
+      return;
+    }
+    // Validar que los campos críticos existan
+    if (!paymentInfo.orderId || !paymentInfo.paymentToken || paymentInfo.total === undefined || paymentInfo.total === null || !paymentInfo.paymentMethod) {
+      console.error('Datos incompletos en paymentInfo:', paymentInfo);
+      // Si falta paymentMethod, redirigir a payment-method en lugar de carrito
+      if (!paymentInfo.paymentMethod && paymentInfo.orderId && paymentInfo.paymentToken) {
+        navigate('/payment-method', {
+          state: {
+            orderId: paymentInfo.orderId,
+            paymentToken: paymentInfo.paymentToken,
+            total: paymentInfo.total,
+            currency: paymentInfo.currency || 'USD',
+          },
+        });
+      } else {
+        navigate('/carrito');
+      }
       return;
     }
   }, [paymentInfo, navigate]);
@@ -31,20 +66,45 @@ const ConfirmPayment: React.FC = () => {
     return null;
   }
 
+  // Obtener total validado
+  const validTotal = getValidTotal(paymentInfo.total);
+
   const handleConfirmPayment = async () => {
     setLoading(true);
     setError(null);
     setConfirming(true);
 
     try {
+      // Validar que paymentMethod esté presente
+      if (!paymentInfo.paymentMethod) {
+        setError('Método de pago no seleccionado. Por favor, selecciona un método de pago.');
+        setLoading(false);
+        setConfirming(false);
+        // Redirigir a payment-method
+        navigate('/payment-method', {
+          state: {
+            orderId: paymentInfo.orderId,
+            paymentToken: paymentInfo.paymentToken,
+            total: validTotal,
+            currency: paymentInfo.currency || 'USD',
+          },
+        });
+        return;
+      }
+
+      // Asegurar que los datos estén en el formato correcto para el backend
+      // Spring Boot puede convertir automáticamente number a BigDecimal y string a enum
       const confirmData = {
         orderId: paymentInfo.orderId,
         paymentToken: paymentInfo.paymentToken,
-        paymentMethod: paymentInfo.paymentMethod,
-        amount: paymentInfo.total.toString(),
-        currency: paymentInfo.currency,
-        paymentData: paymentInfo.paymentData,
+        paymentMethod: paymentInfo.paymentMethod, // Debe ser "STRIPE", "YAPE", o "PAYPAL"
+        amount: validTotal, // Spring convierte automáticamente number a BigDecimal
+        currency: (paymentInfo.currency || "USD").toUpperCase(), // Asegurar mayúsculas para enum
+        paymentData: paymentInfo.paymentData || {},
       };
+      
+      console.log('Enviando confirmData:', JSON.stringify(confirmData, null, 2));
+
 
       const response = await paymentService.confirmPayment(confirmData);
 
@@ -68,11 +128,35 @@ const ConfirmPayment: React.FC = () => {
         });
       }
     } catch (err: any) {
-      // Navegar a la página de resultado con error
+      console.error('Error al confirmar pago:', err);
+      
+      // Extraer mensaje de error más específico
+      let errorMessage = err.message || 'Error al procesar el pago';
+      
+      // Manejar errores específicos
+      if (err.code === 'INSUFFICIENT_STOCK' || errorMessage.includes('Stock insuficiente')) {
+        errorMessage = 'No hay stock suficiente para completar la orden. Por favor, verifica la disponibilidad de los productos.';
+      } else if (err.code === 'INVALID_AMOUNT') {
+        errorMessage = 'El monto no coincide con el total de la orden. Por favor, intenta nuevamente.';
+      } else if (err.code === 'ORDER_ALREADY_PROCESSED') {
+        errorMessage = 'Esta orden ya fue procesada anteriormente.';
+      } else if (err.code === 'PAYMENT_FAILED') {
+        errorMessage = 'El pago no pudo ser procesado. Por favor, verifica tus datos e intenta nuevamente.';
+      }
+      
+      // Mostrar error en la UI
+      setError(errorMessage);
+      setLoading(false);
+      setConfirming(false);
+      
+      // También navegar a la página de resultado con error
       navigate('/payment-result', {
         state: {
           success: false,
-          error: { message: err.message || 'Error al procesar el pago' },
+          error: { 
+            message: errorMessage,
+            code: err.code 
+          },
           orderId: paymentInfo.orderId,
         },
       });
@@ -117,20 +201,20 @@ const ConfirmPayment: React.FC = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Método de Pago:</span>
-                <span className="font-semibold">{getPaymentMethodName(paymentInfo.paymentMethod)}</span>
+                <span className="font-semibold">{getPaymentMethodName(paymentInfo.paymentMethod || '')}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Monto:</span>
-                <span className="font-semibold">${paymentInfo.total.toFixed(2)}</span>
+                <span className="font-semibold">${validTotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Moneda:</span>
-                <span className="font-semibold">{paymentInfo.currency}</span>
+                <span className="font-semibold">{paymentInfo.currency || 'USD'}</span>
               </div>
             </div>
           </div>
 
-          {paymentInfo.paymentMethod === 'STRIPE' && paymentInfo.paymentData.cardNumber && (
+          {paymentInfo.paymentMethod === 'STRIPE' && paymentInfo.paymentData && paymentInfo.paymentData.cardNumber && (
             <div className="bg-white rounded-lg shadow-md p-6">
               <h3 className="text-xl font-semibold mb-4">Información de la Tarjeta</h3>
               <div className="space-y-2">
@@ -140,12 +224,14 @@ const ConfirmPayment: React.FC = () => {
                     **** **** **** {paymentInfo.paymentData.cardNumber.slice(-4)}
                   </span>
                 </p>
-                <p>
-                  <span className="text-gray-600">Vence:</span>{' '}
-                  <span className="font-mono">
-                    {paymentInfo.paymentData.expMonth}/{paymentInfo.paymentData.expYear}
-                  </span>
-                </p>
+                {paymentInfo.paymentData.expMonth && paymentInfo.paymentData.expYear && (
+                  <p>
+                    <span className="text-gray-600">Vence:</span>{' '}
+                    <span className="font-mono">
+                      {paymentInfo.paymentData.expMonth}/{paymentInfo.paymentData.expYear}
+                    </span>
+                  </p>
+                )}
               </div>
             </div>
           )}
@@ -166,7 +252,7 @@ const ConfirmPayment: React.FC = () => {
               <div className="flex justify-between">
                 <span>Total a Pagar:</span>
                 <span className="font-bold text-xl text-primary-600">
-                  ${paymentInfo.total.toFixed(2)}
+                  ${validTotal.toFixed(2)}
                 </span>
               </div>
             </div>

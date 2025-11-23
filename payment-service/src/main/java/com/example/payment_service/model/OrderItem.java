@@ -24,18 +24,8 @@ public class OrderItem {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_id")
-    private Payment payment;
-
-    public Payment getPayment() {
-        return this.payment;
-    }
-
-    public void setPayment(Payment payment) {
-        this.payment = payment;
-    }
-
+    // NOTA: Eliminada la relación con Payment para evitar "Found shared references to a collection"
+    // Los items pertenecen solo al Order. Para obtener los items de un pago, consulta el Order usando orderId
     
 
     @Column(name = "sensor_id", nullable = false)

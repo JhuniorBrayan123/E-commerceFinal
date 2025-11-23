@@ -23,23 +23,17 @@ public class CatalogDeductionListener {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void onPaymentCompleted(PaymentCompletedEvent event) {  // ← Sin fully qualified name
+    public void onPaymentCompleted(PaymentCompletedEvent event) {
         log.info("🔄 Event recibido AFTER_COMMIT: orderId={}, paymentId={}, items={}",
                 event.getOrderId(), event.getPaymentId(), event.getItems());
 
-        try {
-            String response = catalogService.deductStock(event.getItems(), event.getJwtToken())
-                    .doOnSuccess(resp -> log.info("✅ Stock descontado correctamente (payment {}): {}",
-                    event.getPaymentId(), resp))
-                    .doOnError(err -> log.error("❌ Error descontando stock (payment {}): {}",
-                    event.getPaymentId(), err.getMessage()))
-                    .block();
-
-            log.info("🎉 Proceso de stock completado para payment {}", event.getPaymentId());
-
-        } catch (Exception ex) {
-            log.error("💥 Error crítico al descontar stock para payment {}: {}",
-                    event.getPaymentId(), ex.getMessage(), ex);
-        }
+        // NOTA: El stock ya fue descontado ANTES de procesar el pago en OrderService.confirmPayment
+        // Este listener se mantiene por compatibilidad pero NO descuenta stock de nuevo
+        // para evitar doble descuento. Si necesitas descontar stock aquí, asegúrate de
+        // que no se haya descontado previamente.
+        log.info("ℹ️ Stock ya descontado en validación previa al pago. No se descontará de nuevo para evitar duplicación.");
+        
+        // Si en el futuro necesitas procesar algo después del commit, puedes hacerlo aquí
+        // Por ejemplo: notificaciones adicionales, sincronización con otros servicios, etc.
     }
 }

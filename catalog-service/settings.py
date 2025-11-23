@@ -13,9 +13,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-#zvzk4+1y(&ssrx0e@gtk+a#j+rap9!dv_=g3+bj)nbz7svb6_'
 
-DEBUG = True
+# DEBUG para Docker - False en producción
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*']  # Para desarrollo, en producción especifica dominios
 
 # Application definition
 INSTALLED_APPS = [
@@ -68,14 +69,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'wsgi.application'
 
-#  BASE DE DATOS MYSQL
+# BASE DE DATOS MYSQL - CONFIGURACIÓN DOCKER
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('MYSQL_DB', 'ecommerce_db'),
+        'NAME': os.getenv('MYSQL_DATABASE', 'ecommerce_db'),
         'USER': os.getenv('MYSQL_USER', 'root'),
         'PASSWORD': os.getenv('MYSQL_PASSWORD', 'tecsup'),
         'HOST': os.getenv('MYSQL_HOST', 'localhost'),
+
         'PORT': os.getenv('MYSQL_PORT', '3306'),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
@@ -83,6 +85,7 @@ DATABASES = {
         },
     }
 }
+
 JWT_SECRET_KEY = 'mi-clave-secreta-jwt-muy-segura-para-ecommerce'
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -125,14 +128,13 @@ REST_FRAMEWORK = {
     ],
 }
 
-# CONFIGURACIÓN DE CORS
+# CONFIGURACIÓN DE CORS - ACTUALIZADA PARA DOCKER
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://frontend:3000",  # ← Si tu frontend también está en Docker
 ]
-CORS_ALLOW_ALL_ORIGINS = True
-# O para desarrollo, permitir todos los orígenes:
-
+CORS_ALLOW_ALL_ORIGINS = True  # Para desarrollo
 
 # Permitir métodos HTTP
 CORS_ALLOW_METHODS = [
@@ -143,8 +145,8 @@ CORS_ALLOW_METHODS = [
     'DELETE',
     'OPTIONS'
 ]
-  # Para desarrollo
-  # Permitir headers
+
+# Permitir headers
 CORS_ALLOW_HEADERS = [
     'content-type',
     'authorization',

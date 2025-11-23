@@ -11,14 +11,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import java.util.List;
-import com.example.payment_service.model.OrderItem;
-import jakarta.persistence.CascadeType;
 
 
 @Entity
@@ -28,19 +24,9 @@ import jakarta.persistence.CascadeType;
         })
 public class Payment {
 
-    @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItem> items;
-
-    public List<OrderItem> getItems() {
-        return items;
-    }
-
-    public void setItems(List<OrderItem> items) {
-        this.items = items;
-        if (items != null) {
-            items.forEach(i -> i.setPayment(this)); // Enlazar ambos lados
-        }
-    }
+    // NOTA: Los items están asociados al Order, no al Payment
+    // Para obtener los items de un pago, consulta el Order usando orderIda
+    // Esto evita el error "Found shared references to a collection"
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
