@@ -8,6 +8,15 @@ class SensorSerializer(serializers.ModelSerializer):
         model = Sensor
         fields = '__all__'
     
+    def get_imagen_url(self, obj):
+        """Genera la URL completa de la imagen"""
+        if obj.imagen:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.imagen.url)
+            return obj.imagen.url
+        return None
+    
     def validate_precio(self, value):
         """Validar que el precio sea positivo"""
         if value < 0:

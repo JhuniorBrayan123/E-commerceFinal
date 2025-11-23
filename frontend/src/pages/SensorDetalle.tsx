@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import { useParams, useNavigate } from 'react-router-dom';
 import { comentariosService, carritoService, sensoresService } from '../services/api';
 
@@ -25,11 +26,13 @@ const ProductoDetalle: React.FC = () => {
         
       } catch (error) {
         console.error('Error cargando producto:', error);
+
       } finally {
         setLoading(false);
       }
     };
     if (id) {
+
       fetchProducto();
     }
   }, [id]);
@@ -105,6 +108,7 @@ const ProductoDetalle: React.FC = () => {
     if (producto && cantidad > 0 && cantidad <= producto.stock) {
       carritoService.add(producto, cantidad, producto.stock);
       alert('Producto agregado al carrito');
+
       navigate('/carrito');
     } else {
       alert('Cantidad inválida o stock insuficiente');
@@ -119,6 +123,7 @@ const ProductoDetalle: React.FC = () => {
     );
   }
 
+
   if (!producto) {
     return (
       <div className="text-center">
@@ -129,11 +134,13 @@ const ProductoDetalle: React.FC = () => {
         >
           Volver a productos
         </button>
+
       </div>
     );
   }
 
   return (
+
     <div className="max-w-6xl mx-auto">
       {/* Boton volver */}
       <button
@@ -238,10 +245,12 @@ const ProductoDetalle: React.FC = () => {
                 <button
                   onClick={() => setCantidad(Math.max(1, cantidad - 1))}
                   className="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition shadow-sm"
+
                   disabled={cantidad <= 1}
                 >
                   -
                 </button>
+
   
                 <input
                   type="number"
@@ -258,11 +267,13 @@ const ProductoDetalle: React.FC = () => {
                   onClick={() => setCantidad(Math.min(producto.stock, cantidad + 1))}
                   className="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition shadow-sm"
                   disabled={cantidad >= producto.stock}
+
                 >
                   +
                 </button>
               </div>
             </div>
+
   
             {/* Subtotal */}
             <div className="mb-8">
@@ -359,9 +370,11 @@ const ProductoDetalle: React.FC = () => {
         </div>
       </div>
 
+
     </div>
   );
 };
 
 export default ProductoDetalle;
+
 

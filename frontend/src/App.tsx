@@ -13,14 +13,16 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Categorias from "./pages/Categorias";
-import Productos from "./pages/Productos";
-import ProductoDetalle from "./pages/ProductoDetalle";
 import Sensores from "./pages/Sensores";
+import SensorDetalle from "./pages/SensorDetalle";
 import Carrito from "./pages/Carrito";
 import Inventario from "./pages/Inventario";
-import CRUDProductos from "./pages/CRUDProductos";
 import CRUDCategorias from "./pages/CRUDCategorias";
-import SensorDetalle from "./pages/SensorDetalle";
+import Checkout from "./pages/Checkout";
+import PaymentMethod from "./pages/PaymentMethod";
+import ConfirmPayment from "./pages/ConfirmPayment";
+import PaymentResult from "./pages/PaymentResult";
+
 
 interface User {
   id: number;
@@ -139,7 +141,7 @@ function App() {
   }
 
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       {!user ? (
         // Sin usuario autenticado - mostrar solo auth
         <Routes>
@@ -155,22 +157,6 @@ function App() {
             element={
               <AuthenticatedLayout>
                 <Home />
-              </AuthenticatedLayout>
-            }
-          />
-          <Route
-            path="/productos"
-            element={
-              <AuthenticatedLayout>
-                <Productos />
-              </AuthenticatedLayout>
-            }
-          />
-          <Route
-            path="/productos/:id"
-            element={
-              <AuthenticatedLayout>
-                <ProductoDetalle />
               </AuthenticatedLayout>
             }
           />
@@ -203,13 +189,59 @@ function App() {
             }
           />
           <Route
-            path="/sensores"
+            path="/checkout"
             element={
               <ProtectedRoute>
                 <AuthenticatedLayout>
-                  <Sensores />
+                  <Checkout />
                 </AuthenticatedLayout>
               </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/payment-method"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <PaymentMethod />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/confirm-payment"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <ConfirmPayment />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/payment-result"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <PaymentResult />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/sensores"
+            element={
+              <AuthenticatedLayout>
+                <Sensores />
+              </AuthenticatedLayout>
+            }
+          />
+          <Route
+            path="/sensores/:id"
+            element={
+              <AuthenticatedLayout>
+                <SensorDetalle />
+              </AuthenticatedLayout>
             }
           />
           <Route
@@ -218,16 +250,6 @@ function App() {
               <ProtectedRoute>
                 <AuthenticatedLayout>
                   <Inventario />
-                </AuthenticatedLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/productos"
-            element={
-              <ProtectedRoute>
-                <AuthenticatedLayout>
-                  <CRUDProductos />
                 </AuthenticatedLayout>
               </ProtectedRoute>
             }

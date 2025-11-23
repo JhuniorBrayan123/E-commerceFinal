@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { inventarioService, productosService } from '../services/api';
+import { inventarioService, sensoresService } from '../services/api';
 
 const Inventario: React.FC = () => {
   const [movimientos, setMovimientos] = useState<any[]>([]);
-  const [productos, setProductos] = useState<any[]>([]);
+  const [sensores, setSensores] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     producto: '',
     tipo: 'entrada',
@@ -17,12 +17,14 @@ const Inventario: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [movRes, prodRes] = await Promise.all([
+        const [movRes, sensoresRes] = await Promise.all([
           inventarioService.historial(),
-          productosService.getAll(),
+          sensoresService.getAll(),
         ]);
         setMovimientos(movRes.data);
-        setProductos(prodRes.data.results || prodRes.data);
+        // La respuesta puede venir como { sensores: [...] } o directamente como array
+        const sensoresData = sensoresRes.data.sensores || sensoresRes.data.results || sensoresRes.data || [];
+        setSensores(sensoresData);
       } catch (error) {
         console.error('Error cargando datos:', error);
       } finally {
@@ -80,7 +82,7 @@ const Inventario: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Producto *
+                  Sensor *
                 </label>
                 <select
                   value={formData.producto}
@@ -88,10 +90,10 @@ const Inventario: React.FC = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   required
                 >
-                  <option value="">Seleccionar producto</option>
-                  {productos.map((prod) => (
-                    <option key={prod.id} value={prod.id}>
-                      {prod.nombre} (Stock: {prod.stock})
+                  <option value="">Seleccionar sensor</option>
+                  {sensores.map((sensor) => (
+                    <option key={sensor.id} value={sensor.id}>
+                      {sensor.nombre} (Stock: {sensor.stock})
                     </option>
                   ))}
                 </select>
@@ -162,7 +164,7 @@ const Inventario: React.FC = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Producto</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sensor</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cantidad</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Motivo</th>

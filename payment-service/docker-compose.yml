@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # MySQL Database para Payment Service
@@ -11,7 +11,7 @@ services:
       MYSQL_USER: payment_user
       MYSQL_PASSWORD: payment_password
     ports:
-      - "3307:3306" 
+      - "3308:3306"
     volumes:
       - payment_mysql_data:/var/lib/mysql
     networks:
@@ -25,7 +25,7 @@ services:
     environment:
       # ✅ SOLUCIÓN APLICADA: Variable de entorno para notificaciones agregada correctamente
       - NOTIFICATION_BASE_URL=http://notification-service:8081
-      
+
       # Configuración de la DB con allowPublicKeyRetrieval=true para evitar errores de conexión
       - SPRING_DATASOURCE_URL=jdbc:mysql://payment-mysql:3306/payment_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=payment_user

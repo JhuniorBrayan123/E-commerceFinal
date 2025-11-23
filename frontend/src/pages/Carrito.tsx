@@ -50,10 +50,10 @@ const Carrito: React.FC = () => {
         <h1 className="text-4xl font-bold mb-4">Carrito de Compras</h1>
         <p className="text-gray-600 mb-8">Tu carrito está vacío</p>
         <Link
-          to="/productos"
+          to="/sensores"
           className="bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 transition inline-block"
         >
-          Ver Productos
+          Ver Sensores
         </Link>
       </div>
     );
@@ -89,13 +89,18 @@ const Carrito: React.FC = () => {
                 )}
                 <div className="flex-grow">
                   <Link
-                    to={`/productos/${item.id}`}
+                    to={`/sensores/${item.id}`}
                     className="text-xl font-semibold hover:text-primary-600"
                   >
                     {item.nombre}
                   </Link>
                   <p className="text-gray-600 text-sm mt-1">{item.descripcion}</p>
                   <p className="text-primary-600 font-bold mt-2">${item.precio}</p>
+                  {item.tipo_display && (
+                    <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded mt-1 inline-block">
+                      {item.tipo_display}
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
@@ -147,8 +152,7 @@ const Carrito: React.FC = () => {
             </div>
             <button
               onClick={() => {
-                // Aquí se integraría con el endpoint de Spring Boot
-                alert('Funcionalidad de pago en desarrollo. Se integrará con Spring Boot.');
+                navigate('/checkout');
               }}
               className="w-full bg-primary-600 text-white py-3 rounded-lg font-semibold hover:bg-primary-700 transition"
             >

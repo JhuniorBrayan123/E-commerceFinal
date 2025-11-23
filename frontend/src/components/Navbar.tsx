@@ -23,13 +23,10 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
   return (
     <nav className="bg-primary-700 text-black shadow-lg">
       <div className="container mx-auto px-4">
+
         <div className="flex items-center justify-between h-36">
           <Link to="/" className="flex items-center space-x-2">
-
-            
             <img src="/logoWeb.svg" alt="logo" style={{ width: '450px', height: '450px' }}  />
-            
-
           </Link>
 
           <div className="flex items-center space-x-4">
@@ -38,13 +35,6 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
               className="px-3 py-2 rounded-full text-xl font-medium hover:bg-secondary-700 hover:text-white transition"
             >
               Categorías
-            </Link>
-
-            <Link
-              to="/productos"
-              className="px-3 py-2 rounded-full text-xl font-medium hover:bg-secondary-700 hover:text-white transition"
-            >
-              Productos
             </Link>
 
             <Link

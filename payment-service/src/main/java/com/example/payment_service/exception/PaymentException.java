@@ -48,4 +48,8 @@ public class PaymentException extends RuntimeException {
     public static PaymentException gatewayError(String code, String message, Throwable cause) {
         return new PaymentException(code, message, HttpStatus.BAD_GATEWAY, cause);
     }
+
+    public static PaymentException forbidden(String code, String message) {
+        return new PaymentException(code, message, HttpStatus.FORBIDDEN);
+    }
 }
