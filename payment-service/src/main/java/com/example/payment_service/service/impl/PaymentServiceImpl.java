@@ -135,9 +135,6 @@ PaymentCompletedEvent evt = new PaymentCompletedEvent(
         jwtToken
 );
 
-eventPublisher.publishEvent(evt);
-log.info("📢 Evento PaymentCompleted publicado para payment {}", payment.getId());
-
             eventPublisher.publishEvent(evt);
             log.info("📢 Evento PaymentCompleted publicado para payment {}", payment.getId());
 

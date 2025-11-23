@@ -25,7 +25,7 @@ import jakarta.persistence.UniqueConstraint;
 public class Payment {
 
     // NOTA: Los items están asociados al Order, no al Payment
-    // Para obtener los items de un pago, consulta el Order usando orderId
+    // Para obtener los items de un pago, consulta el Order usando orderIda
     // Esto evita el error "Found shared references to a collection"
 
     @Id
