@@ -34,3 +34,12 @@ export interface PaymentResponse {
   gatewayUrl?: string;
   clientSecret?: string;
 }
+export interface ConfirmPaymentProps {
+  orderId: number;
+  paymentToken: string;
+  paymentMethod: string; // STRIPE | YAPE | PAYPAL
+  amount: number;
+  currency: string; // USD, PEN, EUR...
+  paymentData?: any; // tarjeta, yape, paypal
+}
+

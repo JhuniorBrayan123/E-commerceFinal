@@ -272,11 +272,29 @@ export const paymentService = {
       headers: getAuthHeaders(),
       body: JSON.stringify(confirmData),
     });
+    
+    const data = await res.json();
+    
     if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.message || "Error al procesar el pago");
+      // Extraer mensaje de error más detallado
+      const errorMessage = data.error?.message || data.message || data.error?.code || "Error al procesar el pago";
+      const error = new Error(errorMessage);
+      // Agregar información adicional al error
+      (error as any).code = data.error?.code;
+      (error as any).response = data;
+      throw error;
     }
-    return res.json();
+    
+    // Si success es false, también lanzar error
+    if (data.success === false) {
+      const errorMessage = data.error?.message || data.message || "Error al procesar el pago";
+      const error = new Error(errorMessage);
+      (error as any).code = data.error?.code;
+      (error as any).response = data;
+      throw error;
+    }
+    
+    return data;
   },
 
   processPayment: async (paymentData: any) => {

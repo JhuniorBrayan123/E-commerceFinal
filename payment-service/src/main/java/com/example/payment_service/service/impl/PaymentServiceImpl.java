@@ -2,13 +2,16 @@ package com.example.payment_service.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import com.example.payment_service.dto.PaymentItemDto;
 import com.example.payment_service.dto.PaymentRequest;
 import com.example.payment_service.dto.PaymentResponse;
 import com.example.payment_service.dto.RefundRequest;
@@ -57,6 +60,16 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentResponse processPayment(PaymentRequest request, String jwtToken) {
+        // VERIFICACIÓN EXTREMA AL INICIO
+        log.info("🎯🎯🎯 PAYMENT SERVICE - INICIANDO processPayment");
+        log.info("📦 OrderId: {}, Items: {}", request.getOrderId(),
+                request.getItems() != null ? request.getItems().size() : "NULL");
+
+        if (request.getItems() != null) {
+            request.getItems().forEach(item
+                    -> log.info("   - Sensor: {}, Cantidad: {}", item.getSensorId(), item.getCantidad())
+            );
+        }
 
         jwtService.validateToken(jwtToken);
         Long userIdFromToken = jwtService.extractUserId(jwtToken);
@@ -87,11 +100,46 @@ public class PaymentServiceImpl implements PaymentService {
 
             log.info("✔ Pago {} guardado como PAID (orderId={})", payment.getId(), payment.getOrderId());
 
-            // Publicar evento para descontar stock fuera de la transacción (AFTER_COMMIT)
-            List<OrderItem> items = payment.getItems();
-            PaymentCompletedEvent evt = new PaymentCompletedEvent(payment.getOrderId(), payment.getId(), items, jwtToken);
+            // Obtener items del Order (no del Payment para evitar problemas de colecciones compartidas)
+            // Los items se pasan en el request y están asociados al Order
+            List<OrderItem> items = request.getItems();
+            if (items == null || items.isEmpty()) {
+                log.warn("⚠️ No hay items en el request, intentando obtener del Order...");
+                // Si no hay items en el request, intentar obtenerlos del Order
+                // Esto requeriría inyectar OrderRepository, pero por ahora usamos los del request
+                items = java.util.Collections.emptyList();
+            }
+            log.info("📦 Items procesados: {}", items.size());
+            items.forEach(item -> log.info("   - Sensor: {}, Cantidad: {}", item.getSensorId(), item.getCantidad()));
+
+            // NOTA: El stock ya fue descontado ANTES de procesar el pago (en OrderService.confirmPayment)
+            // No es necesario descontarlo de nuevo aquí
+            log.info("✅ Stock ya descontado en la validación previa al pago");
+
+            // Publicar evento para notificaciones (el stock ya está descontado)
+            // Convertir OrderItem → PaymentItemDto (sin entidades JPA)
+List<PaymentItemDto> itemDtos = items.stream()
+        .map(it -> new PaymentItemDto(
+                it.getSensorId(),
+                it.getCantidad(),
+                it.getNombre(),
+                it.getPrecioUnitario()
+        ))
+        .collect(Collectors.toList());
+
+// Publicar evento con DTOs (seguro, sin colecciones compartidas)
+PaymentCompletedEvent evt = new PaymentCompletedEvent(
+        payment.getOrderId(),
+        payment.getId(),
+        itemDtos,
+        jwtToken
+);
+
+eventPublisher.publishEvent(evt);
+log.info("📢 Evento PaymentCompleted publicado para payment {}", payment.getId());
+
             eventPublisher.publishEvent(evt);
-            log.debug("Evento PaymentCompleted publicado para payment {}", payment.getId());
+            log.info("📢 Evento PaymentCompleted publicado para payment {}", payment.getId());
 
             notificationService.notifyPaymentSuccess(payment)
                     .subscribe(
@@ -174,9 +222,14 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setStatus(Payment.PaymentStatus.PENDING);
         payment.setRefundedAmount(BigDecimal.ZERO);
         payment.setGatewayType(request.getPaymentMethod().name());
-        payment.setItems(request.getItems());
+        
+        // NOTA: Los items NO se asignan al Payment
+        // Los items pertenecen solo al Order y se obtienen desde ahí cuando se necesiten
+        // Esto evita el error "Found shared references to a collection"
+        
         return payment;
     }
+
 
     private void markAsFailed(Payment payment) {
         payment.setStatus(Payment.PaymentStatus.FAILED);

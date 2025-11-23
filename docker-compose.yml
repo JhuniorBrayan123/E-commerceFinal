@@ -1,0 +1,33 @@
+services:
+  # Django conectado a MySQL local
+  django-app:
+    build: ./catalog-service
+    ports:
+      - "8000:8000"
+    environment:
+      DEBUG: "True"
+      MYSQL_HOST: host.docker.internal
+      MYSQL_DATABASE: ecommerce_db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ""
+      JWT_SECRET: mi-clave-secreta-jwt-muy-segura-para-ecommerce
+      JWT_EXPIRE: 3600
+      REFRESH_TOKEN_EXPIRE: 604800
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Payment Service conectado a MySQL local + Django
+  payment-service:
+    build: ./payment-service
+    ports:
+      - "8085:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/ecommerce_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+      DJANGO_SERVICE_URL: http://django-app:8000/api
+      NOTIFICATION_BASE_URL: http://django-app:8000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - django-app

@@ -6,9 +6,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import java.time.Duration;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.payment_service.dto.ConfirmPaymentRequest;
@@ -92,7 +95,7 @@ public class OrderService {
     /**
      * Confirma y procesa el pago de una orden
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ConfirmPaymentResponse confirmPayment(ConfirmPaymentRequest request, String jwtToken) {
 
         jwtService.validateToken(jwtToken);
@@ -109,8 +112,14 @@ public class OrderService {
             throw PaymentException.badRequest("INVALID_ORDER_ID", "El orderId no coincide con el paymentToken");
         }
 
-        if (order.getTotal().compareTo(request.getAmount()) != 0) {
-            throw PaymentException.badRequest("INVALID_AMOUNT", "El monto no coincide con el total de la orden");
+        // Comparar montos con tolerancia para decimales (redondeo a 2 decimales)
+        BigDecimal orderTotal = order.getTotal().setScale(2, java.math.RoundingMode.HALF_UP);
+        BigDecimal requestAmount = request.getAmount().setScale(2, java.math.RoundingMode.HALF_UP);
+        if (orderTotal.compareTo(requestAmount) != 0) {
+            log.error("Monto no coincide: orden={}, request={}", orderTotal, requestAmount);
+            throw PaymentException.badRequest("INVALID_AMOUNT", 
+                String.format("El monto no coincide con el total de la orden. Esperado: %s, Recibido: %s", 
+                    orderTotal, requestAmount));
         }
 
         if (order.getStatus() != Order.OrderStatus.PENDING) {
@@ -118,6 +127,34 @@ public class OrderService {
         }
 
         final Order finalOrder = order;
+
+        // 0️⃣ VALIDAR Y DESCONTAR STOCK ANTES DE PROCESAR EL PAGO
+        // Nota: El endpoint deduct-stock valida Y descuenta. Si pasa, el stock ya está descontado.
+        try {
+            log.info("🔍 Validando y descontando stock antes de procesar el pago...");
+            Boolean stockAvailable = catalogService.checkStockAvailability(finalOrder.getItems(), jwtToken)
+                    .block(Duration.ofSeconds(5));
+            
+            if (stockAvailable == null || !stockAvailable) {
+                throw PaymentException.badRequest("INSUFFICIENT_STOCK", 
+                    "No hay stock suficiente para completar la orden");
+            }
+            log.info("✅ Stock validado y descontado correctamente");
+        } catch (RuntimeException e) {
+            log.error("❌ Error validando/descontando stock: {}", e.getMessage());
+            // Si el error contiene información de stock insuficiente, extraer el mensaje
+            String errorMessage = e.getMessage();
+            if (errorMessage != null && errorMessage.contains("Stock insuficiente")) {
+                throw PaymentException.badRequest("INSUFFICIENT_STOCK", 
+                    "Stock insuficiente para uno o más productos en la orden");
+            }
+            throw PaymentException.badRequest("STOCK_VALIDATION_ERROR", 
+                "Error al validar el stock: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("❌ Error inesperado validando stock: {}", e.getMessage(), e);
+            throw PaymentException.badRequest("STOCK_VALIDATION_ERROR", 
+                "Error al validar el stock: " + e.getMessage());
+        }
 
         finalOrder.setStatus(Order.OrderStatus.PROCESSING);
         orderRepository.save(finalOrder);
@@ -131,7 +168,7 @@ public class OrderService {
             paymentRequest.setPaymentMethod(request.getPaymentMethod());
             paymentRequest.setItems(finalOrder.getItems());
 
-            // 1️⃣ Procesar el pago en gateway
+            // 1️⃣ Procesar el pago en gateway (ahora sabemos que hay stock disponible)
             paymentService.processPayment(paymentRequest, jwtToken);
 
             // 2️⃣ Obtener Payment guardado en BD por PaymentService
@@ -143,19 +180,6 @@ public class OrderService {
             // 3️⃣ Cambiar estado a PAID
             finalOrder.setStatus(Order.OrderStatus.PAID);
             orderRepository.save(finalOrder);
-
-            // 4️⃣ DESCONTAR STOCK EN DJANGO
-            try {
-                log.info(">> Enviando solicitud a Django para descontar stock...");
-
-                catalogService.deductStock(finalOrder.getItems(), jwtToken)
-                        .doOnSuccess(v -> log.info(">> Stock descontado correctamente en Django"))
-                        .doOnError(err -> log.error(">> Error al descontar stock en Django: {}", err.getMessage()))
-                        .block(); // <--- esperamos la respuesta SOLO aquí
-
-            } catch (Exception e) {
-                log.error(">> ERROR CRÍTICO: No se pudo descontar el stock en Django", e);
-            }
 
             // 5️⃣ Construir respuesta de éxito
             ConfirmPaymentResponse response = new ConfirmPaymentResponse();
@@ -175,9 +199,8 @@ public class OrderService {
             response.setData(paymentData);
             return response;
         } catch (PaymentException e) {
-
-            finalOrder.setStatus(Order.OrderStatus.FAILED);
-            orderRepository.save(finalOrder);
+            // Usar nueva transacción para guardar el estado FAILED
+            markOrderAsFailed(finalOrder.getId());
 
             ConfirmPaymentResponse response = new ConfirmPaymentResponse();
             response.setSuccess(false);
@@ -191,9 +214,8 @@ public class OrderService {
             return response;
 
         } catch (Exception e) {
-
-            finalOrder.setStatus(Order.OrderStatus.FAILED);
-            orderRepository.save(finalOrder);
+            // Usar nueva transacción para guardar el estado FAILED
+            markOrderAsFailed(finalOrder.getId());
 
             log.error("Error inesperado al procesar la orden {}: {}", finalOrder.getId(), e.getMessage(), e);
 
@@ -207,6 +229,26 @@ public class OrderService {
 
             response.setError(errorData);
             return response;
+        }
+    }
+
+    /**
+     * Marca una orden como fallida usando una nueva transacción
+     * Esto evita el error "Transaction silently rolled back"
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void markOrderAsFailed(Long orderId) {
+        try {
+            Order order = orderRepository.findById(orderId)
+                    .orElse(null);
+            if (order != null) {
+                order.setStatus(Order.OrderStatus.FAILED);
+                orderRepository.save(order);
+                log.info("Orden {} marcada como FAILED", orderId);
+            }
+        } catch (Exception e) {
+            log.error("Error al marcar orden {} como FAILED: {}", orderId, e.getMessage(), e);
+            // No relanzar la excepción para no afectar la respuesta
         }
     }
 
