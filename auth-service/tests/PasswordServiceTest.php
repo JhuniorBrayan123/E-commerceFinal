@@ -8,7 +8,7 @@ class PasswordServiceTest extends TestCase{
     public function setUp(): void{
         $this->passService = new PasswordService();
     }
-    
+
     //Pruebas para el metodo validatePassword
 
     public function testContrasenaMuyCorta(){
