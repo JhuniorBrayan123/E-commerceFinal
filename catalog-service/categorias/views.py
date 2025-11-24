@@ -12,8 +12,8 @@ class CategoriaViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['get'])
     def productos(self, request, pk=None):
         categoria = self.get_object()
-        productos = categoria.producto_set.all()
-        from productos.serializers import ProductoSerializer
-        serializer = ProductoSerializer(productos, many=True, context={'request': request})
+        sensores = categoria.sensores.all()
+        from sensores.serializers import SensorSerializer
+        serializer = SensorSerializer(sensores, many=True, context={'request': request})
         return Response(serializer.data)
 

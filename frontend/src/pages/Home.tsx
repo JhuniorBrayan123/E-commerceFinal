@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { categoriasService, sensoresService } from '../services/api';
-
+import BannerCarousel from "../components/BannerCarousel";
 const Home: React.FC = () => {
   const [categorias, setCategorias] = useState<any[]>([]);
   const [sensoresDestacados, setSensoresDestacados] = useState<any[]>([]);
@@ -45,7 +45,11 @@ const Home: React.FC = () => {
   }
 
   return (
+    
     <div>
+      <div>
+        <BannerCarousel />
+      </div>
       <section className="bg-gradient-to-r from-primary-900 to-secondary-800 text-white py-20 mb-12 rounded-lg">
         <div className="text-center">
           <h1 className="text-5xl font-bold mb-4">Bienvenido a AGROCODE</h1>
@@ -60,7 +64,7 @@ const Home: React.FC = () => {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-3xl font-bold mb-6">Categorías</h2>
+        <h2 className="text-3xl font-bold mb-6">Recomendados para ti</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {categorias.map((categoria) => (
             <Link
@@ -84,7 +88,7 @@ const Home: React.FC = () => {
       </section>
       
       <section>
-        <h2 className="text-3xl font-bold mb-6">Sensores Destacados</h2>
+        <h2 className="text-3xl font-bold mb-6">Todo nuestro catalogo</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {sensoresDestacados.map((sensor) => (
             <Link

@@ -4,7 +4,7 @@ class Sensor(models.Model):
     
     # Campos del sensor
     nombre = models.CharField(max_length=100, verbose_name="Nombre del Sensor")
-    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, verbose_name="Categoría")
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, verbose_name="Categoría", related_name="sensores")
     marca = models.CharField(max_length=50, verbose_name="Marca")
     modelo = models.CharField(max_length=50, verbose_name="Modelo")
     precio = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Precio")

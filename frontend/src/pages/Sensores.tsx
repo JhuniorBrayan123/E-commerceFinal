@@ -1,6 +1,6 @@
 import React from "react";
 import SensorList from "../components/SensorList";
-import BannerCarousel from "../components/BannerCarousel";
+
 
 const Sensores: React.FC = () => {
   return (
@@ -8,9 +8,7 @@ const Sensores: React.FC = () => {
       <div className="w-full bg-primary-600 text-white text-center py-2 text-lg font-semibold">
         Encuentra los mejores productos solo aqui
       </div>
-      <div>
-        <BannerCarousel />
-      </div>
+      
       <div>
         <h1 className="text-4xl font-bold mb-8">Catálogo de Sensores</h1>
         <p className="text-gray-600 mb-6">

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import "./SensorList.css";
 
-import { Link, useNavigate } from "react-router-dom";
-import { carritoService, sensoresService } from "../services/api";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { carritoService, sensoresService, categoriasService } from "../services/api";
 
 interface Sensor {
   id: number;
@@ -37,6 +37,8 @@ const SensorList: React.FC = () => {
   const [sensores, setSensores] = useState<Sensor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { id } = useParams<{ id: string }>();
+
 
   // Configuración de filtros disponibles
   const availableFilters: FilterConfig[] = [
@@ -104,6 +106,8 @@ const SensorList: React.FC = () => {
     stock_max: 0,
   });
 
+
+
   // Filtros guardados (Vistas Personalizadas)
   const [savedFilters, setSavedFilters] = useState<Array<{
     id: string;
@@ -148,7 +152,7 @@ const SensorList: React.FC = () => {
       setError(null);
       try {
 
-        const response = await sensoresService.getAll();
+        const response = await categoriasService.getProductos(parseInt(id!));
         const data = response.data;
         // La respuesta puede venir como { sensores: [...] } o directamente como array
         const sensoresData = data.sensores || data.results || data || [];
@@ -163,7 +167,7 @@ const SensorList: React.FC = () => {
     };
 
     fetchSensores();
-  }, []);
+  }, [id]);
 
   // Aplicar filtros usando useMemo
   const sensoresFiltrados = useMemo(() => {
