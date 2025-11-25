@@ -384,37 +384,8 @@ const SensorList: React.FC = () => {
       {/* Filtros */}
       <div className="filters-section">
 
-        <h3>Filtros</h3>
+        
         <div className="filters-grid">
-          <div className="filter-group">
-            <label htmlFor="search">Buscar:</label>
-            <input
-              id="search"
-              type="text"
-              placeholder="Nombre, marca, modelo..."
-              value={filterValues.search}
-              onChange={(e) => handleFilterValueChange("search", e.target.value)}
-              className="filter-input"
-            />
-          </div>
-
-          <div className="filter-group">
-            <label htmlFor="categoria_nombre">Tipo de Sensor:</label>
-            <select
-              id="categoria_nombre"
-              value={filterValues.categoria_nombre}
-              onChange={(e) => handleFilterValueChange("categoria_nombre", e.target.value)}
-              className="filter-select"
-            >
-              <option value="">Todos</option>
-              {filterOptions.categorias.map((categoria_nombre) => (
-                <option key={categoria_nombre.value} value={String(categoria_nombre.value)}>
-                  {categoria_nombre.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
         <div className="filters-header">
           <h3>Filtros</h3>
           <div className="filters-actions">
@@ -664,7 +635,7 @@ const SensorList: React.FC = () => {
           >
             {sensor.imagen ? (
                 <img
-                  src={sensor.imagen}
+                  src={sensor.imagen?.trim()}
                   alt={sensor.nombre}
                   className="w-full h-48 object-cover"
                 />

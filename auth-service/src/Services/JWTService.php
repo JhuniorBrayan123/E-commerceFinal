@@ -12,7 +12,7 @@ class JWTService
 
     public static function init()
     {
-        self::$secret_key = getenv('JWT_SECRET') ?: 'fallback_secret_key';
+        self::$secret_key = 'Holasoyunaclavesecretadehashparaelpago';
     }
 
     // Generar JWT token
