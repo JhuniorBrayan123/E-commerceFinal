@@ -34,8 +34,9 @@ const PaymentMethod: React.FC = () => {
   const handleMethodSelect = (method: PaymentMethodType) => {
     setSelectedMethod(method);
     setError(null);
-    // Reset payment data cuando se cambia el método
-    setPaymentData({});
+    // No resetear payment data cuando se cambia el método
+    // Esto permite que el usuario mantenga los datos ingresados
+    // setPaymentData({});
   };
 
   const handlePaymentDataChange = (field: string, value: any) => {
@@ -88,11 +89,10 @@ const PaymentMethod: React.FC = () => {
 
           {/* Método: Stripe (Tarjeta) */}
           <div
-            className={`border-2 rounded-lg p-6 cursor-pointer transition ${
-              selectedMethod === "STRIPE"
+            className={`border-2 rounded-lg p-6 cursor-pointer transition ${selectedMethod === "STRIPE"
                 ? "border-primary-600 bg-primary-50"
                 : "border-gray-300 hover:border-gray-400"
-            }`}
+              }`}
             onClick={() => handleMethodSelect("STRIPE")}
           >
             <div className="flex items-center space-x-4">
@@ -200,11 +200,10 @@ const PaymentMethod: React.FC = () => {
 
           {/* Método: Yape */}
           <div
-            className={`border-2 rounded-lg p-6 cursor-pointer transition ${
-              selectedMethod === "YAPE"
+            className={`border-2 rounded-lg p-6 cursor-pointer transition ${selectedMethod === "YAPE"
                 ? "border-primary-600 bg-primary-50"
                 : "border-gray-300 hover:border-gray-400"
-            }`}
+              }`}
             onClick={() => handleMethodSelect("YAPE")}
           >
             <div className="flex items-center space-x-4">
@@ -227,11 +226,10 @@ const PaymentMethod: React.FC = () => {
 
           {/* Método: PayPal */}
           <div
-            className={`border-2 rounded-lg p-6 cursor-pointer transition ${
-              selectedMethod === "PAYPAL"
+            className={`border-2 rounded-lg p-6 cursor-pointer transition ${selectedMethod === "PAYPAL"
                 ? "border-primary-600 bg-primary-50"
                 : "border-gray-300 hover:border-gray-400"
-            }`}
+              }`}
             onClick={() => handleMethodSelect("PAYPAL")}
           >
             <div className="flex items-center space-x-4">

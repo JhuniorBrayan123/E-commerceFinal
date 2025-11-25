@@ -23,7 +23,7 @@ const ProductoDetalle: React.FC = () => {
         setProducto(res.data);
         const comRes = await comentariosService.getAll(parseInt(id!));
         setComentarios(comRes.data.results);
-        
+
       } catch (error) {
         console.error('Error cargando producto:', error);
 
@@ -39,21 +39,21 @@ const ProductoDetalle: React.FC = () => {
 
   const crearComentario = async () => {
     if (!contenido.trim()) return alert("El comentario no puede estar vacio");
-  
+
     try {
       const data = {
         id_user: user.id,
         id_producto: producto.id,
         contenido,
       };
-  
+
       await comentariosService.create(data);
       setContenido("");
-  
+
       // Recargar comentarios
       const comRes = await comentariosService.getAll(producto.id);
       setComentarios(comRes.data.results);
-  
+
     } catch (err) {
       console.error(err);
     }
@@ -64,13 +64,13 @@ const ProductoDetalle: React.FC = () => {
     setComentarioEdit(comentario);
     setContenido(comentario.contenido);
   };
-  
+
   const cancelarEdicion = () => {
     setEditando(false);
     setComentarioEdit(null);
     setContenido("");
   };
-  
+
   const guardarEdicion = async () => {
     try {
       await comentariosService.update(comentarioEdit.id, {
@@ -78,12 +78,12 @@ const ProductoDetalle: React.FC = () => {
         id_user: comentarioEdit.id_user,
         id_producto: producto.id,
       });
-  
+
       cancelarEdicion();
-  
+
       const comRes = await comentariosService.getAll(producto.id);
       setComentarios(comRes.data.results);
-  
+
     } catch (err) {
       console.error(err);
     }
@@ -91,18 +91,18 @@ const ProductoDetalle: React.FC = () => {
 
   const eliminarComentario = async (id: number) => {
     if (!window.confirm("¿Eliminar comentario?")) return;
-  
+
     try {
       await comentariosService.delete(id);
-  
+
       const comRes = await comentariosService.getAll(producto.id);
       setComentarios(comRes.data.results);
-  
+
     } catch (err) {
       console.error(err);
     }
   };
-  
+
 
   const handleAgregarCarrito = () => {
     if (producto && cantidad > 0 && cantidad <= producto.stock) {
@@ -149,11 +149,11 @@ const ProductoDetalle: React.FC = () => {
       >
         <span className="text-xl">←</span> Volver a productos
       </button>
-  
+
       {/* Contenedor del producto */}
       <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 p-10">
-  
+
           {/* Imagen */}
           <div className="flex flex-col items-center">
             {producto.imagen ? (
@@ -168,79 +168,84 @@ const ProductoDetalle: React.FC = () => {
               </div>
             )}
           </div>
-  
+
           {/* Info del producto */}
           <div>
             <h1 className="text-4xl font-extrabold mb-4 tracking-tight text-gray-800">
               {producto.nombre}
             </h1>
-  
+
             {/* Precio */}
             <div className="mb-6">
               <span className="text-5xl font-bold text-primary-600 block drop-shadow-sm">
                 ${producto.precio}
               </span>
             </div>
-  
+
             {/* Estado + categoria */}
             <div className="mb-6 flex items-center gap-4">
               <span
-                className={`px-4 py-1.5 rounded-full text-sm font-semibold shadow ${
-                  producto.stock > 0
+                className={`px-4 py-1.5 rounded-full text-sm font-semibold shadow ${producto.stock > 0
                     ? 'bg-green-100 text-green-700'
                     : 'bg-red-100 text-red-700'
-                }`}
+                  }`}
               >
                 {producto.stock > 0 ? "Disponible" : "No Disponible"}
               </span>
-  
+
               <span className="text-gray-600 text-sm">
                 Categoria: <span className="font-semibold">{producto.categoria_nombre}</span>
               </span>
             </div>
-  
+
+            <div className="mb-4">
+              <p className="text-gray-700">
+                <strong>Modelo:</strong> {producto.modelo}
+              </p>
+            </div>
+
             {/* Descripcion */}
             <p className="text-gray-700 mb-8 leading-relaxed text-lg">
               {producto.descripcion}
             </p>
-  
+
             {/* ESPECIFICACIONES TECNICAS */}
             <div className="mb-10">
               <h2 className="text-2xl font-bold text-gray-800 mb-4">Especificaciones Tecnicas</h2>
-  
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-  
+
                 <div className="bg-gray-50 p-4 rounded-xl shadow-sm border border-gray-200">
                   <p className="text-sm text-gray-500">Rango de Medicion</p>
                   <p className="font-semibold text-gray-800">{producto.rango_medicion}</p>
                 </div>
-  
+
                 <div className="bg-gray-50 p-4 rounded-xl shadow-sm border border-gray-200">
                   <p className="text-sm text-gray-500">Precision</p>
                   <p className="font-semibold text-gray-800">{producto.precision}</p>
                 </div>
-  
+
                 <div className="bg-gray-50 p-4 rounded-xl shadow-sm border border-gray-200">
                   <p className="text-sm text-gray-500">Alimentacion</p>
                   <p className="font-semibold text-gray-800">{producto.alimentacion}</p>
                 </div>
-  
+
                 <div className="bg-gray-50 p-4 rounded-xl shadow-sm border border-gray-200">
                   <p className="text-sm text-gray-500">Protocolo de Comunicacion</p>
                   <p className="font-semibold text-gray-800">
                     {producto.protocolo_comunicacion}
                   </p>
                 </div>
-  
+
               </div>
             </div>
-  
+
             {/* Selector de cantidad */}
             <div className="mb-8">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Cantidad (Stock disponible: {producto.stock})
               </label>
-  
+
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setCantidad(Math.max(1, cantidad - 1))}
@@ -251,7 +256,7 @@ const ProductoDetalle: React.FC = () => {
                   -
                 </button>
 
-  
+
                 <input
                   type="number"
                   value={cantidad}
@@ -262,7 +267,7 @@ const ProductoDetalle: React.FC = () => {
                   min="1"
                   max={producto.stock}
                 />
-  
+
                 <button
                   onClick={() => setCantidad(Math.min(producto.stock, cantidad + 1))}
                   className="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition shadow-sm"
@@ -274,14 +279,14 @@ const ProductoDetalle: React.FC = () => {
               </div>
             </div>
 
-  
+
             {/* Subtotal */}
             <div className="mb-8">
               <p className="text-xl font-semibold text-gray-800">
                 Subtotal: ${(producto.precio * cantidad).toFixed(2)}
               </p>
             </div>
-  
+
             {/* Boton carrito */}
             <button
               onClick={handleAgregarCarrito}
@@ -290,7 +295,7 @@ const ProductoDetalle: React.FC = () => {
             >
               {producto.stock === 0 ? 'Sin Stock' : 'Agregar al Carrito'}
             </button>
-  
+
           </div>
         </div>
       </div>
