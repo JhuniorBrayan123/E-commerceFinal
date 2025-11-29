@@ -52,7 +52,7 @@ const ConfirmPayment: React.FC = () => {
             orderId: paymentInfo.orderId,
             paymentToken: paymentInfo.paymentToken,
             total: paymentInfo.total,
-            currency: paymentInfo.currency || 'USD',
+            currency: paymentInfo.currency || 'PEN',
           },
         });
       } else {
@@ -86,7 +86,7 @@ const ConfirmPayment: React.FC = () => {
             orderId: paymentInfo.orderId,
             paymentToken: paymentInfo.paymentToken,
             total: validTotal,
-            currency: paymentInfo.currency || 'USD',
+            currency: paymentInfo.currency || 'PEN',
           },
         });
         return;
@@ -99,10 +99,10 @@ const ConfirmPayment: React.FC = () => {
         paymentToken: paymentInfo.paymentToken,
         paymentMethod: paymentInfo.paymentMethod, // Debe ser "STRIPE", "YAPE", o "PAYPAL"
         amount: validTotal, // Spring convierte automáticamente number a BigDecimal
-        currency: (paymentInfo.currency || "USD").toUpperCase(), // Asegurar mayúsculas para enum
+        currency: (paymentInfo.currency || "PEN").toUpperCase(), // Asegurar mayúsculas para enum
         paymentData: paymentInfo.paymentData || {},
       };
-      
+
       console.log('Enviando confirmData:', JSON.stringify(confirmData, null, 2));
 
 
@@ -129,10 +129,10 @@ const ConfirmPayment: React.FC = () => {
       }
     } catch (err: any) {
       console.error('Error al confirmar pago:', err);
-      
+
       // Extraer mensaje de error más específico
       let errorMessage = err.message || 'Error al procesar el pago';
-      
+
       // Manejar errores específicos
       if (err.code === 'INSUFFICIENT_STOCK' || errorMessage.includes('Stock insuficiente')) {
         errorMessage = 'No hay stock suficiente para completar la orden. Por favor, verifica la disponibilidad de los productos.';
@@ -143,19 +143,19 @@ const ConfirmPayment: React.FC = () => {
       } else if (err.code === 'PAYMENT_FAILED') {
         errorMessage = 'El pago no pudo ser procesado. Por favor, verifica tus datos e intenta nuevamente.';
       }
-      
+
       // Mostrar error en la UI
       setError(errorMessage);
       setLoading(false);
       setConfirming(false);
-      
+
       // También navegar a la página de resultado con error
       navigate('/payment-result', {
         state: {
           success: false,
-          error: { 
+          error: {
             message: errorMessage,
-            code: err.code 
+            code: err.code
           },
           orderId: paymentInfo.orderId,
         },
@@ -205,11 +205,11 @@ const ConfirmPayment: React.FC = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Monto:</span>
-                <span className="font-semibold">${validTotal.toFixed(2)}</span>
+                <span className="font-semibold">S/ {validTotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Moneda:</span>
-                <span className="font-semibold">{paymentInfo.currency || 'USD'}</span>
+                <span className="font-semibold">{paymentInfo.currency || 'PEN'}</span>
               </div>
             </div>
           </div>
@@ -238,7 +238,7 @@ const ConfirmPayment: React.FC = () => {
 
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-blue-800 text-sm">
-              <strong>⚠️ Importante:</strong> Al confirmar, se procesará el pago inmediatamente. 
+              <strong>⚠️ Importante:</strong> Al confirmar, se procesará el pago inmediatamente.
               Por favor, revisa todos los detalles antes de continuar.
             </p>
           </div>
@@ -252,7 +252,7 @@ const ConfirmPayment: React.FC = () => {
               <div className="flex justify-between">
                 <span>Total a Pagar:</span>
                 <span className="font-bold text-xl text-primary-600">
-                  ${validTotal.toFixed(2)}
+                  S/ {validTotal.toFixed(2)}
                 </span>
               </div>
             </div>

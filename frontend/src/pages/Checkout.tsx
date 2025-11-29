@@ -17,6 +17,16 @@ const Checkout: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Verificar si el usuario está logueado
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (!userStr) {
+      alert('Debes iniciar sesión para continuar con la compra');
+      navigate('/auth');
+      return;
+    }
+  }, [navigate]);
+
   useEffect(() => {
     const items = carritoService.get();
     if (items.length === 0) {
@@ -32,6 +42,10 @@ const Checkout: React.FC = () => {
     setError(null);
 
     try {
+      // Recuperar cupón aplicado desde localStorage
+      const appliedCouponStr = localStorage.getItem('appliedCoupon');
+      const appliedCoupon = appliedCouponStr ? JSON.parse(appliedCouponStr) : null;
+
       // Preparar items de la orden con el formato correcto para el backend
       const items = carrito.map((item) => {
         const precio = parseFloat(item.precio);
@@ -39,15 +53,16 @@ const Checkout: React.FC = () => {
           sensorId: item.id,
           nombre: item.nombre || 'Sensor sin nombre',
           cantidad: item.cantidad,
-          precioUnitario: parseFloat(precio.toFixed(2)), // Debe ser número, no string
+          precioUnitario: parseFloat(precio.toFixed(2)),
         };
       });
 
       // Crear la orden con el formato correcto
       const orderData = {
         items,
-        total: parseFloat(total.toFixed(2)), // Debe ser número
-        currency: 'USD', // El backend espera el enum Payment.Currency (USD o PEN)
+        total: parseFloat(total.toFixed(2)),
+        currency: 'PEN', // Cambiado a PEN (Soles Peruanos)
+        couponCode: appliedCoupon?.code || null
       };
 
       console.log('Enviando orden:', JSON.stringify(orderData, null, 2));
@@ -55,17 +70,14 @@ const Checkout: React.FC = () => {
       const response = await orderService.createOrder(orderData);
 
       console.log('Respuesta del servidor completa:', response);
-      console.log('Respuesta.success:', response.success);
-      console.log('Respuesta.data:', response.data);
 
       // Verificar la respuesta - puede venir directamente como objeto o dentro de data
       let orderDataResponse = response;
-      
+
       // Si la respuesta tiene una estructura diferente, intentar adaptarla
       if (response.data && response.data.orderId) {
         orderDataResponse = response.data;
       } else if (!response.success && response.data) {
-        // Si viene dentro de data directamente
         orderDataResponse = response.data;
       }
 
@@ -82,9 +94,12 @@ const Checkout: React.FC = () => {
         localStorage.setItem('currentOrderId', orderId.toString());
         localStorage.setItem('currentPaymentToken', paymentToken);
 
+        // Limpiar cupón aplicado después de crear la orden
+        localStorage.removeItem('appliedCoupon');
+
         // Navegar a la página de selección de método de pago
-        navigate('/payment-method', { 
-          state: { 
+        navigate('/payment-method', {
+          state: {
             orderId: orderId,
             paymentToken: paymentToken,
             total: typeof orderTotal === 'string' ? parseFloat(orderTotal) : orderTotal,
@@ -100,36 +115,26 @@ const Checkout: React.FC = () => {
       }
     } catch (err: any) {
       console.error('Error creating order:', err);
-      console.error('Error details:', {
-        message: err.message,
-        stack: err.stack,
-        response: err.response,
-      });
-      
-      // Mejorar el mensaje de error
+
       let errorMessage = 'Error al procesar la orden. Por favor intenta nuevamente.';
-      
+
       if (err.message) {
         errorMessage = err.message;
       } else if (err.response?.data?.message) {
         errorMessage = err.response.data.message;
       } else if (err.response?.data?.error) {
-        errorMessage = typeof err.response.data.error === 'string' 
-          ? err.response.data.error 
+        errorMessage = typeof err.response.data.error === 'string'
+          ? err.response.data.error
           : err.response.data.error.message || 'Error desconocido';
-      } else if (err.response?.status === 401) {
-        errorMessage = 'Tu sesión ha expirado. Por favor inicia sesión nuevamente.';
-      } else if (err.response?.status === 400) {
-        errorMessage = 'Datos inválidos. Por favor verifica la información.';
       }
-      
+
       setError(errorMessage);
       setLoading(false);
     }
   };
 
   if (carrito.length === 0) {
-    return null; // Se redirigirá automáticamente
+    return null;
   }
 
   return (
@@ -164,7 +169,7 @@ const Checkout: React.FC = () => {
                   <h3 className="text-xl font-semibold">{item.nombre}</h3>
                   <p className="text-gray-600 text-sm mt-1">Cantidad: {item.cantidad}</p>
                   <p className="text-primary-600 font-bold mt-2">
-                    ${item.precio} x {item.cantidad} = ${(parseFloat(item.precio) * item.cantidad).toFixed(2)}
+                    S/ {item.precio} x {item.cantidad} = S/ {(parseFloat(item.precio) * item.cantidad).toFixed(2)}
                   </p>
                 </div>
               </div>
@@ -179,7 +184,7 @@ const Checkout: React.FC = () => {
             <div className="space-y-2 mb-4">
               <div className="flex justify-between">
                 <span>Subtotal:</span>
-                <span>${total.toFixed(2)}</span>
+                <span>S/ {total.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Envío:</span>
@@ -187,32 +192,18 @@ const Checkout: React.FC = () => {
               </div>
               <div className="border-t pt-2 flex justify-between font-bold text-xl">
                 <span>Total:</span>
-                <span>${total.toFixed(2)}</span>
+                <span>S/ {total.toFixed(2)}</span>
               </div>
             </div>
             <button
-              onClick={async () => {
-                try {
-                  await handleCreateOrder();
-                } catch (err) {
-                  console.error('Error en handleCreateOrder:', err);
-                  setError('Error al crear la orden. Por favor intenta nuevamente.');
-                  setLoading(false);
-                }
-              }}
+              onClick={handleCreateOrder}
               disabled={loading}
               className="w-full bg-primary-600 text-white py-3 rounded-lg font-semibold hover:bg-primary-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {loading ? 'Creando orden...' : 'Crear Orden y Continuar'}
             </button>
             <button
-              onClick={() => {
-                try {
-                  navigate('/carrito');
-                } catch (err) {
-                  console.error('Error al navegar:', err);
-                }
-              }}
+              onClick={() => navigate('/carrito')}
               className="w-full mt-3 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition"
             >
               Volver al Carrito
@@ -225,4 +216,3 @@ const Checkout: React.FC = () => {
 };
 
 export default Checkout;
-

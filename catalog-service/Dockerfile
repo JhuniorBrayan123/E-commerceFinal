@@ -20,4 +20,4 @@ COPY . .
 EXPOSE 8000
 
 # Comando para ejecutar (con migraciones automáticas)
-CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+CMD ["sh", "-c", "python manage.py migrate && DEBUG=true python manage.py runserver 0.0.0.0:8000"]

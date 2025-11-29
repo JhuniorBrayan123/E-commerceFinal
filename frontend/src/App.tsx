@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useNavigate,
 } from "react-router-dom";
 import Login from "./components/Login";
 import Register from "./components/Register";
@@ -72,10 +73,14 @@ function App() {
 
   const handleLoginSuccess = (token: string, userData: User) => {
     setUser(userData);
+    // Forzar recarga para que React Router detecte el cambio
+    window.location.href = "/";
   };
 
   const handleRegisterSuccess = (token: string, userData: User) => {
     setUser(userData);
+    // Forzar recarga para que React Router detecte el cambio
+    window.location.href = "/";
   };
 
   const handleLogout = () => {
@@ -140,170 +145,153 @@ function App() {
 
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      {!user ? (
-        <Routes>
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="*" element={<Navigate to="/auth" replace />} />
-        </Routes>
-      ) : (
-        <Routes>
-          {/* Rutas públicas */}
-          <Route
-            path="/"
-            element={
+      <Routes>
+        {/* Ruta de autenticación - accesible siempre */}
+        <Route path="/auth" element={<AuthPage />} />
+
+        {/* Rutas públicas - accesibles sin login */}
+        <Route
+          path="/"
+          element={
+            <AuthenticatedLayout>
+              <Home />
+            </AuthenticatedLayout>
+          }
+        />
+
+        <Route
+          path="/categorias"
+          element={
+            <AuthenticatedLayout>
+              <Categorias />
+            </AuthenticatedLayout>
+          }
+        />
+
+        <Route
+          path="/categorias/:id"
+          element={
+            <AuthenticatedLayout>
+              <Categorias />
+            </AuthenticatedLayout>
+          }
+        />
+
+        <Route
+          path="/soporte"
+          element={
+            <AuthenticatedLayout>
+              <SupportPage />
+            </AuthenticatedLayout>
+          }
+        />
+
+        <Route
+          path="/sensores/:stringParam/:id"
+          element={
+            <AuthenticatedLayout>
+              <Sensores />
+            </AuthenticatedLayout>
+          }
+        />
+
+        <Route
+          path="/sensores"
+          element={
+            <AuthenticatedLayout>
+              <Sensores />
+            </AuthenticatedLayout>
+          }
+        />
+
+        <Route
+          path="/sensores/:id"
+          element={
+            <AuthenticatedLayout>
+              <SensorDetalle />
+            </AuthenticatedLayout>
+          }
+        />
+
+        <Route
+          path="/carrito"
+          element={
+            <AuthenticatedLayout>
+              <Carrito />
+            </AuthenticatedLayout>
+          }
+        />
+
+        {/* Rutas protegidas - requieren login */}
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute>
               <AuthenticatedLayout>
-                <Home />
+                <Checkout />
               </AuthenticatedLayout>
-            }
-          />
+            </ProtectedRoute>
+          }
+        />
 
-          <Route
-            path="/categorias"
-            element={
+        <Route
+          path="/payment-method"
+          element={
+            <ProtectedRoute>
               <AuthenticatedLayout>
-                <Categorias />
+                <PaymentMethod />
               </AuthenticatedLayout>
-            }
-          />
+            </ProtectedRoute>
+          }
+        />
 
-          <Route
-            path="/categorias/:id"
-            element={
+        <Route
+          path="/confirm-payment"
+          element={
+            <ProtectedRoute>
               <AuthenticatedLayout>
-                <Categorias />
+                <ConfirmPayment />
               </AuthenticatedLayout>
-            }
-          />
+            </ProtectedRoute>
+          }
+        />
 
-          {/* 👇👇 NUEVA RUTA /soporte 👇👇 */}
-          <Route
-            path="/soporte"
-            element={
+        <Route
+          path="/payment-result"
+          element={
+            <ProtectedRoute>
               <AuthenticatedLayout>
-                <SupportPage />
+                <PaymentResult />
               </AuthenticatedLayout>
-            }
-          />
+            </ProtectedRoute>
+          }
+        />
 
-          {/* Rutas protegidas */}
-          <Route
-            path="/carrito"
-            element={
-              <ProtectedRoute>
-                <AuthenticatedLayout>
-                  <Carrito />
-                </AuthenticatedLayout>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/checkout"
-            element={
-              <ProtectedRoute>
-                <AuthenticatedLayout>
-                  <Checkout />
-                </AuthenticatedLayout>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/payment-method"
-            element={
-              <ProtectedRoute>
-                <AuthenticatedLayout>
-                  <PaymentMethod />
-                </AuthenticatedLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/confirm-payment"
-            element={
-              <ProtectedRoute>
-                <AuthenticatedLayout>
-                  <ConfirmPayment />
-                </AuthenticatedLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/payment-result"
-            element={
-              <ProtectedRoute>
-                <AuthenticatedLayout>
-                  <PaymentResult />
-                </AuthenticatedLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/sensores/:stringParam/:id"
-            element={
+        <Route
+          path="/inventario"
+          element={
+            <ProtectedRoute>
               <AuthenticatedLayout>
-                <Sensores />
+                <Inventario />
               </AuthenticatedLayout>
-            }
-          />
-          <Route
-            path="/sensores"
-            element={
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/categorias"
+          element={
+            <ProtectedRoute>
               <AuthenticatedLayout>
-                <Sensores />
+                <CRUDCategorias />
               </AuthenticatedLayout>
-            }
-          />
-          <Route
-            path="/sensores/:id"
-            element={
-              <AuthenticatedLayout>
-                <SensorDetalle />
-              </AuthenticatedLayout>
-            }
-          />
-          <Route
-            path="/inventario"
-            element={
-              <ProtectedRoute>
-                <AuthenticatedLayout>
-                  <Inventario />
-                </AuthenticatedLayout>
-              </ProtectedRoute>
-            }
-          />
+            </ProtectedRoute>
+          }
+        />
 
-          <Route
-            path="/admin/categorias"
-            element={
-              <ProtectedRoute>
-                <AuthenticatedLayout>
-                  <CRUDCategorias />
-                </AuthenticatedLayout>
-              </ProtectedRoute>
-            }
-          />
-
-
-          <Route
-            path="/sensores/:id"
-            element={
-              <ProtectedRoute>
-                <AuthenticatedLayout>
-                  <SensorDetalle />
-                </AuthenticatedLayout>
-              </ProtectedRoute>
-            }
-          />
-
-
-
-          {/* Redirección por defecto */}
-
-          <Route path="/auth" element={<Navigate to="/" replace />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      )}
+        {/* Redirección por defecto */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </Router>
   );
 }

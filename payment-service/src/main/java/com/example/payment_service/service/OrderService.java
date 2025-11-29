@@ -36,6 +36,7 @@ public class OrderService {
     private final JwtService jwtService;
     private final PaymentService paymentService;
     private final CatalogService catalogService;
+    private final CouponService couponService; // ← NUEVO
 
     private static final String PAYMENT_TOKEN_PREFIX = "pay_token_";
     private static final SecureRandom random = new SecureRandom();
@@ -45,13 +46,15 @@ public class OrderService {
             PaymentRepository paymentRepository,
             JwtService jwtService,
             PaymentService paymentService,
-            CatalogService catalogService
+            CatalogService catalogService,
+            CouponService couponService // ← NUEVO
     ) {
         this.orderRepository = orderRepository;
         this.paymentRepository = paymentRepository;
         this.jwtService = jwtService;
         this.paymentService = paymentService;
         this.catalogService = catalogService;
+        this.couponService = couponService; // ← NUEVO
     }
 
     /**
@@ -62,9 +65,37 @@ public class OrderService {
         jwtService.validateToken(jwtToken);
         Long userId = jwtService.extractUserId(jwtToken);
 
+        // Calcular subtotal (total antes de descuentos)
+        BigDecimal subtotal = request.getTotal();
+        BigDecimal discountAmount = BigDecimal.ZERO;
+        String couponCode = null;
+
+        // Si hay un cupón, validarlo y calcular descuento
+        if (request.getCouponCode() != null && !request.getCouponCode().trim().isEmpty()) {
+            couponCode = request.getCouponCode().trim().toUpperCase();
+            log.info("Validando cupón: {}", couponCode);
+
+            var couponValidation = couponService.validateCoupon(couponCode, subtotal, userId);
+
+            if (couponValidation.isValid()) {
+                discountAmount = couponValidation.getDiscount();
+                log.info("Cupón válido. Descuento aplicado: {}", discountAmount);
+            } else {
+                log.warn("Cupón inválido: {}. Mensaje: {}", couponCode, couponValidation.getMessage());
+                // No lanzar excepción, simplemente no aplicar descuento
+                couponCode = null;
+            }
+        }
+
+        // Calcular total final (subtotal - descuento)
+        BigDecimal finalTotal = subtotal.subtract(discountAmount);
+
         Order order = new Order();
         order.setUserId(userId);
-        order.setTotal(request.getTotal());
+        order.setSubtotal(subtotal);
+        order.setDiscountAmount(discountAmount);
+        order.setCouponCode(couponCode);
+        order.setTotal(finalTotal); // Total con descuento aplicado
         order.setCurrency(request.getCurrency());
         order.setStatus(Order.OrderStatus.PENDING);
 
@@ -88,6 +119,12 @@ public class OrderService {
         savedOrder.setItems(items);
 
         Order finalOrder = orderRepository.save(savedOrder);
+
+        // Si se aplicó un cupón válido, registrar su uso
+        if (couponCode != null && discountAmount.compareTo(BigDecimal.ZERO) > 0) {
+            couponService.registerCouponUsage(couponCode, userId, finalOrder.getId(),
+                    discountAmount, subtotal);
+        }
 
         return buildOrderResponse(finalOrder);
     }
@@ -117,9 +154,9 @@ public class OrderService {
         BigDecimal requestAmount = request.getAmount().setScale(2, java.math.RoundingMode.HALF_UP);
         if (orderTotal.compareTo(requestAmount) != 0) {
             log.error("Monto no coincide: orden={}, request={}", orderTotal, requestAmount);
-            throw PaymentException.badRequest("INVALID_AMOUNT", 
-                String.format("El monto no coincide con el total de la orden. Esperado: %s, Recibido: %s", 
-                    orderTotal, requestAmount));
+            throw PaymentException.badRequest("INVALID_AMOUNT",
+                    String.format("El monto no coincide con el total de la orden. Esperado: %s, Recibido: %s",
+                            orderTotal, requestAmount));
         }
 
         if (order.getStatus() != Order.OrderStatus.PENDING) {
@@ -129,15 +166,16 @@ public class OrderService {
         final Order finalOrder = order;
 
         // 0️⃣ VALIDAR Y DESCONTAR STOCK ANTES DE PROCESAR EL PAGO
-        // Nota: El endpoint deduct-stock valida Y descuenta. Si pasa, el stock ya está descontado.
+        // Nota: El endpoint deduct-stock valida Y descuenta. Si pasa, el stock ya está
+        // descontado.
         try {
             log.info("🔍 Validando y descontando stock antes de procesar el pago...");
             Boolean stockAvailable = catalogService.checkStockAvailability(finalOrder.getItems(), jwtToken)
                     .block(Duration.ofSeconds(5));
-            
+
             if (stockAvailable == null || !stockAvailable) {
-                throw PaymentException.badRequest("INSUFFICIENT_STOCK", 
-                    "No hay stock suficiente para completar la orden");
+                throw PaymentException.badRequest("INSUFFICIENT_STOCK",
+                        "No hay stock suficiente para completar la orden");
             }
             log.info("✅ Stock validado y descontado correctamente");
         } catch (RuntimeException e) {
@@ -145,15 +183,15 @@ public class OrderService {
             // Si el error contiene información de stock insuficiente, extraer el mensaje
             String errorMessage = e.getMessage();
             if (errorMessage != null && errorMessage.contains("Stock insuficiente")) {
-                throw PaymentException.badRequest("INSUFFICIENT_STOCK", 
-                    "Stock insuficiente para uno o más productos en la orden");
+                throw PaymentException.badRequest("INSUFFICIENT_STOCK",
+                        "Stock insuficiente para uno o más productos en la orden");
             }
-            throw PaymentException.badRequest("STOCK_VALIDATION_ERROR", 
-                "Error al validar el stock: " + e.getMessage());
+            throw PaymentException.badRequest("STOCK_VALIDATION_ERROR",
+                    "Error al validar el stock: " + e.getMessage());
         } catch (Exception e) {
             log.error("❌ Error inesperado validando stock: {}", e.getMessage(), e);
-            throw PaymentException.badRequest("STOCK_VALIDATION_ERROR", 
-                "Error al validar el stock: " + e.getMessage());
+            throw PaymentException.badRequest("STOCK_VALIDATION_ERROR",
+                    "Error al validar el stock: " + e.getMessage());
         }
 
         finalOrder.setStatus(Order.OrderStatus.PROCESSING);
@@ -174,8 +212,7 @@ public class OrderService {
             // 2️⃣ Obtener Payment guardado en BD por PaymentService
             Payment payment = paymentRepository.findByOrderId(finalOrder.getId())
                     .orElseThrow(() -> PaymentException.notFound(
-                    "PAYMENT_NOT_FOUND", "Pago no encontrado después de procesarlo"
-            ));
+                            "PAYMENT_NOT_FOUND", "Pago no encontrado después de procesarlo"));
 
             // 3️⃣ Cambiar estado a PAID
             finalOrder.setStatus(Order.OrderStatus.PAID);
@@ -294,17 +331,20 @@ public class OrderService {
         orderData.setStatus(order.getStatus().name());
         orderData.setCreatedAt(order.getCreatedAt());
 
-        List<OrderResponse.OrderItemResponse> itemsResponse
-                = order.getItems().stream().map(item -> {
-                    OrderResponse.OrderItemResponse itemResponse
-                            = new OrderResponse.OrderItemResponse();
-                    itemResponse.setSensorId(item.getSensorId());
-                    itemResponse.setNombre(item.getNombre());
-                    itemResponse.setCantidad(item.getCantidad());
-                    itemResponse.setPrecioUnitario(item.getPrecioUnitario());
-                    itemResponse.setSubtotal(item.getSubtotal());
-                    return itemResponse;
-                }).collect(Collectors.toList());
+        // Agregar información de cupones
+        orderData.setSubtotal(order.getSubtotal());
+        orderData.setDiscountAmount(order.getDiscountAmount());
+        orderData.setCouponCode(order.getCouponCode());
+
+        List<OrderResponse.OrderItemResponse> itemsResponse = order.getItems().stream().map(item -> {
+            OrderResponse.OrderItemResponse itemResponse = new OrderResponse.OrderItemResponse();
+            itemResponse.setSensorId(item.getSensorId());
+            itemResponse.setNombre(item.getNombre());
+            itemResponse.setCantidad(item.getCantidad());
+            itemResponse.setPrecioUnitario(item.getPrecioUnitario());
+            itemResponse.setSubtotal(item.getSubtotal());
+            return itemResponse;
+        }).collect(Collectors.toList());
 
         orderData.setItems(itemsResponse);
         response.setData(orderData);

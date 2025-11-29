@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'productos',
     'inventario',
     'orders',
+    'cupones',  # ← NUEVA APP
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

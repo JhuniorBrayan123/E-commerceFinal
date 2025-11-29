@@ -21,6 +21,9 @@ public class OrderRequest {
     @NotNull
     private Payment.Currency currency;
 
+    // Código de cupón opcional
+    private String couponCode;
+
     // Getters and Setters
     public List<OrderItemRequest> getItems() {
         return items;
@@ -44,6 +47,14 @@ public class OrderRequest {
 
     public void setCurrency(Payment.Currency currency) {
         this.currency = currency;
+    }
+
+    public String getCouponCode() {
+        return couponCode;
+    }
+
+    public void setCouponCode(String couponCode) {
+        this.couponCode = couponCode;
     }
 
     // Inner class for order items
@@ -97,4 +108,3 @@ public class OrderRequest {
         }
     }
 }
-

@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { carritoService } from '../services/api';
+import CouponInput from '../components/CouponInput';
+import { AppliedCoupon } from '../types/coupon';
 
 const Carrito: React.FC = () => {
   const navigate = useNavigate();
   const [carrito, setCarrito] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
-
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
 
   useEffect(() => {
     const actualizarCarrito = () => {
       const items = carritoService.get();
       setCarrito(items);
       setTotal(carritoService.getTotal());
-      
     };
     actualizarCarrito();
   }, []);
@@ -40,9 +41,33 @@ const Carrito: React.FC = () => {
   const handleVaciar = () => {
     if (window.confirm('¿Estás seguro de vaciar el carrito?')) {
       carritoService.clear();
+      setAppliedCoupon(null); // Limpiar cupón al vaciar carrito
       actualizarCarrito();
     }
   };
+
+  const handleCouponApplied = (coupon: AppliedCoupon) => {
+    setAppliedCoupon(coupon);
+  };
+
+  const handleCouponRemoved = () => {
+    setAppliedCoupon(null);
+  };
+
+  const handleProceedToCheckout = () => {
+    // Guardar cupón en localStorage para usarlo en checkout
+    if (appliedCoupon) {
+      localStorage.setItem('appliedCoupon', JSON.stringify(appliedCoupon));
+    } else {
+      localStorage.removeItem('appliedCoupon');
+    }
+    navigate('/checkout');
+  };
+
+  // Calcular totales con descuento
+  const subtotal = total;
+  const discountAmount = appliedCoupon?.discount || 0;
+  const finalTotal = subtotal - discountAmount;
 
   if (carrito.length === 0) {
     return (
@@ -136,24 +161,41 @@ const Carrito: React.FC = () => {
         <div className="lg:col-span-1">
           <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
             <h2 className="text-2xl font-bold mb-4">Resumen</h2>
+
+            {/* Componente de cupón */}
+            <CouponInput
+              total={subtotal}
+              onCouponApplied={handleCouponApplied}
+              onCouponRemoved={handleCouponRemoved}
+              appliedCoupon={appliedCoupon}
+            />
+
             <div className="space-y-2 mb-4">
               <div className="flex justify-between">
                 <span>Subtotal:</span>
-                <span>${total.toFixed(2)}</span>
+                <span>${subtotal.toFixed(2)}</span>
               </div>
+
+              {appliedCoupon && (
+                <div className="flex justify-between text-green-600">
+                  <span>Descuento ({appliedCoupon.code}):</span>
+                  <span>-${discountAmount.toFixed(2)}</span>
+                </div>
+              )}
+
               <div className="flex justify-between">
                 <span>Envío:</span>
                 <span>Gratis</span>
               </div>
+
               <div className="border-t pt-2 flex justify-between font-bold text-xl">
                 <span>Total:</span>
-                <span>${total.toFixed(2)}</span>
+                <span>${finalTotal.toFixed(2)}</span>
               </div>
             </div>
+
             <button
-              onClick={() => {
-                navigate('/checkout');
-              }}
+              onClick={handleProceedToCheckout}
               className="w-full bg-primary-600 text-white py-3 rounded-lg font-semibold hover:bg-primary-700 transition"
             >
               Proceder al Pago
@@ -166,4 +208,3 @@ const Carrito: React.FC = () => {
 };
 
 export default Carrito;
-

@@ -131,12 +131,14 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
               Sensores
             </Link>
 
-            <Link
-              to="/inventario"
-              className="px-3 py-2 rounded-full text-xl font-medium hover:bg-secondary-700 hover:text-white transition"
-            >
-              Inventario
-            </Link>
+            {user && (
+              <Link
+                to="/inventario"
+                className="px-3 py-2 rounded-full text-xl font-medium hover:bg-secondary-700 hover:text-white transition"
+              >
+                Inventario
+              </Link>
+            )}
           </div>
 
           {/* CARRITO + USUARIO */}
@@ -169,8 +171,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
             </button>
 
             {/* Usuario */}
-            {user && (
-
+            {user ? (
               <div className="flex items-center space-x-2">
                 <span className="font-semibold text-sm">
                   {user.first_name} {user.last_name}
@@ -182,6 +183,13 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
                   Cerrar sesión
                 </button>
               </div>
+            ) : (
+              <button
+                onClick={() => navigate("/auth")}
+                className="bg-secondary-600 px-4 py-2 rounded-full text-ml font-medium hover:bg-secondary-700 transition text-white"
+              >
+                Iniciar Sesión
+              </button>
             )}
           </div>
 
