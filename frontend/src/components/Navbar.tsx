@@ -131,13 +131,6 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
             >
               Inventario
             </Link>
-
-            <Link
-              to="/admin/dashboard"
-              className="px-3 py-2 rounded-full text-xl font-medium hover:bg-secondary-700 hover:text-white transition"
-            >
-              Panel de administración
-            </Link>
           </div>
 
           {/* CARRITO + USUARIO */}
