@@ -5,3 +5,4 @@ django-filter==23.3  # ← AGREGAR django_filters
 mysqlclient==2.1.1
 PyMySQL==1.1.0
 Pillow
+whitenoise==6.11.0

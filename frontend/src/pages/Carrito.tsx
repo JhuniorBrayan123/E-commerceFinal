@@ -76,7 +76,7 @@ const Carrito: React.FC = () => {
           {carrito.map((item) => (
             <div key={item.id} className="bg-white rounded-lg shadow-md p-6">
               <div className="flex items-center space-x-4">
-                {item.imagen_url ? (
+                {item.imagen ? (
                   <img
                     src={item.imagen_url}
                     alt={item.nombre}

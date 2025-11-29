@@ -22,6 +22,7 @@ import Checkout from "./pages/Checkout";
 import PaymentMethod from "./pages/PaymentMethod";
 import ConfirmPayment from "./pages/ConfirmPayment";
 import PaymentResult from "./pages/PaymentResult";
+import AdminDashboard from "./pages/AdminDashboard";
 
 
 // 👇👇 NUEVO IMPORT QUE TE PEDÍ 👇👇
@@ -266,6 +267,17 @@ function App() {
           />
 
           <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <AdminDashboard />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/admin/categorias"
             element={
               <ProtectedRoute>
@@ -287,8 +299,8 @@ function App() {
               </ProtectedRoute>
             }
           />
-            
-          
+
+
 
           {/* Redirección por defecto */}
 

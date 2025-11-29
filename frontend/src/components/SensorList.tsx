@@ -45,26 +45,30 @@ const SensorList: React.FC = () => {
     { id: "search", label: "Buscar", type: "search", placeholder: "Nombre, marca, modelo..." },
     { id: "categoria_nombre", label: "Tipo de Sensor", type: "select" },
     { id: "marca", label: "Marca", type: "select" },
-    { id: "disponible", label: "Disponibilidad", type: "select", options: [
-      { value: "true", label: "Disponibles" },
-      { value: "false", label: "No Disponibles" }
-    ]},
+    {
+      id: "disponible", label: "Disponibilidad", type: "select", options: [
+        { value: "true", label: "Disponibles" },
+        { value: "false", label: "No Disponibles" }
+      ]
+    },
     { id: "precio_min", label: "Precio Mínimo", type: "number", placeholder: "Min" },
     { id: "precio_max", label: "Precio Máximo", type: "number", placeholder: "Max" },
     { id: "stock_min", label: "Stock Mínimo", type: "number", placeholder: "Min" },
     { id: "rango", label: "Rango de Medición", type: "search", placeholder: "Ej: 0-100%" },
     { id: "modelo", label: "Modelo", type: "search", placeholder: "Buscar por modelo" },
     { id: "protocolo", label: "Protocolo de Comunicación", type: "search", placeholder: "Ej: Digital, I2C" },
-    { id: "ordering", label: "Ordenar por", type: "select", options: [
-      { value: "-fecha_creacion", label: "Más Recientes" },
-      { value: "fecha_creacion", label: "Más Antiguos" },
-      { value: "-precio", label: "Precio: Mayor a Menor" },
-      { value: "precio", label: "Precio: Menor a Mayor" },
-      { value: "nombre", label: "Nombre: A-Z" },
-      { value: "-nombre", label: "Nombre: Z-A" },
-      { value: "-stock", label: "Stock: Mayor a Menor" },
-      { value: "stock", label: "Stock: Menor a Mayor" }
-    ]}
+    {
+      id: "ordering", label: "Ordenar por", type: "select", options: [
+        { value: "-fecha_creacion", label: "Más Recientes" },
+        { value: "fecha_creacion", label: "Más Antiguos" },
+        { value: "-precio", label: "Precio: Mayor a Menor" },
+        { value: "precio", label: "Precio: Menor a Mayor" },
+        { value: "nombre", label: "Nombre: A-Z" },
+        { value: "-nombre", label: "Nombre: Z-A" },
+        { value: "-stock", label: "Stock: Mayor a Menor" },
+        { value: "stock", label: "Stock: Menor a Mayor" }
+      ]
+    }
   ];
 
   // Filtros activos por defecto (no se pueden eliminar)
@@ -182,8 +186,8 @@ const SensorList: React.FC = () => {
         const modelo = sensor.modelo?.toLowerCase() || "";
         // Buscar por primera letra o contiene
         return nombre.startsWith(searchTerm) || nombre.includes(searchTerm) ||
-               marca.startsWith(searchTerm) || marca.includes(searchTerm) ||
-               modelo.startsWith(searchTerm) || modelo.includes(searchTerm);
+          marca.startsWith(searchTerm) || marca.includes(searchTerm) ||
+          modelo.startsWith(searchTerm) || modelo.includes(searchTerm);
       });
     }
 
@@ -194,7 +198,7 @@ const SensorList: React.FC = () => {
 
     // Aplicar filtro de marca
     if (activeFilters.has("marca") && filterValues.marca) {
-      filtered = filtered.filter(sensor => 
+      filtered = filtered.filter(sensor =>
         sensor.marca?.toLowerCase().includes(filterValues.marca.toLowerCase())
       );
     }
@@ -269,7 +273,7 @@ const SensorList: React.FC = () => {
           const precioB = parseFloat(b.precio) || 0;
           return order === "-precio" ? precioB - precioA : precioA - precioB;
         } else if (order === "-nombre" || order === "nombre") {
-          return order === "-nombre" 
+          return order === "-nombre"
             ? (b.nombre || "").localeCompare(a.nombre || "")
             : (a.nombre || "").localeCompare(b.nombre || "");
         } else if (order === "-stock" || order === "stock") {
@@ -384,258 +388,258 @@ const SensorList: React.FC = () => {
       {/* Filtros */}
       <div className="filters-section">
 
-        
+
         <div className="filters-grid">
-        <div className="filters-header">
-          <h3>Filtros</h3>
-          <div className="filters-actions">
-            <button onClick={handleClearFilters} className="clear-filters-btn">
-              Restablecer
-            </button>
-            <button 
-              onClick={() => setShowSaveDialog(true)} 
-              className="save-filter-btn"
-            >
-              💾 Guardar Vista
-            </button>
-
-          </div>
-        </div>
-
-        {/* Botones para agregar filtros */}
-        <div className="filter-available-list">
-          <span style={{ fontWeight: 600, marginRight: '8px', alignSelf: 'center' }}>
-            Agregar filtros:
-          </span>
-          {availableFilters
-            .filter(filter => !activeFilters.has(filter.id))
-            .map(filter => (
-              <button
-                key={filter.id}
-                onClick={() => handleToggleFilter(filter.id)}
-                className="filter-available-btn"
-              >
-                + {filter.label}
+          <div className="filters-header">
+            <h3>Filtros</h3>
+            <div className="filters-actions">
+              <button onClick={handleClearFilters} className="clear-filters-btn">
+                Restablecer
               </button>
-            ))}
-          {availableFilters.filter(filter => !activeFilters.has(filter.id)).length === 0 && (
-            <span style={{ color: '#666', fontStyle: 'italic' }}>
-              Todos los filtros están activos
-            </span>
-          )}
-        </div>
+              <button
+                onClick={() => setShowSaveDialog(true)}
+                className="save-filter-btn"
+              >
+                💾 Guardar Vista
+              </button>
 
-        {/* Filtros activos */}
-        {Array.from(activeFilters).length > 0 && (
-          <div className="filters-grid">
-            {Array.from(activeFilters).map(filterId => {
-              const filter = availableFilters.find(f => f.id === filterId);
-              if (!filter) return null;
-              
-              const isDefault = defaultFilters.has(filterId);
-              
-              return (
-                <div 
-                  key={filterId} 
-                  className={`filter-group-wrapper ${isDefault ? 'required' : ''}`}
-                >
-                  <div className="filter-group" style={{ flex: 1, minWidth: 0 }}>
-                    <label htmlFor={filterId}>
-                      {filter.label}
-                      {isDefault && (
-                        <span className="required-badge">(requerido)</span>
-                      )}
-                    </label>
-                    {filter.type === "search" ? (
-                      <input
-                        id={filterId}
-                        type="text"
-                        value={filterValues[filterId] || ""}
-                        onChange={(e) => handleFilterValueChange(filterId, e.target.value)}
-                        placeholder={filter.placeholder || "Buscar..."}
-                        className="filter-input"
-                      />
-                    ) : filter.type === "number" ? (
-                      <input
-                        id={filterId}
-                        type="number"
-                        value={filterValues[filterId] || ""}
-                        onChange={(e) => handleFilterValueChange(filterId, e.target.value)}
-                        placeholder={filter.placeholder || ""}
-                        className="filter-input"
-                        min="0"
-                        step={filterId.includes("precio") ? "0.01" : "1"}
-                      />
-                    ) : (
-                      <select
-                        id={filterId}
-                        value={filterValues[filterId] || ""}
-                        onChange={(e) => handleFilterValueChange(filterId, e.target.value)}
-                        className="filter-select"
-                      >
-                        {filterId === "tipo" && <option value="">Todos</option>}
-                        {filterId === "marca" && <option value="">Todas</option>}
-                        {filterId === "disponible" && <option value="">Todos</option>}
-                        {filterId === "tipo" && filterOptions.categorias.map((tipo) => (
-                          <option key={tipo.value} value={String(tipo.value)}>
-                            {tipo.label}
-                          </option>
-                        ))}
-                        {filterId === "marca" && filterOptions.marcas.map((marca, index) => (
-                          <option key={`${marca}-${index}`} value={marca}>
-                            {marca}
-                          </option>
-                        ))}
-                        {filter.options?.map(opt => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                  </div>
-                  {!isDefault && (
-                    <button
-                      onClick={() => handleToggleFilter(filterId)}
-                      className="filter-remove-btn"
-                      title="Remover filtro"
-                    >
-                      ×
-                    </button>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Diálogo para guardar filtro */}
-        {showSaveDialog && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0,0,0,0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000
-          }}>
-            <div style={{
-              background: 'white',
-              padding: '24px',
-              borderRadius: '8px',
-              minWidth: '300px',
-              maxWidth: '500px'
-            }}>
-              <h4 style={{ marginBottom: '16px', color: '#2c5530' }}>
-                Guardar Vista Personalizada
-              </h4>
-              <input
-                type="text"
-                value={saveFilterName}
-                onChange={(e) => setSaveFilterName(e.target.value)}
-                placeholder="Nombre de la vista (ej: Sensores económicos)"
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  marginBottom: '16px',
-                  fontSize: '0.95em'
-                }}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleSaveFilter();
-                  }
-                }}
-              />
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button
-                  onClick={() => {
-                    setShowSaveDialog(false);
-                    setSaveFilterName("");
-                  }}
-                  style={{
-                    padding: '8px 16px',
-                    background: '#ccc',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleSaveFilter}
-                  style={{
-                    padding: '8px 16px',
-                    background: '#2c5530',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Guardar
-                </button>
-              </div>
             </div>
           </div>
-        )}
 
-        {/* Filtros guardados */}
-        {savedFilters.length > 0 && (
-          <div className="saved-filters-section">
-            <h4 style={{ marginBottom: '10px', color: '#2c5530', fontSize: '1.1em' }}>
-              Vistas Personalizadas:
-            </h4>
-            <div className="saved-filters-list">
-              {savedFilters.map(savedFilter => (
-                <div key={savedFilter.id} className="saved-filter-chip">
-                  <span>{savedFilter.name}</span>
+          {/* Botones para agregar filtros */}
+          <div className="filter-available-list">
+            <span style={{ fontWeight: 600, marginRight: '8px', alignSelf: 'center' }}>
+              Agregar filtros:
+            </span>
+            {availableFilters
+              .filter(filter => !activeFilters.has(filter.id))
+              .map(filter => (
+                <button
+                  key={filter.id}
+                  onClick={() => handleToggleFilter(filter.id)}
+                  className="filter-available-btn"
+                >
+                  + {filter.label}
+                </button>
+              ))}
+            {availableFilters.filter(filter => !activeFilters.has(filter.id)).length === 0 && (
+              <span style={{ color: '#666', fontStyle: 'italic' }}>
+                Todos los filtros están activos
+              </span>
+            )}
+          </div>
+
+          {/* Filtros activos */}
+          {Array.from(activeFilters).length > 0 && (
+            <div className="filters-grid">
+              {Array.from(activeFilters).map(filterId => {
+                const filter = availableFilters.find(f => f.id === filterId);
+                if (!filter) return null;
+
+                const isDefault = defaultFilters.has(filterId);
+
+                return (
+                  <div
+                    key={filterId}
+                    className={`filter-group-wrapper ${isDefault ? 'required' : ''}`}
+                  >
+                    <div className="filter-group" style={{ flex: 1, minWidth: 0 }}>
+                      <label htmlFor={filterId}>
+                        {filter.label}
+                        {isDefault && (
+                          <span className="required-badge">(requerido)</span>
+                        )}
+                      </label>
+                      {filter.type === "search" ? (
+                        <input
+                          id={filterId}
+                          type="text"
+                          value={filterValues[filterId] || ""}
+                          onChange={(e) => handleFilterValueChange(filterId, e.target.value)}
+                          placeholder={filter.placeholder || "Buscar..."}
+                          className="filter-input"
+                        />
+                      ) : filter.type === "number" ? (
+                        <input
+                          id={filterId}
+                          type="number"
+                          value={filterValues[filterId] || ""}
+                          onChange={(e) => handleFilterValueChange(filterId, e.target.value)}
+                          placeholder={filter.placeholder || ""}
+                          className="filter-input"
+                          min="0"
+                          step={filterId.includes("precio") ? "0.01" : "1"}
+                        />
+                      ) : (
+                        <select
+                          id={filterId}
+                          value={filterValues[filterId] || ""}
+                          onChange={(e) => handleFilterValueChange(filterId, e.target.value)}
+                          className="filter-select"
+                        >
+                          {filterId === "tipo" && <option value="">Todos</option>}
+                          {filterId === "marca" && <option value="">Todas</option>}
+                          {filterId === "disponible" && <option value="">Todos</option>}
+                          {filterId === "tipo" && filterOptions.categorias.map((tipo) => (
+                            <option key={tipo.value} value={String(tipo.value)}>
+                              {tipo.label}
+                            </option>
+                          ))}
+                          {filterId === "marca" && filterOptions.marcas.map((marca, index) => (
+                            <option key={`${marca}-${index}`} value={marca}>
+                              {marca}
+                            </option>
+                          ))}
+                          {filter.options?.map(opt => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+                    {!isDefault && (
+                      <button
+                        onClick={() => handleToggleFilter(filterId)}
+                        className="filter-remove-btn"
+                        title="Remover filtro"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Diálogo para guardar filtro */}
+          {showSaveDialog && (
+            <div style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0,0,0,0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000
+            }}>
+              <div style={{
+                background: 'white',
+                padding: '24px',
+                borderRadius: '8px',
+                minWidth: '300px',
+                maxWidth: '500px'
+              }}>
+                <h4 style={{ marginBottom: '16px', color: '#2c5530' }}>
+                  Guardar Vista Personalizada
+                </h4>
+                <input
+                  type="text"
+                  value={saveFilterName}
+                  onChange={(e) => setSaveFilterName(e.target.value)}
+                  placeholder="Nombre de la vista (ej: Sensores económicos)"
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    marginBottom: '16px',
+                    fontSize: '0.95em'
+                  }}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleSaveFilter();
+                    }
+                  }}
+                />
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
                   <button
-                    onClick={() => handleLoadSavedFilter(savedFilter)}
+                    onClick={() => {
+                      setShowSaveDialog(false);
+                      setSaveFilterName("");
+                    }}
                     style={{
+                      padding: '8px 16px',
+                      background: '#ccc',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleSaveFilter}
+                    style={{
+                      padding: '8px 16px',
                       background: '#2c5530',
                       color: 'white',
                       border: 'none',
                       borderRadius: '4px',
-                      padding: '2px 8px',
-                      cursor: 'pointer',
-                      fontSize: '0.85em'
+                      cursor: 'pointer'
                     }}
-                    title="Cargar vista"
                   >
-                    Cargar
-                  </button>
-                  <button
-                    onClick={() => handleDeleteSavedFilter(savedFilter.id)}
-                    title="Eliminar vista"
-                  >
-                    ×
+                    Guardar
                   </button>
                 </div>
-              ))}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
 
-      {/* Grid de sensores */}
-      <div className="sensors-grid">
-        {sensores.map((sensor) => (
-          <Link
-            key={sensor.id}
-            to={`/sensores/${sensor.id}`}
-            className="bg-white rounded-lg shadow-md hover:shadow-lg transition"
-          >
-            {sensor.imagen ? (
+          {/* Filtros guardados */}
+          {savedFilters.length > 0 && (
+            <div className="saved-filters-section">
+              <h4 style={{ marginBottom: '10px', color: '#2c5530', fontSize: '1.1em' }}>
+                Vistas Personalizadas:
+              </h4>
+              <div className="saved-filters-list">
+                {savedFilters.map(savedFilter => (
+                  <div key={savedFilter.id} className="saved-filter-chip">
+                    <span>{savedFilter.name}</span>
+                    <button
+                      onClick={() => handleLoadSavedFilter(savedFilter)}
+                      style={{
+                        background: '#2c5530',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        padding: '2px 8px',
+                        cursor: 'pointer',
+                        fontSize: '0.85em'
+                      }}
+                      title="Cargar vista"
+                    >
+                      Cargar
+                    </button>
+                    <button
+                      onClick={() => handleDeleteSavedFilter(savedFilter.id)}
+                      title="Eliminar vista"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Grid de sensores */}
+        <div className="sensors-grid">
+          {sensores.map((sensor) => (
+            <Link
+              key={sensor.id}
+              to={`/sensores/${sensor.id}`}
+              className="bg-white rounded-lg shadow-md hover:shadow-lg transition"
+            >
+              {sensor.imagen ? (
                 <img
-                  src={sensor.imagen?.trim()}
+                  src={sensor.imagen}
                   alt={sensor.nombre}
                   className="w-full h-48 object-cover"
                 />
@@ -643,54 +647,54 @@ const SensorList: React.FC = () => {
                 <div className="w-full h-48 bg-gray-200 flex items-center justify-center ">
                   <span className="text-gray-400">Sin imagen</span>
                 </div>
-            )}
-            <div className="sensor-card">
-              <div className="sensor-header">
-                <h3>{sensor.nombre}</h3>
-                <span className={`tipo-badge cat-${sensor.categoria}`}>
-                  {sensor.categoria_nombre}
-                </span>
-              </div>
-
-              <div className="sensor-details">
-                <p>
-                  <strong>Marca:</strong> {sensor.marca}
-                </p>
-                <p>
-                  <strong>Modelo:</strong> {sensor.modelo}
-                </p>
-                <p className="sensor-description line-clamp-2">
-                  <strong>Descripción:</strong> {sensor.descripcion}
-                </p>
-              </div>
-
-              <div className="sensor-footer">
-                <div className="price-stock">
-                  <p className="sensor-price">S/. {sensor.precio}</p>
-                  <p className="sensor-stock">Stock: {sensor.stock}</p>
+              )}
+              <div className="sensor-card">
+                <div className="sensor-header">
+                  <h3>{sensor.nombre}</h3>
+                  <span className={`tipo-badge cat-${sensor.categoria}`}>
+                    {sensor.categoria_nombre}
+                  </span>
                 </div>
+
+                <div className="sensor-details">
+                  <p>
+                    <strong>Marca:</strong> {sensor.marca}
+                  </p>
+                  <p>
+                    <strong>Modelo:</strong> {sensor.modelo}
+                  </p>
+                  <p className="sensor-description line-clamp-2">
+                    <strong>Descripción:</strong> {sensor.descripcion}
+                  </p>
+                </div>
+
+                <div className="sensor-footer">
+                  <div className="price-stock">
+                    <p className="sensor-price">S/. {sensor.precio}</p>
+                    <p className="sensor-stock">Stock: {sensor.stock}</p>
+                  </div>
+                </div>
+
               </div>
 
-            </div>
-              
-          </Link>
-          
-        ))}
-      </div>
+            </Link>
 
-      {sensores.length === 0 && !loading && (
-        <div className="no-sensors">
-          <p>No hay sensores disponibles con los filtros seleccionados.</p>
-          <p>Intenta cambiar los filtros o limpia tu búsqueda.</p>
+          ))}
         </div>
-      )}
 
-      <div className="sensors-summary">
-        <p>
-          Total de sensores: <strong>{sensores.length}</strong>
-        </p>
+        {sensores.length === 0 && !loading && (
+          <div className="no-sensors">
+            <p>No hay sensores disponibles con los filtros seleccionados.</p>
+            <p>Intenta cambiar los filtros o limpia tu búsqueda.</p>
+          </div>
+        )}
+
+        <div className="sensors-summary">
+          <p>
+            Total de sensores: <strong>{sensores.length}</strong>
+          </p>
+        </div>
       </div>
-    </div>
     </div>
   );
 };

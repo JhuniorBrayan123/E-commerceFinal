@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { carritoService } from "../services/api";
 import { categoriasService } from "../services/api";
@@ -51,15 +51,15 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
 
   const HandleSensoresPorCategoria = async (categoriaId: number) => {
     try {
-          // Obtiene los sensores de la categoría seleccionada
-          const res = await categoriasService.getProductos(categoriaId);
-          setAllSensores(res.data);      
-          //Los manda como paquete 
-          navigate("/sensores", { state: { sensoresFiltradoCategoria: res.data} });
+      // Obtiene los sensores de la categoría seleccionada
+      const res = await categoriasService.getProductos(categoriaId);
+      setAllSensores(res.data);
+      //Los manda como paquete 
+      navigate("/sensores", { state: { sensoresFiltradoCategoria: res.data } });
 
-        } catch (err) {
-          console.error(err);
-        }
+    } catch (err) {
+      console.error(err);
+    }
   }
 
 
@@ -71,7 +71,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
         <div className="flex items-center justify-between h-36">
 
           <Link to="/" className="flex items-center space-x-2">
-            <img src="/logoWeb.svg" alt="logo" style={{ width: '450px', height: '450px' }}  />
+            <img src="/logoWeb.svg" alt="logo" style={{ width: '450px', height: '450px' }} />
           </Link>
 
           {/* ENLACES CENTRALES — AHORA MAS COMPACTOS */}
@@ -123,13 +123,20 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
               Soporte
             </Link>
 
-            
+
 
             <Link
               to="/inventario"
               className="px-3 py-2 rounded-full text-xl font-medium hover:bg-secondary-700 hover:text-white transition"
             >
               Inventario
+            </Link>
+
+            <Link
+              to="/admin/dashboard"
+              className="px-3 py-2 rounded-full text-xl font-medium hover:bg-secondary-700 hover:text-white transition"
+            >
+              Panel de administración
             </Link>
           </div>
 
