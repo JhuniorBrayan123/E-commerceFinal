@@ -10,11 +10,12 @@ class SensorSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
     def get_imagen(self, obj):
-        """Return the full URL for the image if it exists"""
+        """Genera la URL completa de la imagen"""
         if obj.imagen:
             request = self.context.get('request')
-            if request is not None:
+            if request:
                 return request.build_absolute_uri(obj.imagen.url)
+            # Fallback si no hay request en el contexto
             return obj.imagen.url
         return None
     

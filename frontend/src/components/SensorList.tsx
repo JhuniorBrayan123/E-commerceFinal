@@ -155,8 +155,13 @@ const SensorList: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
+        let response;
+        if (id) {
+          response = await categoriasService.getProductos(parseInt(id));
+        } else {
+          response = await sensoresService.getAll();
+        }
 
-        const response = await categoriasService.getProductos(parseInt(id!));
         const data = response.data;
         // La respuesta puede venir como { sensores: [...] } o directamente como array
         const sensoresData = data.sensores || data.results || data || [];
@@ -384,72 +389,56 @@ const SensorList: React.FC = () => {
   if (error) return <div className="error">Error: {error}</div>;
 
   return (
-    <div className="sensor-list">
-      {/* Filtros */}
-      <div className="filters-section">
+    <div className="sensor-list container mx-auto px-4 py-8">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Sidebar de Filtros */}
+        <div className="lg:col-span-1">
+          <div className="filters-section bg-white p-6 rounded-lg shadow-sm sticky top-4">
+            <h3 className="text-xl font-bold text-green-900 mb-4">Filtros</h3>
 
+            <div className="flex flex-col gap-6">
+              {/* Buscador */}
+              <div className="filter-group">
+                <label htmlFor="search" className="font-semibold text-gray-700 mb-2 block">Buscar</label>
+                <input
+                  id="search"
+                  type="text"
+                  placeholder="Nombre, marca, modelo..."
+                  value={filterValues.search}
+                  onChange={(e) => handleFilterValueChange("search", e.target.value)}
+                  className="filter-input w-full"
+                />
+              </div>
 
-        <div className="filters-grid">
-          <div className="filters-header">
-            <h3>Filtros</h3>
-            <div className="filters-actions">
-              <button onClick={handleClearFilters} className="clear-filters-btn">
-                Restablecer
-              </button>
-              <button
-                onClick={() => setShowSaveDialog(true)}
-                className="save-filter-btn"
-              >
-                💾 Guardar Vista
-              </button>
-
-            </div>
-          </div>
-
-          {/* Botones para agregar filtros */}
-          <div className="filter-available-list">
-            <span style={{ fontWeight: 600, marginRight: '8px', alignSelf: 'center' }}>
-              Agregar filtros:
-            </span>
-            {availableFilters
-              .filter(filter => !activeFilters.has(filter.id))
-              .map(filter => (
-                <button
-                  key={filter.id}
-                  onClick={() => handleToggleFilter(filter.id)}
-                  className="filter-available-btn"
+              {/* Tipo de Sensor */}
+              <div className="filter-group">
+                <label htmlFor="categoria_nombre" className="font-semibold text-gray-700 mb-2 block">Tipo de Sensor</label>
+                <select
+                  id="categoria_nombre"
+                  value={filterValues.categoria_nombre}
+                  onChange={(e) => handleFilterValueChange("categoria_nombre", e.target.value)}
+                  className="filter-select w-full"
                 >
-                  + {filter.label}
-                </button>
-              ))}
-            {availableFilters.filter(filter => !activeFilters.has(filter.id)).length === 0 && (
-              <span style={{ color: '#666', fontStyle: 'italic' }}>
-                Todos los filtros están activos
-              </span>
-            )}
-          </div>
+                  <option value="">Todos</option>
+                  {filterOptions.categorias.map((categoria_nombre) => (
+                    <option key={categoria_nombre.value} value={String(categoria_nombre.value)}>
+                      {categoria_nombre.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          {/* Filtros activos */}
-          {Array.from(activeFilters).length > 0 && (
-            <div className="filters-grid">
+              {/* Filtros Activos Dinámicos */}
               {Array.from(activeFilters).map(filterId => {
                 const filter = availableFilters.find(f => f.id === filterId);
-                if (!filter) return null;
-
-                const isDefault = defaultFilters.has(filterId);
+                if (!filter || defaultFilters.has(filterId)) return null; // Skip default filters here as they are handled above or hidden
 
                 return (
-                  <div
-                    key={filterId}
-                    className={`filter-group-wrapper ${isDefault ? 'required' : ''}`}
-                  >
-                    <div className="filter-group" style={{ flex: 1, minWidth: 0 }}>
-                      <label htmlFor={filterId}>
-                        {filter.label}
-                        {isDefault && (
-                          <span className="required-badge">(requerido)</span>
-                        )}
-                      </label>
+                  <div key={filterId} className="filter-group relative">
+                    <label htmlFor={filterId} className="font-semibold text-gray-700 mb-2 block">
+                      {filter.label}
+                    </label>
+                    <div className="flex gap-2">
                       {filter.type === "search" ? (
                         <input
                           id={filterId}
@@ -457,7 +446,7 @@ const SensorList: React.FC = () => {
                           value={filterValues[filterId] || ""}
                           onChange={(e) => handleFilterValueChange(filterId, e.target.value)}
                           placeholder={filter.placeholder || "Buscar..."}
-                          className="filter-input"
+                          className="filter-input w-full"
                         />
                       ) : filter.type === "number" ? (
                         <input
@@ -466,7 +455,7 @@ const SensorList: React.FC = () => {
                           value={filterValues[filterId] || ""}
                           onChange={(e) => handleFilterValueChange(filterId, e.target.value)}
                           placeholder={filter.placeholder || ""}
-                          className="filter-input"
+                          className="filter-input w-full"
                           min="0"
                           step={filterId.includes("precio") ? "0.01" : "1"}
                         />
@@ -475,16 +464,11 @@ const SensorList: React.FC = () => {
                           id={filterId}
                           value={filterValues[filterId] || ""}
                           onChange={(e) => handleFilterValueChange(filterId, e.target.value)}
-                          className="filter-select"
+                          className="filter-select w-full"
                         >
                           {filterId === "tipo" && <option value="">Todos</option>}
                           {filterId === "marca" && <option value="">Todas</option>}
                           {filterId === "disponible" && <option value="">Todos</option>}
-                          {filterId === "tipo" && filterOptions.categorias.map((tipo) => (
-                            <option key={tipo.value} value={String(tipo.value)}>
-                              {tipo.label}
-                            </option>
-                          ))}
                           {filterId === "marca" && filterOptions.marcas.map((marca, index) => (
                             <option key={`${marca}-${index}`} value={marca}>
                               {marca}
@@ -497,204 +481,203 @@ const SensorList: React.FC = () => {
                           ))}
                         </select>
                       )}
-                    </div>
-                    {!isDefault && (
                       <button
                         onClick={() => handleToggleFilter(filterId)}
-                        className="filter-remove-btn"
+                        className="text-red-500 hover:text-red-700 font-bold px-2"
                         title="Remover filtro"
                       >
                         ×
                       </button>
-                    )}
+                    </div>
                   </div>
                 );
               })}
-            </div>
-          )}
 
-          {/* Diálogo para guardar filtro */}
-          {showSaveDialog && (
-            <div style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: 'rgba(0,0,0,0.5)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 1000
-            }}>
-              <div style={{
-                background: 'white',
-                padding: '24px',
-                borderRadius: '8px',
-                minWidth: '300px',
-                maxWidth: '500px'
-              }}>
-                <h4 style={{ marginBottom: '16px', color: '#2c5530' }}>
-                  Guardar Vista Personalizada
-                </h4>
-                <input
-                  type="text"
-                  value={saveFilterName}
-                  onChange={(e) => setSaveFilterName(e.target.value)}
-                  placeholder="Nombre de la vista (ej: Sensores económicos)"
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    marginBottom: '16px',
-                    fontSize: '0.95em'
-                  }}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      handleSaveFilter();
-                    }
-                  }}
-                />
-                <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                  <button
-                    onClick={() => {
-                      setShowSaveDialog(false);
-                      setSaveFilterName("");
-                    }}
-                    style={{
-                      padding: '8px 16px',
-                      background: '#ccc',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Cancelar
+              {/* Botones de Acción de Filtros */}
+              <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-gray-200">
+                <div className="flex gap-2">
+                  <button onClick={handleClearFilters} className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition text-sm font-medium">
+                    Restablecer
                   </button>
                   <button
-                    onClick={handleSaveFilter}
-                    style={{
-                      padding: '8px 16px',
-                      background: '#2c5530',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer'
-                    }}
+                    onClick={() => setShowSaveDialog(true)}
+                    className="flex-1 px-4 py-2 bg-green-700 text-white rounded hover:bg-green-800 transition text-sm font-medium"
                   >
-                    Guardar
+                    Guardar Vista
                   </button>
                 </div>
-              </div>
-            </div>
-          )}
 
-          {/* Filtros guardados */}
-          {savedFilters.length > 0 && (
-            <div className="saved-filters-section">
-              <h4 style={{ marginBottom: '10px', color: '#2c5530', fontSize: '1.1em' }}>
-                Vistas Personalizadas:
-              </h4>
-              <div className="saved-filters-list">
-                {savedFilters.map(savedFilter => (
-                  <div key={savedFilter.id} className="saved-filter-chip">
-                    <span>{savedFilter.name}</span>
-                    <button
-                      onClick={() => handleLoadSavedFilter(savedFilter)}
-                      style={{
-                        background: '#2c5530',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        padding: '2px 8px',
-                        cursor: 'pointer',
-                        fontSize: '0.85em'
-                      }}
-                      title="Cargar vista"
-                    >
-                      Cargar
-                    </button>
-                    <button
-                      onClick={() => handleDeleteSavedFilter(savedFilter.id)}
-                      title="Eliminar vista"
-                    >
-                      ×
-                    </button>
+                {/* Agregar más filtros */}
+                <div className="mt-2">
+                  <p className="text-sm font-semibold text-gray-600 mb-2">Agregar filtros:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {availableFilters
+                      .filter(filter => !activeFilters.has(filter.id))
+                      .map(filter => (
+                        <button
+                          key={filter.id}
+                          onClick={() => handleToggleFilter(filter.id)}
+                          className="px-3 py-1 text-xs border border-green-600 text-green-700 rounded-full hover:bg-green-50 transition"
+                        >
+                          + {filter.label}
+                        </button>
+                      ))}
                   </div>
-                ))}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
 
-        {/* Grid de sensores */}
-        <div className="sensors-grid">
-          {sensores.map((sensor) => (
-            <Link
-              key={sensor.id}
-              to={`/sensores/${sensor.id}`}
-              className="bg-white rounded-lg shadow-md hover:shadow-lg transition"
-            >
-              {sensor.imagen ? (
-                <img
-                  src={sensor.imagen}
-                  alt={sensor.nombre}
-                  className="w-full h-48 object-cover"
-                />
-              ) : (
-                <div className="w-full h-48 bg-gray-200 flex items-center justify-center ">
-                  <span className="text-gray-400">Sin imagen</span>
+              {/* Vistas Guardadas */}
+              {savedFilters.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Vistas Guardadas:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {savedFilters.map(savedFilter => (
+                      <div key={savedFilter.id} className="flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs border border-blue-200">
+                        <span className="truncate max-w-[100px]">{savedFilter.name}</span>
+                        <button
+                          onClick={() => handleLoadSavedFilter(savedFilter)}
+                          className="hover:text-blue-900 font-bold"
+                          title="Cargar"
+                        >
+                          ↑
+                        </button>
+                        <button
+                          onClick={() => handleDeleteSavedFilter(savedFilter.id)}
+                          className="hover:text-red-600 font-bold ml-1"
+                          title="Eliminar"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
-              <div className="sensor-card">
-                <div className="sensor-header">
-                  <h3>{sensor.nombre}</h3>
-                  <span className={`tipo-badge cat-${sensor.categoria}`}>
-                    {sensor.categoria_nombre}
-                  </span>
-                </div>
+            </div>
+          </div>
+        </div>
 
-                <div className="sensor-details">
-                  <p>
-                    <strong>Marca:</strong> {sensor.marca}
-                  </p>
-                  <p>
-                    <strong>Modelo:</strong> {sensor.modelo}
-                  </p>
-                  <p className="sensor-description line-clamp-2">
-                    <strong>Descripción:</strong> {sensor.descripcion}
-                  </p>
-                </div>
+        {/* Contenido Principal */}
+        <div className="lg:col-span-3">
+          {/* Grid de Sensores */}
+          <div className="sensors-grid grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            {sensores.map((sensor) => (
+              <Link
+                key={sensor.id}
+                to={`/sensores/${sensor.id}`}
+                className="bg-white rounded-lg shadow-md hover:shadow-lg transition flex flex-col h-full"
+              >
+                {sensor.imagen ? (
+                  <img
+                    src={sensor.imagen}
+                    alt={sensor.nombre}
+                    className="w-full h-48 object-cover rounded-t-lg"
+                  />
+                ) : (
+                  <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded-t-lg">
+                    <span className="text-gray-400">Sin imagen</span>
+                  </div>
+                )}
+                <div className="p-4 flex flex-col flex-grow">
+                  <div className="mb-2">
+                    <div className="flex justify-between items-start mb-1">
+                      <h3 className="text-lg font-bold text-gray-800 line-clamp-1" title={sensor.nombre}>{sensor.nombre}</h3>
+                      <span className={`text-xs px-2 py-1 rounded-full bg-green-100 text-green-800 whitespace-nowrap`}>
+                        {sensor.categoria_nombre}
+                      </span>
+                    </div>
+                  </div>
 
-                <div className="sensor-footer">
-                  <div className="price-stock">
-                    <p className="sensor-price">S/. {sensor.precio}</p>
-                    <p className="sensor-stock">Stock: {sensor.stock}</p>
+                  <div className="text-sm text-gray-600 mb-4 flex-grow">
+                    <p><strong>Marca:</strong> {sensor.marca}</p>
+                    <p><strong>Modelo:</strong> {sensor.modelo}</p>
+                    <p className="line-clamp-2 mt-1">{sensor.descripcion}</p>
+                  </div>
+
+                  <div className="mt-auto pt-4 border-t border-gray-100">
+                    <div className="flex justify-between items-end mb-3">
+                      <p className="text-xl font-bold text-gray-900">S/. {sensor.precio}</p>
+                      <p className="text-sm text-gray-500">Stock: {sensor.stock}</p>
+                    </div>
+
+                    <div className="flex flex-col xl:flex-row gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleActualizarCantidad(sensor);
+                          navigate("/carrito");
+                        }}
+                        className="flex-1 bg-green-700 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-green-800 transition text-center"
+                      >
+                        Agregar
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigate(`/sensores/${sensor.id}`);
+                        }}
+                        className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-lg text-sm font-semibold hover:bg-gray-300 transition text-center"
+                      >
+                        Detalles
+                      </button>
+                    </div>
                   </div>
                 </div>
-
-              </div>
-
-            </Link>
-
-          ))}
-        </div>
-
-        {sensores.length === 0 && !loading && (
-          <div className="no-sensors">
-            <p>No hay sensores disponibles con los filtros seleccionados.</p>
-            <p>Intenta cambiar los filtros o limpia tu búsqueda.</p>
+              </Link>
+            ))}
           </div>
-        )}
 
-        <div className="sensors-summary">
-          <p>
-            Total de sensores: <strong>{sensores.length}</strong>
-          </p>
+          {/* Mensajes de Estado */}
+          {sensores.length === 0 && !loading && (
+            <div className="text-center py-12 bg-white rounded-lg shadow-sm mt-6">
+              <p className="text-gray-500 text-lg">No hay sensores disponibles con los filtros seleccionados.</p>
+              <button onClick={handleClearFilters} className="mt-4 text-green-700 font-semibold hover:underline">
+                Limpiar filtros
+              </button>
+            </div>
+          )}
+
+          <div className="mt-6 text-center text-gray-500 text-sm">
+            <p>Total de sensores: <strong>{sensores.length}</strong></p>
+          </div>
         </div>
       </div>
+
+      {/* Modal de Guardar Filtro (Mantenido igual pero con estilos inline/clases) */}
+      {showSaveDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md">
+            <h4 className="text-lg font-bold text-green-900 mb-4">Guardar Vista Personalizada</h4>
+            <input
+              type="text"
+              value={saveFilterName}
+              onChange={(e) => setSaveFilterName(e.target.value)}
+              placeholder="Nombre de la vista (ej: Sensores económicos)"
+              className="w-full p-2 border border-gray-300 rounded mb-4"
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') handleSaveFilter();
+              }}
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setShowSaveDialog(false);
+                  setSaveFilterName("");
+                }}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSaveFilter}
+                className="px-4 py-2 bg-green-700 text-white rounded hover:bg-green-800"
+              >
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

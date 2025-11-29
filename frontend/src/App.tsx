@@ -247,6 +247,14 @@ function App() {
             }
           />
           <Route
+            path="/sensores"
+            element={
+              <AuthenticatedLayout>
+                <Sensores />
+              </AuthenticatedLayout>
+            }
+          />
+          <Route
             path="/sensores/:id"
             element={
               <AuthenticatedLayout>

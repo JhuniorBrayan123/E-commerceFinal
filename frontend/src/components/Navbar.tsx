@@ -79,6 +79,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
           <div className="flex items-center space-x-2">
 
 
+
             <div className="relative group">
               <button className="px-3 py-2 rounded-full text-xl font-medium hover:bg-secondary-700 hover:text-white transition flex items-center">
                 Categorias
@@ -123,7 +124,12 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
               Soporte
             </Link>
 
-
+            <Link
+              to="/sensores"
+              className="px-3 py-2 rounded-full text-xl font-medium hover:bg-secondary-700 hover:text-white transition"
+            >
+              Sensores
+            </Link>
 
             <Link
               to="/inventario"

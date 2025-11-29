@@ -34,8 +34,9 @@ const PaymentMethod: React.FC = () => {
   const handleMethodSelect = (method: PaymentMethodType) => {
     setSelectedMethod(method);
     setError(null);
-    // Reset payment data cuando se cambia el método
-    setPaymentData({});
+    // No resetear payment data cuando se cambia el método
+    // Esto permite que el usuario mantenga los datos ingresados
+    // setPaymentData({});
   };
 
   const handlePaymentDataChange = (field: string, value: any) => {
@@ -92,12 +93,7 @@ const PaymentMethod: React.FC = () => {
                 ? "border-primary-600 bg-primary-50"
                 : "border-gray-300 hover:border-gray-400"
               }`}
-            onClick={(e) => {
-              // Solo seleccionar el método si el click no es en un input
-              if ((e.target as HTMLElement).tagName !== 'INPUT') {
-                handleMethodSelect("STRIPE");
-              }
-            }}
+            onClick={() => handleMethodSelect("STRIPE")}
           >
             <div className="flex items-center space-x-4">
               <input
@@ -119,7 +115,7 @@ const PaymentMethod: React.FC = () => {
             </div>
 
             {selectedMethod === "STRIPE" && (
-              <div className="mt-4 space-y-4 border-t pt-4" onClick={(e) => e.stopPropagation()}>
+              <div className="mt-4 space-y-4 border-t pt-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     Número de Tarjeta
@@ -130,14 +126,12 @@ const PaymentMethod: React.FC = () => {
                     maxLength={19}
                     value={paymentData.cardNumber || ""}
                     onChange={(e) => {
-                      e.stopPropagation();
                       const value = e.target.value
                         .replace(/\s/g, "")
                         .replace(/\D/g, "");
                       const formatted = value.replace(/(.{4})/g, "$1 ").trim();
                       handlePaymentDataChange("cardNumber", formatted);
                     }}
-                    onClick={(e) => e.stopPropagation()}
                     className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
                   />
                 </div>
@@ -152,13 +146,11 @@ const PaymentMethod: React.FC = () => {
                       maxLength={2}
                       value={paymentData.expMonth || ""}
                       onChange={(e) => {
-                        e.stopPropagation();
                         const value = e.target.value
                           .replace(/\D/g, "")
                           .slice(0, 2);
                         handlePaymentDataChange("expMonth", value);
                       }}
-                      onClick={(e) => e.stopPropagation()}
                       className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
                     />
                   </div>
@@ -172,13 +164,11 @@ const PaymentMethod: React.FC = () => {
                       maxLength={4}
                       value={paymentData.expYear || ""}
                       onChange={(e) => {
-                        e.stopPropagation();
                         const value = e.target.value
                           .replace(/\D/g, "")
                           .slice(0, 4);
                         handlePaymentDataChange("expYear", value);
                       }}
-                      onClick={(e) => e.stopPropagation()}
                       className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
                     />
                   </div>
@@ -192,13 +182,11 @@ const PaymentMethod: React.FC = () => {
                       maxLength={4}
                       value={paymentData.cvv || ""}
                       onChange={(e) => {
-                        e.stopPropagation();
                         const value = e.target.value
                           .replace(/\D/g, "")
                           .slice(0, 4);
                         handlePaymentDataChange("cvv", value);
                       }}
-                      onClick={(e) => e.stopPropagation()}
                       className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
                     />
                   </div>
