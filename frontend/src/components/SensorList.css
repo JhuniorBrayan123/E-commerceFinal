@@ -15,35 +15,113 @@
 
 /* Filtros */
 .filters-section {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* background: white; */
+  /* padding: 24px; */
+  /* border-radius: 8px; */
+  /* margin-bottom: 30px; */
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
 }
 
 .filters-section h3 {
   color: #2c5530;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  font-size: 1.5em;
+}
+
+.filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.filters-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-available-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #f5f5f5;
+  border-radius: 6px;
+}
+
+.filter-available-btn {
+  padding: 8px 16px;
+  background: white;
+  border: 2px solid #2c5530;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9em;
+  color: #2c5530;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.filter-available-btn:hover {
+  background: #2c5530;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.filter-available-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #ccc;
+  color: #999;
 }
 
 .filters-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-  align-items: flex-end;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 20px;
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
+  gap: 6px;
+  min-width: 0; /* Previene overflow */
+}
+
+.filter-group-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #f9f9f9;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.filter-group-wrapper.required {
+  background: #e8f5e9;
+  border-color: #2c5530;
 }
 
 .filter-group label {
   font-weight: 600;
   color: #333;
-  margin-bottom: 5px;
   font-size: 0.9em;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.filter-group label .required-badge {
+  font-size: 0.75em;
+  color: #666;
+  font-weight: normal;
+  margin-left: 4px;
 }
 
 .filter-input,
@@ -53,6 +131,9 @@
   border-radius: 4px;
   font-size: 0.95em;
   transition: border-color 0.3s;
+  width: 100%;
+  min-width: 0; /* Previene overflow */
+  box-sizing: border-box;
 }
 
 .filter-input:focus,
@@ -62,7 +143,31 @@
   box-shadow: 0 0 0 2px rgba(44, 85, 48, 0.1);
 }
 
-.clear-filters-btn {
+.filter-remove-btn {
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.2s;
+  margin-top: 2px;
+}
+
+.filter-remove-btn:hover {
+  background: #d32f2f;
+}
+
+.clear-filters-btn,
+.save-filter-btn {
   padding: 10px 20px;
   background: #f44336;
   color: white;
@@ -71,10 +176,63 @@
   cursor: pointer;
   font-weight: 600;
   transition: background 0.3s;
+  font-size: 0.9em;
 }
 
 .clear-filters-btn:hover {
   background: #d32f2f;
+}
+
+.save-filter-btn {
+  background: #2c5530;
+}
+
+.save-filter-btn:hover {
+  background: #1e3a1f;
+}
+
+.saved-filters-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.saved-filters-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.saved-filter-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #e3f2fd;
+  border: 1px solid #2196f3;
+  border-radius: 20px;
+  font-size: 0.9em;
+}
+
+.saved-filter-chip button {
+  background: none;
+  border: none;
+  color: #f44336;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.saved-filter-chip button:hover {
+  background: #ffebee;
 }
 
 /* Grid de sensores */
@@ -95,6 +253,8 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 50px;
+  max-height: 240px; 
 }
 
 .sensor-card:hover {
@@ -128,43 +288,34 @@
   white-space: nowrap;
 }
 
-.tipo-badge.humedad {
-  background: #b3e5fc;
-  color: #01579b;
-}
 
-.tipo-badge.temperatura {
-  background: #ffccbc;
-  color: #bf360c;
-}
-
-.tipo-badge.ph {
-  background: #f8bbd0;
-  color: #880e4f;
-}
-
-.tipo-badge.luz {
-  background: #fff9c4;
-  color: #f57f17;
-}
-
-.tipo-badge.nutrientes {
-  background: #c8e6c9;
-  color: #1b5e20;
-}
-
-.tipo-badge.co2 {
-  background: #d1c4e9;
-  color: #311b92;
-}
+.tipo-badge.cat-1 { background: #b3e5fc; color: #01579b; }
+.tipo-badge.cat-2 { background: #ffccbc; color: #bf360c; }
+.tipo-badge.cat-3 { background: #c8e6c9; color: #1b5e20; }
+.tipo-badge.cat-4 { background: #fff9c4; color: #f57f17; }
+.tipo-badge.cat-5 { background: #d1c4e9; color: #4a148c; }
+.tipo-badge.cat-6 { background: #ffcdd2; color: #b71c1c; }
+.tipo-badge.cat-7 { background: #dcedc8; color: #33691e; }
+.tipo-badge.cat-8 { background: #b2dfdb; color: #004d40; }
+.tipo-badge.cat-9 { background: #ffe0b2; color: #e65100; }
+.tipo-badge.cat-10 { background: #f8bbd0; color: #880e4f; }
+.tipo-badge.cat-11 { background: #bbdefb; color: #0d47a1; }
+.tipo-badge.cat-12 { background: #e1bee7; color: #6a1b9a; }
+.tipo-badge.cat-13 { background: #f0f4c3; color: #827717; }
+.tipo-badge.cat-14 { background: #c5cae9; color: #1a237e; }
+.tipo-badge.cat-15 { background: #ffecb3; color: #ff6f00; }
+.tipo-badge.cat-16 { background: #b2ebf2; color: #006064; }
+.tipo-badge.cat-17 { background: #d7ccc8; color: #3e2723; }
+.tipo-badge.cat-18 { background: #f5f5f5; color: #424242; }
+.tipo-badge.cat-19 { background: #eeeeee; color: #212121; }
+.tipo-badge.cat-20 { background: #f1f8e9; color: #2e7d32; }
 
 .sensor-details {
-  margin-bottom: 15px;
-  flex-grow: 1;
+  margin-bottom: 10px;
 }
 
 .sensor-details p {
-  margin: 8px 0;
+  margin: 1px 0;
   color: #555;
   font-size: 0.9em;
 }
@@ -209,9 +360,9 @@
 }
 
 .sensor-price {
-  font-size: 1.3em;
-  font-weight: bold;
-  color: #2c5530;
+  font-size: 1.5em;
+
+  color: #000000;
   margin: 0;
 }
 

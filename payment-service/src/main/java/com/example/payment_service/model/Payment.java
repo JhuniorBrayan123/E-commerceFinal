@@ -1,5 +1,9 @@
 package com.example.payment_service.model;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,16 +15,18 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "payments",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_payment_order_method", columnNames = {"order_id", "payment_method"})
+            @UniqueConstraint(name = "uk_payment_order_method", columnNames = {"order_id", "payment_method"})
         })
 public class Payment {
+
+    // NOTA: Los items están asociados al Order, no al Payment
+    // Para obtener los items de un pago, consulta el Order usando orderIda
+    // Esto evita el error "Found shared references to a collection"
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

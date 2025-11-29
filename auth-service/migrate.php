@@ -10,7 +10,7 @@ echo "🚀 Iniciando migración de la base de datos...\n";
 // Obtener credenciales con valores por defecto
 $dbHost = getenv('DB_HOST') ?: 'localhost';
 $dbUser = getenv('DB_USER') ?: 'root';
-$dbPass = getenv('DB_PASS') ?: '';  // Cadena vacía si no hay password
+$dbPass = getenv('DB_PASS') ?: 'tecsup';  // Cadena vacía si no hay password
 $dbName = getenv('DB_NAME') ?: 'auth_db';
 
 echo "📝 Configuración de conexión:\n";

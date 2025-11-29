@@ -26,8 +26,12 @@ urlpatterns = [
     path('api/', include('inventario.urls')),
     path('api/', include('orders.urls')),
     path('api/', include('sensores.urls')),
+    path('api/', include('preferencias.urls')),
+    path('api/', include('comentarios.urls')),
+    path('api/', include('marketing.urls')),
 ]
 
 # Servir archivos media en desarrollo
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 

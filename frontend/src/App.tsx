@@ -13,13 +13,16 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import Categorias from "./pages/Categorias";
-import Productos from "./pages/Productos";
-import ProductoDetalle from "./pages/ProductoDetalle";
 import Sensores from "./pages/Sensores";
+import SensorDetalle from "./pages/SensorDetalle";
 import Carrito from "./pages/Carrito";
 import Inventario from "./pages/Inventario";
-import CRUDProductos from "./pages/CRUDProductos";
 import CRUDCategorias from "./pages/CRUDCategorias";
+import Checkout from "./pages/Checkout";
+import PaymentMethod from "./pages/PaymentMethod";
+import ConfirmPayment from "./pages/ConfirmPayment";
+import PaymentResult from "./pages/PaymentResult";
+
 
 // 👇👇 NUEVO IMPORT QUE TE PEDÍ 👇👇
 import SupportPage from "./pages/SupportPage";
@@ -136,7 +139,7 @@ function App() {
   }
 
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       {!user ? (
         <Routes>
           <Route path="/auth" element={<AuthPage />} />
@@ -150,24 +153,6 @@ function App() {
             element={
               <AuthenticatedLayout>
                 <Home />
-              </AuthenticatedLayout>
-            }
-          />
-
-          <Route
-            path="/productos"
-            element={
-              <AuthenticatedLayout>
-                <Productos />
-              </AuthenticatedLayout>
-            }
-          />
-
-          <Route
-            path="/productos/:id"
-            element={
-              <AuthenticatedLayout>
-                <ProductoDetalle />
               </AuthenticatedLayout>
             }
           />
@@ -213,33 +198,76 @@ function App() {
           />
 
           <Route
-            path="/sensores"
+            path="/checkout"
             element={
               <ProtectedRoute>
                 <AuthenticatedLayout>
-                  <Sensores />
+                  <Checkout />
                 </AuthenticatedLayout>
               </ProtectedRoute>
             }
           />
 
+          <Route
+            path="/payment-method"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <PaymentMethod />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/confirm-payment"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <ConfirmPayment />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/payment-result"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <PaymentResult />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/sensores/:stringParam/:id"
+            element={
+              <AuthenticatedLayout>
+                <Sensores />
+              </AuthenticatedLayout>
+            }
+          />
+          <Route
+            path="/sensores"
+            element={
+              <AuthenticatedLayout>
+                <Sensores />
+              </AuthenticatedLayout>
+            }
+          />
+          <Route
+            path="/sensores/:id"
+            element={
+              <AuthenticatedLayout>
+                <SensorDetalle />
+              </AuthenticatedLayout>
+            }
+          />
           <Route
             path="/inventario"
             element={
               <ProtectedRoute>
                 <AuthenticatedLayout>
                   <Inventario />
-                </AuthenticatedLayout>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/admin/productos"
-            element={
-              <ProtectedRoute>
-                <AuthenticatedLayout>
-                  <CRUDProductos />
                 </AuthenticatedLayout>
               </ProtectedRoute>
             }
@@ -256,7 +284,22 @@ function App() {
             }
           />
 
-          {/* Redirecciones */}
+
+          <Route
+            path="/sensores/:id"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <SensorDetalle />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
+
+
+
+          {/* Redirección por defecto */}
+
           <Route path="/auth" element={<Navigate to="/" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

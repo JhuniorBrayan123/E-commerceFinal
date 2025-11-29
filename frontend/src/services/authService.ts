@@ -57,15 +57,31 @@ export const authService = {
   },
 
   async verifyToken(token: string): Promise<AuthResponse> {
-    const response = await fetch(`${API_BASE_URL}/verify`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ token }),
-    });
+    try {
+      const response = await fetch(`${API_BASE_URL}/verify`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token }),
+      });
 
-    return await response.json();
+      if (!response.ok) {
+        // Si el token no es válido, retornar respuesta de error sin lanzar excepción
+        return {
+          success: false,
+          message: "Token inválido o expirado",
+        };
+      }
+
+      return await response.json();
+    } catch (error) {
+      // Silenciar errores de red para evitar logs innecesarios
+      return {
+        success: false,
+        message: "Error al verificar token",
+      };
+    }
   },
 
   async refreshToken(refreshToken: string): Promise<AuthResponse> {

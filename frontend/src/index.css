@@ -15,3 +15,40 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.swiper-button-prev,
+.swiper-button-next {
+  background-color: rgba(128, 128, 128, 0.5); /* gris con 50% opacidad */
+  width: 14px;
+  height: 14px;
+  border-radius: 50%; /* círculo */
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgb(255, 255, 255) !important; /* flecha blanca */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  font-size: 14px !important;
+  color: rgb(255, 249, 249) !important;
+}
+
+/* Opcional: para que no quede con borde o sombra extra */
+.swiper-button-prev,
+.swiper-button-next {
+  box-shadow: none;
+  border: none;
+}
+
+/* Ajuste posición si hace falta */
+.swiper-button-prev {
+  left: 10px;
+}
+
+.swiper-button-next {
+  right: 10px;
+}

@@ -1,8 +1,9 @@
 package com.example.payment_service.gateway;
 
+import org.springframework.stereotype.Component;
+
 import com.example.payment_service.exception.PaymentException;
 import com.example.payment_service.model.Payment;
-import org.springframework.stereotype.Component;
 
 @Component
 public class GatewayFactory {

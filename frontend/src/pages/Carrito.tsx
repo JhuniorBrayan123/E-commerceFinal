@@ -7,11 +7,13 @@ const Carrito: React.FC = () => {
   const [carrito, setCarrito] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
 
+
   useEffect(() => {
     const actualizarCarrito = () => {
       const items = carritoService.get();
       setCarrito(items);
       setTotal(carritoService.getTotal());
+      
     };
     actualizarCarrito();
   }, []);
@@ -22,8 +24,11 @@ const Carrito: React.FC = () => {
     setTotal(carritoService.getTotal());
   };
 
-  const handleActualizarCantidad = (productoId: number, cantidad: number) => {
-    carritoService.update(productoId, cantidad);
+  const handleActualizarCantidad = (productoId: number, cantidad: number, oper: string, stock: number) => {
+    if (oper === '+') {
+      cantidad = Math.min(stock, cantidad);
+    }
+    carritoService.update(productoId, cantidad, stock);
     actualizarCarrito();
   };
 
@@ -45,10 +50,10 @@ const Carrito: React.FC = () => {
         <h1 className="text-4xl font-bold mb-4">Carrito de Compras</h1>
         <p className="text-gray-600 mb-8">Tu carrito está vacío</p>
         <Link
-          to="/productos"
+          to="/sensores"
           className="bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 transition inline-block"
         >
-          Ver Productos
+          Ver Sensores
         </Link>
       </div>
     );
@@ -84,25 +89,30 @@ const Carrito: React.FC = () => {
                 )}
                 <div className="flex-grow">
                   <Link
-                    to={`/productos/${item.id}`}
+                    to={`/sensores/${item.id}`}
                     className="text-xl font-semibold hover:text-primary-600"
                   >
                     {item.nombre}
                   </Link>
                   <p className="text-gray-600 text-sm mt-1">{item.descripcion}</p>
                   <p className="text-primary-600 font-bold mt-2">${item.precio}</p>
+                  {item.tipo_display && (
+                    <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded mt-1 inline-block">
+                      {item.tipo_display}
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
                     <button
-                      onClick={() => handleActualizarCantidad(item.id, item.cantidad - 1)}
+                      onClick={() => handleActualizarCantidad(item.id, item.cantidad - 1, '-', item.stock)}
                       className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
                     >
                       -
                     </button>
                     <span className="w-12 text-center">{item.cantidad}</span>
                     <button
-                      onClick={() => handleActualizarCantidad(item.id, item.cantidad + 1)}
+                      onClick={() => handleActualizarCantidad(item.id, item.cantidad + 1, '+', item.stock)}
                       className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
                     >
                       +
@@ -142,8 +152,7 @@ const Carrito: React.FC = () => {
             </div>
             <button
               onClick={() => {
-                // Aquí se integraría con el endpoint de Spring Boot
-                alert('Funcionalidad de pago en desarrollo. Se integrará con Spring Boot.');
+                navigate('/checkout');
               }}
               className="w-full bg-primary-600 text-white py-3 rounded-lg font-semibold hover:bg-primary-700 transition"
             >
