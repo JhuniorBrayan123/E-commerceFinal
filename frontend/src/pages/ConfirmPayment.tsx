@@ -103,9 +103,6 @@ const ConfirmPayment: React.FC = () => {
         paymentData: paymentInfo.paymentData || {},
       };
 
-      console.log('Enviando confirmData:', JSON.stringify(confirmData, null, 2));
-
-
       const response = await paymentService.confirmPayment(confirmData);
 
       if (response.success) {

@@ -11,10 +11,11 @@ interface NavbarProps {
     last_name: string;
   } | null;
   onLogout: () => void;
+  onOpenLogin?: () => void;
 }
 
 
-const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
+const Navbar: React.FC<NavbarProps> = ({ user, onLogout, onOpenLogin }) => {
   const navigate = useNavigate();
   const carrito = carritoService.get();
   const totalItems = carrito.reduce(
@@ -65,26 +66,27 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
 
   return (
     <nav className="bg-primary-700 text-black shadow-lg">
-      <div className="container mx-auto px-4">
-
-
-        <div className="flex items-center justify-between h-36">
-
-          <Link to="/" className="flex items-center space-x-2">
-            <img src="/logoWeb.svg" alt="logo" style={{ width: '450px', height: '450px' }} />
+      <div className="container mx-auto px-2 sm:px-4">
+        <div className="flex items-center justify-between h-20 sm:h-28 md:h-36">
+          <Link to="/" className="flex items-center space-x-2 flex-shrink-0">
+            <img 
+              src="/logoWeb.svg" 
+              alt="logo" 
+              className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-[450px] lg:h-[450px] object-contain"
+            />
           </Link>
 
           {/* ENLACES CENTRALES — AHORA MAS COMPACTOS */}
-
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1 sm:space-x-2 flex-wrap justify-center">
 
 
 
             <div className="relative group">
-              <button className="px-3 py-2 rounded-full text-xl font-medium hover:bg-secondary-700 hover:text-white transition flex items-center">
-                Categorias
+              <button className="px-2 sm:px-3 py-1 sm:py-2 rounded-full text-sm sm:text-base md:text-xl font-medium hover:bg-secondary-700 hover:text-white transition flex items-center">
+                <span className="hidden sm:inline">Categorias</span>
+                <span className="sm:hidden">Cat</span>
                 <svg
-                  className="w-5 h-5 ml-1 transition-transform group-hover:rotate-180"
+                  className="w-4 h-4 sm:w-5 sm:h-5 ml-1 transition-transform group-hover:rotate-180"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -93,11 +95,10 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
                 </svg>
               </button>
 
-
               {/* MENU DESPLEGABLE */}
               <div
                 className="
-                  absolute left-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200
+                  absolute left-0 mt-2 w-40 sm:w-48 bg-white rounded-xl shadow-lg border border-gray-200
                   opacity-0 invisible group-hover:opacity-100 group-hover:visible
                   transition-all duration-200
                   z-50
@@ -119,38 +120,31 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
 
             <Link
               to="/soporte"
-              className="px-3 py-2 rounded-full text-xl font-medium hover:bg-secondary-700 hover:text-white transition"
+              className="px-2 sm:px-3 py-1 sm:py-2 rounded-full text-sm sm:text-base md:text-xl font-medium hover:bg-secondary-700 hover:text-white transition"
             >
-              Soporte
+              <span className="hidden sm:inline">Soporte</span>
+              <span className="sm:hidden">Sop</span>
             </Link>
 
             <Link
               to="/sensores"
-              className="px-3 py-2 rounded-full text-xl font-medium hover:bg-secondary-700 hover:text-white transition"
+              className="px-2 sm:px-3 py-1 sm:py-2 rounded-full text-sm sm:text-base md:text-xl font-medium hover:bg-secondary-700 hover:text-white transition"
             >
-              Sensores
+              <span className="hidden sm:inline">Sensores</span>
+              <span className="sm:hidden">Sen</span>
             </Link>
-
-            {user && (
-              <Link
-                to="/inventario"
-                className="px-3 py-2 rounded-full text-xl font-medium hover:bg-secondary-700 hover:text-white transition"
-              >
-                Inventario
-              </Link>
-            )}
           </div>
 
           {/* CARRITO + USUARIO */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
 
             {/* Carrito */}
             <button
               onClick={() => navigate("/carrito")}
-              className="relative px-3 py-2 rounded-full text-xl font-medium hover:bg-secondary-700 hover:text-white transition"
+              className="btn-animated relative px-2 sm:px-3 py-1 sm:py-2 rounded-full text-sm sm:text-base md:text-xl font-medium hover:bg-secondary-700 hover:text-white"
             >
               <svg
-                className="w-6 h-6"
+                className="w-5 h-5 sm:w-6 sm:h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -164,7 +158,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
               </svg>
 
               {totalItems > 0 && (
-                <span className="absolute top-0 right-0 bg-secondary-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-secondary-500 text-white text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-[10px] sm:text-xs">
                   {totalItems}
                 </span>
               )}
@@ -172,23 +166,25 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
 
             {/* Usuario */}
             {user ? (
-              <div className="flex items-center space-x-2">
-                <span className="font-semibold text-sm">
+              <div className="flex items-center space-x-1 sm:space-x-2 flex-wrap">
+                <span className="font-semibold text-xs sm:text-sm hidden sm:inline">
                   {user.first_name} {user.last_name}
                 </span>
                 <button
                   onClick={onLogout}
-                  className="bg-primary-600 px-3 py-2 rounded-full text-ml font-medium  hover:bg-secondary-700 transition text-white"
+                  className="btn-animated bg-primary-600 px-2 sm:px-3 py-1 sm:py-2 rounded-full text-xs sm:text-sm md:text-base font-medium hover:bg-secondary-700 text-white whitespace-nowrap"
                 >
-                  Cerrar sesión
+                  <span className="hidden sm:inline">Cerrar sesión</span>
+                  <span className="sm:hidden">Salir</span>
                 </button>
               </div>
             ) : (
               <button
-                onClick={() => navigate("/auth")}
-                className="bg-secondary-600 px-4 py-2 rounded-full text-ml font-medium hover:bg-secondary-700 transition text-white"
+                onClick={onOpenLogin || (() => navigate("/auth"))}
+                className="btn-animated bg-secondary-600 px-2 sm:px-3 md:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm md:text-base font-medium hover:bg-secondary-700 text-white whitespace-nowrap"
               >
-                Iniciar Sesión
+                <span className="hidden sm:inline">Iniciar Sesión</span>
+                <span className="sm:hidden">Login</span>
               </button>
             )}
           </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { carritoService } from '../services/api';
 import { orderService } from '../services/api';
+import { getImageUrl } from '../utils/imageUtils';
 
 interface OrderItem {
   sensorId: number;
@@ -65,11 +66,7 @@ const Checkout: React.FC = () => {
         couponCode: appliedCoupon?.code || null
       };
 
-      console.log('Enviando orden:', JSON.stringify(orderData, null, 2));
-
       const response = await orderService.createOrder(orderData);
-
-      console.log('Respuesta del servidor completa:', response);
 
       // Verificar la respuesta - puede venir directamente como objeto o dentro de data
       let orderDataResponse = response;
@@ -87,8 +84,6 @@ const Checkout: React.FC = () => {
         const orderTotal = orderDataResponse.total || response.data.total;
         const orderCurrency = orderDataResponse.currency || response.data.currency;
         const orderItems = orderDataResponse.items || response.data.items;
-
-        console.log('Navegando con datos:', { orderId, paymentToken, orderTotal, orderCurrency });
 
         // Guardar orderId y paymentToken en localStorage para el siguiente paso
         localStorage.setItem('currentOrderId', orderId.toString());
@@ -138,37 +133,45 @@ const Checkout: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-8">
-      <h1 className="text-4xl font-bold mb-8">Resumen de Compra</h1>
+    <div className="max-w-4xl mx-auto py-4 sm:py-8 px-4 sm:px-6 lg:px-8">
+      <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8">Resumen de Compra</h1>
 
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-3 sm:px-4 py-2 sm:py-3 rounded mb-4 text-sm sm:text-base">
           {error}
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         {/* Items de la orden */}
-        <div className="lg:col-span-2 space-y-4">
-          <h2 className="text-2xl font-semibold mb-4">Items en tu orden</h2>
+        <div className="lg:col-span-2 space-y-3 sm:space-y-4">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">Items en tu orden</h2>
           {carrito.map((item) => (
-            <div key={item.id} className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center space-x-4">
+            <div key={item.id} className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                 {item.imagen_url || item.imagen ? (
                   <img
-                    src={item.imagen_url || item.imagen}
+                    src={getImageUrl(item.imagen_url || item.imagen)}
                     alt={item.nombre}
-                    className="w-24 h-24 object-cover rounded-lg"
+                    className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = "none";
+                      const parent = target.parentElement;
+                      if (parent) {
+                        parent.innerHTML = '<div class="w-20 h-20 sm:w-24 sm:h-24 bg-gray-200 rounded-lg flex items-center justify-center"><span class="text-gray-400 text-xs">Sin imagen</span></div>';
+                      }
+                    }}
                   />
                 ) : (
-                  <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
-                    <span className="text-gray-400">Sin imagen</span>
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-200 rounded-lg flex items-center justify-center">
+                    <span className="text-gray-400 text-xs">Sin imagen</span>
                   </div>
                 )}
-                <div className="flex-grow">
-                  <h3 className="text-xl font-semibold">{item.nombre}</h3>
-                  <p className="text-gray-600 text-sm mt-1">Cantidad: {item.cantidad}</p>
-                  <p className="text-primary-600 font-bold mt-2">
+                <div className="flex-grow w-full sm:w-auto">
+                  <h3 className="text-lg sm:text-xl font-semibold break-words">{item.nombre}</h3>
+                  <p className="text-gray-600 text-xs sm:text-sm mt-1">Cantidad: {item.cantidad}</p>
+                  <p className="text-primary-600 font-bold mt-2 text-sm sm:text-base">
                     S/ {item.precio} x {item.cantidad} = S/ {(parseFloat(item.precio) * item.cantidad).toFixed(2)}
                   </p>
                 </div>
@@ -198,13 +201,13 @@ const Checkout: React.FC = () => {
             <button
               onClick={handleCreateOrder}
               disabled={loading}
-              className="w-full bg-primary-600 text-white py-3 rounded-lg font-semibold hover:bg-primary-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="btn-animated w-full bg-primary-600 text-white py-3 rounded-lg font-semibold hover:bg-primary-700 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:shadow-none"
             >
               {loading ? 'Creando orden...' : 'Crear Orden y Continuar'}
             </button>
             <button
               onClick={() => navigate('/carrito')}
-              className="w-full mt-3 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300 transition"
+              className="btn-animated w-full mt-3 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300"
             >
               Volver al Carrito
             </button>

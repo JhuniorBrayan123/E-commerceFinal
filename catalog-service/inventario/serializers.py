@@ -1,16 +1,16 @@
 from rest_framework import serializers
 from .models import MovimientoInventario
-from productos.serializers import ProductoSerializer
+from sensores.serializers import SensorSerializer
 
 
 class MovimientoInventarioSerializer(serializers.ModelSerializer):
-    producto_nombre = serializers.CharField(source='producto.nombre', read_only=True)
-    producto_detalle = ProductoSerializer(source='producto', read_only=True)
+    sensor_nombre = serializers.CharField(source='sensor.nombre', read_only=True)
+    sensor_detalle = SensorSerializer(source='sensor', read_only=True)
 
     class Meta:
         model = MovimientoInventario
         fields = [
-            'id', 'producto', 'producto_nombre', 'producto_detalle',
+            'id', 'sensor', 'sensor_nombre', 'sensor_detalle',
             'tipo', 'cantidad', 'motivo', 'fecha', 'observaciones'
         ]
         read_only_fields = ['id', 'fecha']
@@ -23,12 +23,12 @@ class MovimientoInventarioSerializer(serializers.ModelSerializer):
     def validate(self, data):
         # Validar que no se pueda hacer una salida mayor al stock disponible
         if data.get('tipo') == 'salida':
-            producto = data.get('producto')
+            sensor = data.get('sensor')
             cantidad = data.get('cantidad')
-            if producto and cantidad:
-                if producto.stock < cantidad:
+            if sensor and cantidad:
+                if sensor.stock < cantidad:
                     raise serializers.ValidationError(
-                        f"No hay suficiente stock. Stock disponible: {producto.stock}"
+                        f"No hay suficiente stock. Stock disponible: {sensor.stock}"
                     )
         return data
 

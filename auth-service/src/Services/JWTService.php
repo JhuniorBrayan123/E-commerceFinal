@@ -12,7 +12,8 @@ class JWTService
 
     public static function init()
     {
-        self::$secret_key = 'Holasoyunaclavesecretadehashparaelpago';
+        // Usar variable de entorno JWT_SECRET, con fallback al valor por defecto
+        self::$secret_key = getenv('JWT_SECRET') ?: 'mi-clave-secreta-jwt-muy-segura-para-ecommerce';
     }
 
     // Generar JWT token

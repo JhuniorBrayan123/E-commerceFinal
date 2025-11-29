@@ -7,6 +7,7 @@ services:
     environment:
       DEBUG: "True"
       MYSQL_HOST: host.docker.internal
+      MYSQL_PORT: "3306"
       MYSQL_DATABASE: ecommerce_db
       MYSQL_USER: root
       MYSQL_PASSWORD: ""
@@ -25,6 +26,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/ecommerce_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ""
+      JWT_SECRET: mi-clave-secreta-jwt-muy-segura-para-ecommerce
       DJANGO_SERVICE_URL: http://django-app:8000/api
       NOTIFICATION_BASE_URL: http://django-app:8000
     extra_hosts:

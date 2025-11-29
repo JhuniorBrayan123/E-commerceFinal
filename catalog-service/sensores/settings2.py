@@ -18,22 +18,6 @@ DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = ['*']  # Para desarrollo, en producción especifica dominios
 
-# --- CONFIGURACIÓN DE BASE DE DATOS (MODIFICADA) ---
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('MYSQL_DATABASE', 'ecommerce_db'),  # ← Cambiado a MYSQL_DATABASE
-        'USER': os.getenv('MYSQL_USER', 'root'),              # ← Cambiado a MYSQL_USER
-        'PASSWORD': os.getenv('MYSQL_PASSWORD', ''),          # ← Cambiado a MYSQL_PASSWORD
-        'HOST': os.getenv('MYSQL_HOST', 'host.docker.internal'),  # ← Cambiado a MYSQL_HOST
-        'PORT': os.getenv('MYSQL_PORT', '3306'),  # Puerto estándar de MySQL
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        },
-    }
-}
-# -------------------------------------------------
-
 # Application definition
 INSTALLED_APPS = [
     'marketing',
@@ -44,9 +28,9 @@ INSTALLED_APPS = [
     'django_filters',
     'sensores',
     'categorias',
+    'productos',
     'inventario',
     'orders',
-    'cupones',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -83,7 +67,27 @@ TEMPLATES = [
     },
 ]
 
-# Validadores de contraseña
+WSGI_APPLICATION = 'wsgi.application'
+
+# BASE DE DATOS MYSQL - CONFIGURACIÓN DOCKER
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('MYSQL_DATABASE', 'ecommerce_db'),
+        'USER': os.getenv('MYSQL_USER', 'root'),
+        'PASSWORD': os.getenv('MYSQL_PASSWORD', ''),
+        'HOST': os.getenv('MYSQL_HOST', 'localhost'),
+
+        'PORT': os.getenv('MYSQL_PORT', '3306'),
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4',
+        },
+    }
+}
+
+JWT_SECRET_KEY = 'mi-clave-secreta-jwt-muy-segura-para-ecommerce'
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -113,9 +117,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# JWT Configuration
-JWT_SECRET_KEY = os.getenv('JWT_SECRET', 'mi-clave-secreta-jwt-muy-segura-para-ecommerce')
-
 # Django REST Framework configuration
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
@@ -131,7 +132,7 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "http://frontend:3000",  # Si tu frontend también está en Docker
+    "http://frontend:3000",  # ← Si tu frontend también está en Docker
 ]
 CORS_ALLOW_ALL_ORIGINS = True  # Para desarrollo
 

@@ -18,6 +18,6 @@ class OrdenAdmin(admin.ModelAdmin):
 
 @admin.register(ItemOrden)
 class ItemOrdenAdmin(admin.ModelAdmin):
-    list_display = ['id', 'orden', 'producto', 'cantidad', 'precio_unitario', 'subtotal']
+    list_display = ['id', 'orden', 'sensor', 'cantidad', 'precio_unitario', 'subtotal']
     list_filter = ['orden']
 

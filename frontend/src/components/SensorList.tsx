@@ -3,6 +3,7 @@ import "./SensorList.css";
 
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { carritoService, sensoresService, categoriasService } from "../services/api";
+import { getImageUrl } from "../utils/imageUtils";
 
 interface Sensor {
   id: number;
@@ -496,12 +497,12 @@ const SensorList: React.FC = () => {
               {/* Botones de Acción de Filtros */}
               <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-gray-200">
                 <div className="flex gap-2">
-                  <button onClick={handleClearFilters} className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition text-sm font-medium">
+                  <button onClick={handleClearFilters} className="btn-animated flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm font-medium">
                     Restablecer
                   </button>
                   <button
                     onClick={() => setShowSaveDialog(true)}
-                    className="flex-1 px-4 py-2 bg-green-700 text-white rounded hover:bg-green-800 transition text-sm font-medium"
+                    className="btn-animated flex-1 px-4 py-2 bg-green-700 text-white rounded hover:bg-green-800 text-sm font-medium"
                   >
                     Guardar Vista
                   </button>
@@ -565,17 +566,27 @@ const SensorList: React.FC = () => {
               <Link
                 key={sensor.id}
                 to={`/sensores/${sensor.id}`}
-                className="bg-white rounded-lg shadow-md hover:shadow-lg transition flex flex-col h-full"
+                className="product-card bg-white rounded-lg shadow-md flex flex-col h-full"
               >
                 {sensor.imagen ? (
-                  <img
-                    src={sensor.imagen}
-                    alt={sensor.nombre}
-                    className="w-full h-48 object-cover rounded-t-lg"
+                  <div className="product-card-image">
+                    <img
+                      src={getImageUrl(sensor.imagen)}
+                      alt={sensor.nombre}
+                      className="w-full h-40 sm:h-48 object-cover rounded-t-lg"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = "none";
+                      const parent = target.parentElement;
+                      if (parent) {
+                        parent.innerHTML = '<div class="w-full h-40 sm:h-48 bg-gray-200 flex items-center justify-center rounded-t-lg"><span class="text-gray-400 text-sm">Sin imagen</span></div>';
+                      }
+                    }}
                   />
+                  </div>
                 ) : (
-                  <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded-t-lg">
-                    <span className="text-gray-400">Sin imagen</span>
+                  <div className="w-full h-40 sm:h-48 bg-gray-200 flex items-center justify-center rounded-t-lg">
+                    <span className="text-gray-400 text-sm">Sin imagen</span>
                   </div>
                 )}
                 <div className="p-4 flex flex-col flex-grow">
@@ -607,7 +618,7 @@ const SensorList: React.FC = () => {
                           handleActualizarCantidad(sensor);
                           navigate("/carrito");
                         }}
-                        className="flex-1 bg-green-700 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-green-800 transition text-center"
+                        className="btn-animated flex-1 bg-green-700 text-white py-2 px-4 rounded-lg text-sm font-semibold hover:bg-green-800 text-center"
                       >
                         Agregar
                       </button>
@@ -616,7 +627,7 @@ const SensorList: React.FC = () => {
                           e.preventDefault();
                           navigate(`/sensores/${sensor.id}`);
                         }}
-                        className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-lg text-sm font-semibold hover:bg-gray-300 transition text-center"
+                        className="btn-animated flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-lg text-sm font-semibold hover:bg-gray-300 text-center"
                       >
                         Detalles
                       </button>

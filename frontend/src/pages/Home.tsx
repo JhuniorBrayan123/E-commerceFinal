@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { categoriasService, sensoresService } from '../services/api';
-import BannerCarousel from "../components/BannerCarousel";
+import { getImageUrl } from '../utils/imageUtils';
 const Home: React.FC = () => {
   const [categorias, setCategorias] = useState<any[]>([]);
   const [sensoresDestacados, setSensoresDestacados] = useState<any[]>([]);
@@ -45,39 +45,35 @@ const Home: React.FC = () => {
   }
 
   return (
-    
-    <div>
-      <div>
-        <BannerCarousel />
-      </div>
-      <section className="bg-gradient-to-r from-primary-900 to-secondary-800 text-white py-20 mb-12 rounded-lg">
-        <div className="text-center">
-          <h1 className="text-5xl font-bold mb-4">Bienvenido a AGROCODE</h1>
-          <p className="text-xl mb-8">Encuentra los mejores sensores al mejor precio</p>
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="bg-gradient-to-r from-primary-900 to-secondary-800 text-white py-12 sm:py-16 md:py-20 mb-8 sm:mb-12 rounded-lg">
+        <div className="text-center px-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Bienvenido a AGROCODE</h1>
+          <p className="text-lg sm:text-xl mb-6 sm:mb-8">Encuentra los mejores sensores al mejor precio</p>
           <Link
             to="/sensores"
-            className="bg-white text-primary-800  px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition inline-block"
+            className="btn-animated bg-white text-primary-800 px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold hover:bg-gray-100 inline-block"
           >
             Ver Sensores
           </Link>
         </div>
       </section>
 
-      <section className="mb-12">
-        <h2 className="text-3xl font-bold mb-6">Recomendados para ti</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+      <section className="mb-8 sm:mb-12">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Recomendados para ti</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
           {categorias.map((categoria) => (
             <Link
               key={categoria.id}
               to={`/categorias/${categoria.id}`}
-              className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition text-center"
+              className="bg-white p-4 sm:p-6 rounded-lg shadow-md hover:shadow-lg transition text-center"
             >
-              <div className="text-4xl mb-4">📦</div>
-              <h3 className="text-xl font-semibold">{categoria.nombre}</h3>
+              <div className="text-3xl sm:text-4xl mb-2 sm:mb-4">📦</div>
+              <h3 className="text-base sm:text-lg md:text-xl font-semibold break-words">{categoria.nombre}</h3>
             </Link>
           ))}
         </div>
-        <div className="text-center mt-6">
+        <div className="text-center mt-4 sm:mt-6">
           <Link
             to="/categorias"
             className="text-primary-600 hover:text-primary-700 font-semibold"
@@ -88,38 +84,48 @@ const Home: React.FC = () => {
       </section>
       
       <section>
-        <h2 className="text-3xl font-bold mb-6">Todo nuestro catalogo</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Todo nuestro catalogo</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {sensoresDestacados.map((sensor) => (
             <Link
               key={sensor.id}
               to={`/sensores/${sensor.id}`}
-              className="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden"
+              className="product-card bg-white rounded-lg shadow-md overflow-hidden"
             >
               {sensor.imagen_url || sensor.imagen ? (
-                <img
-                  src={sensor.imagen_url || sensor.imagen}
-                  alt={sensor.nombre}
-                  className="w-full h-48 object-cover"
+                <div className="product-card-image">
+                  <img
+                    src={getImageUrl(sensor.imagen_url || sensor.imagen)}
+                    alt={sensor.nombre}
+                    className="w-full h-40 sm:h-48 object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = "none";
+                    const parent = target.parentElement;
+                    if (parent) {
+                      parent.innerHTML = '<div class="w-full h-40 sm:h-48 bg-gray-200 flex items-center justify-center"><span class="text-gray-400 text-sm">Sin imagen</span></div>';
+                    }
+                  }}
                 />
+                </div>
               ) : (
-                <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-                  <span className="text-gray-400">Sin imagen</span>
+                <div className="w-full h-40 sm:h-48 bg-gray-200 flex items-center justify-center">
+                  <span className="text-gray-400 text-sm">Sin imagen</span>
                 </div>
               )}
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-lg font-semibold">{sensor.nombre}</h3>
-                  <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
+              <div className="p-3 sm:p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-1 sm:gap-0">
+                  <h3 className="text-base sm:text-lg font-semibold line-clamp-2">{sensor.nombre}</h3>
+                  <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded self-start sm:self-auto">
                     {sensor.tipo_display || sensor.tipo}
                   </span>
                 </div>
-                <p className="text-gray-600 text-sm mb-2 line-clamp-2">{sensor.descripcion}</p>
-                <div className="flex justify-between items-center">
-                  <span className="text-2xl font-bold text-primary-600">${sensor.precio}</span>
-                  <span className="text-sm text-gray-500">Stock: {sensor.stock}</span>
+                <p className="text-gray-600 text-xs sm:text-sm mb-2 line-clamp-2">{sensor.descripcion}</p>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
+                  <span className="text-xl sm:text-2xl font-bold text-primary-600">${sensor.precio}</span>
+                  <span className="text-xs sm:text-sm text-gray-500">Stock: {sensor.stock}</span>
                 </div>
-                <div className="text-xs text-gray-500 mt-1">
+                <div className="text-xs text-gray-500 mt-1 line-clamp-1">
                   {sensor.marca} - {sensor.modelo}
                 </div>
               </div>

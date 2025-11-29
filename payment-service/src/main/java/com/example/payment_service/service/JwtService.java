@@ -17,7 +17,7 @@ import jakarta.annotation.PostConstruct;
 public class JwtService {
 
     // Usar jwt.secret directamente (mismo que auth-service)
-    @Value("Holasoyunaclavesecretadehashparaelpago")
+    @Value("${jwt.secret}")
     private String secretKey;
     
     // Verificar que el secreto se haya cargado correctamente al iniciar

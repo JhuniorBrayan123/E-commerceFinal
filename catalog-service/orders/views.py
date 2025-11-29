@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-from productos.models import Producto
+from sensores.models import Sensor
 from inventario.models import MovimientoInventario
 from .models import Orden, ItemOrden
 from .serializers import CrearOrdenSerializer, OrdenSerializer
@@ -12,7 +12,7 @@ from .serializers import CrearOrdenSerializer, OrdenSerializer
 def crear_orden(request):
     """
     Endpoint para crear órdenes desde Spring Boot
-    Recibe: usuario_id, productos (lista con producto_id y cantidad), total
+    Recibe: usuario_id, sensores (lista con sensor_id y cantidad), total
     """
     serializer = CrearOrdenSerializer(data=request.data)
     
@@ -37,39 +37,39 @@ def crear_orden(request):
     )
     
     # Crear items de la orden y actualizar stock
-    for item_data in data['productos']:
-        producto_id = item_data['producto_id']
+    for item_data in data['sensores']:
+        sensor_id = item_data['sensor_id']
         cantidad = item_data['cantidad']
         
         try:
-            producto = Producto.objects.get(id=producto_id)
-        except Producto.DoesNotExist:
+            sensor = Sensor.objects.get(id=sensor_id)
+        except Sensor.DoesNotExist:
             orden.delete()
             return Response(
-                {'error': f'Producto con id {producto_id} no encontrado'}, 
+                {'error': f'Sensor con id {sensor_id} no encontrado'}, 
                 status=status.HTTP_404_NOT_FOUND
             )
         
         # Verificar stock
-        if producto.stock < cantidad:
+        if sensor.stock < cantidad:
             orden.delete()
             return Response(
-                {'error': f'Stock insuficiente para el producto {producto.nombre}. Stock disponible: {producto.stock}'}, 
+                {'error': f'Stock insuficiente para el sensor {sensor.nombre}. Stock disponible: {sensor.stock}'}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
         
         # Crear item de orden
         ItemOrden.objects.create(
             orden=orden,
-            producto=producto,
+            sensor=sensor,
             cantidad=cantidad,
-            precio_unitario=producto.precio,
-            subtotal=producto.precio * cantidad
+            precio_unitario=sensor.precio,
+            subtotal=sensor.precio * cantidad
         )
         
         # Registrar movimiento de inventario (salida)
         MovimientoInventario.objects.create(
-            producto=producto,
+            sensor=sensor,
             tipo='salida',
             cantidad=cantidad,
             motivo=f'Venta - Orden #{orden.id}',
@@ -79,6 +79,7 @@ def crear_orden(request):
     # Retornar la orden creada
     orden_serializer = OrdenSerializer(orden)
     return Response(orden_serializer.data, status=status.HTTP_201_CREATED)
+
 @api_view(['POST'])
 def sincronizar_orden_pago(request):
     """
@@ -86,25 +87,27 @@ def sincronizar_orden_pago(request):
     (por ahora solo devuelve un mensaje para que Django no falle)
     """
     return Response({"message": "Sincronización de pago recibida"})
+
 @api_view(['GET'])
 def obtener_info_producto(request, producto_id):
     """
-    Devuelve información básica de un producto para que Spring Boot pueda consultarla
+    Devuelve información básica de un sensor para que Spring Boot pueda consultarla
+    (Mantenemos el nombre de la función para compatibilidad, pero busca en Sensor)
     """
     try:
-        producto = Producto.objects.get(id=producto_id)
-    except Producto.DoesNotExist:
+        sensor = Sensor.objects.get(id=producto_id)
+    except Sensor.DoesNotExist:
         return Response(
-            {'error': 'Producto no encontrado'},
+            {'error': 'Sensor no encontrado'},
             status=status.HTTP_404_NOT_FOUND
         )
 
     data = {
-        "id": producto.id,
-        "nombre": producto.nombre,
-        "precio": producto.precio,
-        "stock": producto.stock,
-        "categoria": producto.categoria.nombre if producto.categoria else None
+        "id": sensor.id,
+        "nombre": sensor.nombre,
+        "precio": sensor.precio,
+        "stock": sensor.stock,
+        "categoria": sensor.categoria.nombre if sensor.categoria else None
     }
 
     return Response(data, status=status.HTTP_200_OK)

@@ -1,5 +1,5 @@
 from django.db import models
-from productos.models import Producto
+from sensores.models import Sensor
 
 
 class MovimientoInventario(models.Model):
@@ -29,7 +29,7 @@ class MovimientoInventario(models.Model):
     ]
 
     # Campos básicos del movimiento
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='movimientos', verbose_name="Producto")
+    sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, related_name='movimientos', verbose_name="Sensor")
     tipo = models.CharField(max_length=10, choices=TIPO_CHOICES, verbose_name="Tipo de Movimiento")
     motivo= models.CharField(max_length=100, verbose_name="Motivo", help_text="Motivo del movimiento de inventario")
     cantidad = models.IntegerField(verbose_name="Cantidad")
@@ -47,19 +47,19 @@ class MovimientoInventario(models.Model):
 
     def __str__(self):
         if self.tipo == 'salida' and self.order_id:
-            return f"VENTA #{self.order_id} - {self.producto.nombre} - {self.cantidad} unidades - {self.payment_status}"
-        return f"{self.tipo.upper()} - {self.producto.nombre} - {self.cantidad} unidades"
+            return f"VENTA #{self.order_id} - {self.sensor.nombre} - {self.cantidad} unidades - {self.payment_status}"
+        return f"{self.tipo.upper()} - {self.sensor.nombre} - {self.cantidad} unidades"
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        # Actualizar stock del producto automáticamente
+        # Actualizar stock del sensor automáticamente
         if self.tipo == 'entrada':
-            self.producto.stock += self.cantidad
+            self.sensor.stock += self.cantidad
         elif self.tipo == 'salida':
-            self.producto.stock -= self.cantidad
-            if self.producto.stock < 0:
-                self.producto.stock = 0
-        self.producto.save()
+            self.sensor.stock -= self.cantidad
+            if self.sensor.stock < 0:
+                self.sensor.stock = 0
+        self.sensor.save()
 
     class Meta:
         verbose_name = "Movimiento de Inventario"
