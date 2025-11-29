@@ -114,7 +114,7 @@ class AuthController
             http_response_code(400);
             return json_encode([
                 'success' => false,
-                'message' => 'Email y contraseña son requeridos'
+                'message' => 'Email y contraseña obligatorios'
             ]);
         }
 
