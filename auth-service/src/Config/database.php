@@ -13,7 +13,7 @@ class Database
         $this->host = getenv('DB_HOST') ?: 'localhost';
         $this->db_name = getenv('DB_NAME') ?: 'auth_db';
         $this->username = getenv('DB_USER') ?: 'root';
-        $this->password = getenv('DB_PASS') ?: '';
+        $this->password = getenv('DB_PASS') ?: '12345';
     }
 
     public function getConnection()
