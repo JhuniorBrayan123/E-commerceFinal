@@ -31,11 +31,14 @@ class Orden(models.Model):
 
 
 class ItemOrden(models.Model):
+    # ... (Orden y Producto correctos)
     orden = models.ForeignKey(Orden, on_delete=models.CASCADE, related_name='items', verbose_name="Orden")
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, verbose_name="Producto")
 
-    # NUEVOS CAMPOS ➜ Compatibilidad con microservicio o frontend desacoplado
-    #producto_id = models.IntegerField(blank=True, null=True)  
+    # NUEVOS CAMPOS ➜ Descomenta si los necesitas, sino ELIMÍNALOS.
+    # Asumo que NO necesitas 'producto_id' ya que tienes la Foreign Key.
+    # Si lo usas para desacoplar, DESCOMENTA esta línea:
+    # producto_id = models.IntegerField(blank=True, null=True)  
     nombre_producto = models.CharField(max_length=255, blank=True, null=True)
 
     cantidad = models.IntegerField(verbose_name="Cantidad")
@@ -46,18 +49,15 @@ class ItemOrden(models.Model):
         # autocalcular subtotal
         self.subtotal = self.precio_unitario * self.cantidad
 
-        # completar valores automáticamente si vienen de Producto
+        # CÓDIGO CORREGIDO: Usaremos self.producto_id solo si lo tienes descomentado.
+        # Si NO tienes producto_id descomentado, debes ELIMINAR el bloque siguiente:
         if self.producto:
-            if not self.producto_id:
-                self.producto_id = self.producto.id
-            if not self.nombre_producto:
-                self.nombre_producto = self.producto.nombre
+             # if not self.producto_id:
+             #     self.producto_id = self.producto.id
+             if not self.nombre_producto:
+                 self.nombre_producto = self.producto.nombre
 
         super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"{self.producto.nombre} x{self.cantidad} - ${self.subtotal}"
-
     class Meta:
         verbose_name = "Item de Orden"
         verbose_name_plural = "Items de Orden"

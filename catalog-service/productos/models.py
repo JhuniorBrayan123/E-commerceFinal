@@ -1,3 +1,4 @@
+# productos/models.py
 from django.db import models
 from categorias.models import Categoria
 
@@ -25,4 +26,3 @@ class Producto(models.Model):
         verbose_name = "Producto"
         verbose_name_plural = "Productos"
         ordering = ['-fecha_creacion']
-
