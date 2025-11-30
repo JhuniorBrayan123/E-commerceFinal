@@ -31,7 +31,7 @@ class MovimientoInventario(models.Model):
     # Campos básicos del movimiento
     sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, related_name='movimientos', verbose_name="Sensor")
     tipo = models.CharField(max_length=10, choices=TIPO_CHOICES, verbose_name="Tipo de Movimiento")
-    motivo= models.CharField(max_length=100, verbose_name="Motivo", help_text="Motivo del movimiento de inventario")
+    motivo= models.CharField(max_length=100, verbose_name="Motivo", help_text="Motivo del movimiento de inventario", null=True, blank=True)
     cantidad = models.IntegerField(verbose_name="Cantidad")
     descripcion = models.CharField(max_length=200, verbose_name="Descripción", help_text="Descripción del movimiento")
     fecha = models.DateTimeField(auto_now_add=True, verbose_name="Fecha")

@@ -27,9 +27,6 @@ class MovimientoInventarioViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def historial(self, request):
         sensor_id = request.query_params.get('sensor_id', None)
-        # Soporte retrocompatible para producto_id
-        if not sensor_id:
-            sensor_id = request.query_params.get('producto_id', None)
             
         if sensor_id:
             movimientos = MovimientoInventario.objects.filter(sensor_id=sensor_id)
@@ -42,9 +39,6 @@ class MovimientoInventarioViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def stock_actual(self, request):
         sensor_id = request.query_params.get('sensor_id', None)
-        # Soporte retrocompatible
-        if not sensor_id:
-            sensor_id = request.query_params.get('producto_id', None)
             
         if sensor_id:
             try:

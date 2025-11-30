@@ -9,10 +9,10 @@ class Comentario_ViewSet(ModelViewSet):
     serializer_class = ComentarioSerializer 
 
     def get_queryset(self):
-        id_producto = self.request.query_params.get("producto_id", None)
+        sensor_id = self.request.query_params.get("sensor_id", None)
         queryset = Comentario.objects.all()
 
-        if id_producto:
-            queryset = queryset.filter(id_producto=id_producto)
+        if sensor_id:
+            queryset = queryset.filter(id_sensor=sensor_id)
 
         return queryset

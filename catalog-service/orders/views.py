@@ -89,13 +89,12 @@ def sincronizar_orden_pago(request):
     return Response({"message": "Sincronización de pago recibida"})
 
 @api_view(['GET'])
-def obtener_info_producto(request, producto_id):
+def obtener_info_sensor(request, sensor_id):
     """
     Devuelve información básica de un sensor para que Spring Boot pueda consultarla
-    (Mantenemos el nombre de la función para compatibilidad, pero busca en Sensor)
     """
     try:
-        sensor = Sensor.objects.get(id=producto_id)
+        sensor = Sensor.objects.get(id=sensor_id)
     except Sensor.DoesNotExist:
         return Response(
             {'error': 'Sensor no encontrado'},

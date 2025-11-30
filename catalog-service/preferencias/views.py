@@ -30,24 +30,24 @@ class RecomendacionesView(APIView):
         if not categoria_fav and not marca_fav:
             return Response({"por_categoria": [], "por_marca": []})
 
-        # filtrar productos por categoria (max 3)
-        productos_categoria = []
+        # filtrar sensores por categoria (max 3)
+        sensores_categoria = []
         if categoria_fav:
-            productos_categoria = Sensor.objects.filter(
+            sensores_categoria = Sensor.objects.filter(
                 categoria=categoria_fav.id_categoria
             )[:3]
 
-        # filtrar productos por marca (max 2)
-        productos_marca = []
+        # filtrar sensores por marca (max 2)
+        sensores_marca = []
         if marca_fav:
-            productos_marca = Sensor.objects.filter(
+            sensores_marca = Sensor.objects.filter(
                 marca=marca_fav.marca
             )[:2]
 
         # serializar manualmente (simple)
         data = {
-            "por_categoria":SensorSerializer(productos_categoria, many=True).data,
-            "por_marca": SensorSerializer(productos_marca, many=True).data
+            "por_categoria":SensorSerializer(sensores_categoria, many=True).data,
+            "por_marca": SensorSerializer(sensores_marca, many=True).data
         }
 
         return Response(data, status=status.HTTP_200_OK)
