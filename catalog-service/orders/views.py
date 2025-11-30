@@ -110,3 +110,33 @@ def obtener_info_sensor(request, sensor_id):
     }
 
     return Response(data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def mis_pedidos(request):
+    """
+    Obtiene todas las órdenes del usuario autenticado
+    """
+    # Verificar autenticación (si usas JWT u otro método)
+    # Por simplicidad, usamos el parámetro user_id si está disponible
+    user_id = request.query_params.get('user_id')
+    
+    if not user_id:
+        return Response(
+            {'error': 'Se requiere user_id'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        usuario = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response(
+            {'error': 'Usuario no encontrado'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    # Obtener órdenes del usuario ordenadas por fecha más reciente
+    ordenes = Orden.objects.filter(usuario=usuario).order_by('-fecha_creacion')
+    serializer = OrdenSerializer(ordenes, many=True)
+    
+    return Response(serializer.data, status=status.HTTP_200_OK)
+

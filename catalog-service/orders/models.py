@@ -31,27 +31,22 @@ class Orden(models.Model):
 
 
 class ItemOrden(models.Model):
-    # ... (Orden y Sensor correctos)
     orden = models.ForeignKey(Orden, on_delete=models.CASCADE, related_name='items', verbose_name="Orden")
     sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, verbose_name="Sensor")
 
-
-    # Compatibilidad con microservicio o frontend desacoplado
-    sensor_id_ref = models.IntegerField(blank=True, null=True)  
+    # CAMBIO AQUÍ
+    sensor_id_ext = models.IntegerField(blank=True, null=True)
     nombre_sensor = models.CharField(max_length=255, blank=True, null=True)
     cantidad = models.IntegerField(verbose_name="Cantidad")
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Precio Unitario")
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Subtotal")
 
     def save(self, *args, **kwargs):
-        # autocalcular subtotal
         self.subtotal = self.precio_unitario * self.cantidad
 
-
-        # completar valores automáticamente si vienen de Sensor
         if self.sensor:
-            if not self.sensor_id_ref:
-                self.sensor_id_ref = self.sensor.id
+            if not self.sensor_id_ext:
+                self.sensor_id_ext = self.sensor.id
             if not self.nombre_sensor:
                 self.nombre_sensor = self.sensor.nombre
 
