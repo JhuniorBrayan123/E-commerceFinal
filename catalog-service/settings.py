@@ -99,7 +99,7 @@ DATABASES = {
     }
 }
 
-JWT_SECRET_KEY = 'mi-clave-secreta-jwt-muy-segura-para-ecommerce'
+JWT_SECRET_KEY = os.getenv('JWT_SECRET', 'mi-clave-secreta-jwt-muy-segura-para-ecommerce')
 
 AUTH_PASSWORD_VALIDATORS = [
     {

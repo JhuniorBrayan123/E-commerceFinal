@@ -203,7 +203,7 @@
         {% if messages %}
         {% for message in messages %}
         Toast.fire({
-            icon: '{% if message.tags == "error" %}error{% elif message.tags == "warning" %}warning{% elif message.tags == "success" %}success{% else %}info{% endif %}',
+            icon: '{% if "error" in message.tags %}error{% elif "warning" in message.tags %}warning{% elif "success" in message.tags %}success{% else %}info{% endif %}',
             title: '{{ message|escapejs }}'
         });
         {% endfor %}
