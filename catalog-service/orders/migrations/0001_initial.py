@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('productos', '0001_initial'),
+        ('sensores', '0001_initial'),
     ]
 
     operations = [
@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 ('precio_unitario', models.DecimalField(decimal_places=2, max_digits=10, verbose_name='Precio Unitario')),
                 ('subtotal', models.DecimalField(decimal_places=2, max_digits=10, verbose_name='Subtotal')),
                 ('orden', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='items', to='orders.orden', verbose_name='Orden')),
-                ('producto', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='productos.producto', verbose_name='Producto')),
+                ('producto', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='sensores.sensor', verbose_name='Producto')),
             ],
             options={
                 'verbose_name': 'Item de Orden',

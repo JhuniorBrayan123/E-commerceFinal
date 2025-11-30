@@ -5,7 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 from .models import MovimientoInventario
 from .serializers import MovimientoInventarioSerializer
-from productos.models import Producto
+from sensores.models import Sensor
 
 
 class MovimientoInventarioViewSet(viewsets.ModelViewSet):
@@ -40,13 +40,13 @@ class MovimientoInventarioViewSet(viewsets.ModelViewSet):
         producto_id = request.query_params.get('producto_id', None)
         if producto_id:
             try:
-                producto = Producto.objects.get(id=producto_id)
+                producto = Sensor.objects.get(id=producto_id)
                 return Response({
                     'producto_id': producto.id,
                     'producto_nombre': producto.nombre,
                     'stock_actual': producto.stock
                 })
-            except Producto.DoesNotExist:
+            except Sensor.DoesNotExist:
                 return Response(
                     {'error': 'Producto no encontrado'}, 
                     status=status.HTTP_404_NOT_FOUND

@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  # Auth Service (PHP)
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - "8081:80"
+    environment:
+      - DB_HOST=mysql-auth
+      - DB_NAME=auth_db
+      - DB_USER=root
+      - DB_PASS=password
+      - JWT_SECRET=mi-clave-secreta-jwt-muy-segura-para-ecommerce
+      - JWT_EXPIRE=3600
+      - REFRESH_TOKEN_EXPIRE=604800
+    depends_on:
+      - mysql-auth
+    volumes:
+      - ./auth-service/logs:/var/www/html/logs
+    networks:
+      - ecommerce-network
+
+  mysql-auth:
+    image: mysql:8.0
+    container_name: mysql-auth
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=auth_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_auth_data:/var/lib/mysql
+      - ./auth-service/src/Database/Migrations:/docker-entrypoint-initdb.d
+    networks:
+      - ecommerce-network
+
+  # Catalog Service (Django)
+  catalog-service:
+    build: ./catalog-service
+    container_name: catalog-service
+    ports:
+      - "8000:8000"
+    environment:
+      - MYSQL_DATABASE=ecommerce_db
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - JWT_SECRET=mi-clave-secreta-jwt-muy-segura-para-ecommerce
+      - DEBUG=True
+    depends_on:
+      - mysql
+    networks:
+      - ecommerce-network
+
+  # Payment Service (Spring Boot)
+  payment-service:
+    build: ./payment-service
+    container_name: payment-service
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ecommerce_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=
+      - JWT_SECRET=mi-clave-secreta-jwt-muy-segura-para-ecommerce
+      - CATALOG_BASE_URL=http://catalog-service:8000
+    depends_on:
+      - mysql
+    networks:
+      - ecommerce-network
+
+  # MySQL Database (Shared)
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-ecommerce
+    environment:
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE=ecommerce_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_ecommerce_data:/var/lib/mysql
+    networks:
+      - ecommerce-network
+
+volumes:
+  mysql_auth_data:
+  mysql_ecommerce_data:
+
+networks:
+  ecommerce-network:
+    driver: bridge

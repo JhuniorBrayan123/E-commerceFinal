@@ -13,6 +13,8 @@ class JWTService
     public static function init()
     {
         self::$secret_key = getenv('JWT_SECRET') ?: 'fallback_secret_key';
+        // Debug logging - remove in production
+        error_log("JWT_SECRET loaded: " . substr(self::$secret_key, 0, 10) . "... (length: " . strlen(self::$secret_key) . ")");
     }
 
     // Generar JWT token

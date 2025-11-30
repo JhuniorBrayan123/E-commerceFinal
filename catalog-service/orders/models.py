@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
-from productos.models import Producto
+# CORRECCIÓN CLAVE: Cambiar de 'productos' a 'sensores' y el modelo a 'Sensor'
+from sensores.models import Sensor
 
 
 class Orden(models.Model):
@@ -32,10 +33,11 @@ class Orden(models.Model):
 
 class ItemOrden(models.Model):
     orden = models.ForeignKey(Orden, on_delete=models.CASCADE, related_name='items', verbose_name="Orden")
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, verbose_name="Producto")
+    # CORRECCIÓN CLAVE: Cambiar la referencia de Producto a Sensor
+    producto = models.ForeignKey(Sensor, on_delete=models.CASCADE, verbose_name="Producto")
 
     # NUEVOS CAMPOS ➜ Compatibilidad con microservicio o frontend desacoplado
-    #producto_id = models.IntegerField(blank=True, null=True)  
+    #producto_id = models.IntegerField(blank=True, null=True) 
     nombre_producto = models.CharField(max_length=255, blank=True, null=True)
 
     cantidad = models.IntegerField(verbose_name="Cantidad")
@@ -46,10 +48,11 @@ class ItemOrden(models.Model):
         # autocalcular subtotal
         self.subtotal = self.precio_unitario * self.cantidad
 
-        # completar valores automáticamente si vienen de Producto
+        # completar valores automáticamente si vienen de Producto (que ahora es Sensor)
         if self.producto:
-            if not self.producto_id:
-                self.producto_id = self.producto.id
+            # Asumiendo que has decidido dejar el campo producto_id
+            # if not self.producto_id:
+            #     self.producto_id = self.producto.id
             if not self.nombre_producto:
                 self.nombre_producto = self.producto.nombre
 

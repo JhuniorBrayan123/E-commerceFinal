@@ -71,11 +71,7 @@ const Navbar: React.FC<NavbarProps> = ({ user, onLogout }) => {
         <div className="flex items-center justify-between h-36">
 
           <Link to="/" className="flex items-center space-x-2">
-<<<<<<< HEAD
-            <img src="/agrocodeLogo.svg" alt="logo" className="w-32 h-32" />
-=======
             <img src="/logoWeb.svg" alt="logo" style={{ width: '450px', height: '450px' }} />
->>>>>>> origin/Jhunior
           </Link>
 
           {/* ENLACES CENTRALES — AHORA MAS COMPACTOS */}

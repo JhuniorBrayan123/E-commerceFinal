@@ -10,6 +10,15 @@ from categorias.models import Categoria
 from .models import Sensor
 from .serializers import SensorSerializer
 
+# Importar Paginación de DRF
+from rest_framework.pagination import PageNumberPagination
+
+# Definir una clase de paginación si se necesita personalizar, si no, se usa la de settings.py
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 20  # Sobrescribir o usar el valor de settings
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
 class IndexView(APIView):
     """Endpoint raíz para verificar que el servidor está activo"""
     def get(self, request):
@@ -28,12 +37,16 @@ class IndexView(APIView):
 @method_decorator(csrf_exempt, name='dispatch')
 class SensoresView(APIView):
     """
-    Vista para listar y crear sensores
+    Vista para listar y crear sensores (Implementando paginación)
     GET: Lista sensores con filtros opcionales
     POST: Crear un nuevo sensor
     """
+    pagination_class = StandardResultsSetPagination
     
     def get(self, request):
+        # Inicializar paginador
+        paginator = self.pagination_class()
+
         # Obtener parámetros de filtro, búsqueda y ordenamiento
         tipo_filter = request.GET.get('categoria', None)
         marca_filter = request.GET.get('marca', None)
@@ -50,7 +63,7 @@ class SensoresView(APIView):
         # Base queryset
         sensores = Sensor.objects.all()
         
-        # Aplicar filtros
+        # Aplicar filtros (código existente)
         if tipo_filter:
             sensores = sensores.filter(categoria=tipo_filter)
         if marca_filter:
@@ -62,13 +75,13 @@ class SensoresView(APIView):
                 precio_min_decimal = float(precio_min)
                 sensores = sensores.filter(precio__gte=precio_min_decimal)
             except (ValueError, TypeError):
-                pass  # Ignorar si el valor no es válido
+                pass
         if precio_max:
             try:
                 precio_max_decimal = float(precio_max)
                 sensores = sensores.filter(precio__lte=precio_max_decimal)
             except (ValueError, TypeError):
-                pass  # Ignorar si el valor no es válido
+                pass
         if disponible_filter is not None:
             sensores = sensores.filter(disponible=disponible_filter.lower() == 'true')
         if stock_min:
@@ -76,13 +89,13 @@ class SensoresView(APIView):
                 stock_min_int = int(stock_min)
                 sensores = sensores.filter(stock__gte=stock_min_int)
             except (ValueError, TypeError):
-                pass  # Ignorar si el valor no es válido
+                pass
         if modelo_filter:
             sensores = sensores.filter(modelo__icontains=modelo_filter)
         if protocolo_filter:
             sensores = sensores.filter(protocolo_comunicacion__icontains=protocolo_filter)
         
-        # Aplicar búsqueda
+        # Aplicar búsqueda (código existente)
         if search_query:
             sensores = sensores.filter(
                 Q(nombre__icontains=search_query) |
@@ -93,37 +106,46 @@ class SensoresView(APIView):
                 Q(protocolo_comunicacion__icontains=search_query)
             )
         
-        # Aplicar ordenamiento
+        # Aplicar ordenamiento (código existente)
         valid_ordering_fields = ['id', 'nombre', 'precio', 'marca', 'categoria', 'stock', 'fecha_creacion']
         if ordering.lstrip('-') in valid_ordering_fields:
             sensores = sensores.order_by(ordering)
         else:
             sensores = sensores.order_by('-fecha_creacion')
         
-        # Serializar y retornar
-        serializer = SensorSerializer(sensores, many=True, context={'request': request})
+        # Aplicar paginación
+        page = paginator.paginate_queryset(sensores, request, view=self)
         
-        # Agregar metadata útil en la respuesta
+        # Serializar y retornar
+        serializer = SensorSerializer(page, many=True, context={'request': request})
+        
+        # Retornar respuesta paginada con metadata (DRF se encarga del formato)
+        # return paginator.get_paginated_response(serializer.data)
+        
+        # Si prefieres tu formato de respuesta original con la paginación manual:
         response_data = {
-            'count': sensores.count(),
-            'filters_applied': {
-                'categoria': tipo_filter,
-                'marca': marca_filter,
-                'rango': rango_filter,
-                'precio_min': precio_min,
-                'precio_max': precio_max,
-                'disponible': disponible_filter,
-                'stock_min': stock_min,
-                'modelo': modelo_filter,
-                'protocolo': protocolo_filter,
-                'search': search_query,
-                'ordering': ordering
-            },
-            'sensores': serializer.data
+             'count': sensores.count(), # Total sin paginación
+             'next': paginator.get_next_link(),
+             'previous': paginator.get_previous_link(),
+             'filters_applied': {
+                 'categoria': tipo_filter,
+                 'marca': marca_filter,
+                 'rango': rango_filter,
+                 'precio_min': precio_min,
+                 'precio_max': precio_max,
+                 'disponible': disponible_filter,
+                 'stock_min': stock_min,
+                 'modelo': modelo_filter,
+                 'protocolo': protocolo_filter,
+                 'search': search_query,
+                 'ordering': ordering
+             },
+             'sensores': serializer.data
         }
         
-        return Response(response_data)
-    
+        # Usar la respuesta estándar de paginación para mantener la coherencia con DRF
+        return paginator.get_paginated_response(serializer.data)
+
     def post(self, request):
         """Crear un nuevo sensor"""
         serializer = SensorSerializer(data=request.data)
@@ -142,8 +164,8 @@ class SensorDetailView(APIView):
     """
     Vista para obtener, actualizar y eliminar un sensor específico
     GET: Obtener detalles de un sensor
-    PUT: Actualizar un sensor
-    PATCH: Actualización parcial
+    PUT: Actualizar un sensor (Reemplazo Total)
+    PATCH: Actualización parcial (Corregido: usa partial=True)
     DELETE: Eliminar un sensor
     """
     
@@ -159,18 +181,20 @@ class SensorDetailView(APIView):
             )
     
     def put(self, request, sensor_id):
-        """Actualización completa"""
+        """Actualización completa (Requiere todos los campos)"""
         try:
             sensor = Sensor.objects.get(pk=sensor_id)
-            serializer = SensorSerializer(sensor, data=request.data)
+            # PUT por defecto NO usa partial=True, forzando la validación de todos los campos
+            serializer = SensorSerializer(sensor, data=request.data) 
             
             if serializer.is_valid():
                 serializer.save()
                 return Response({
-                    'mensaje': 'Sensor actualizado exitosamente',
+                    'mensaje': 'Sensor actualizado exitosamente (Reemplazo Total)',
                     'sensor': serializer.data
                 })
             else:
+                # Si falló la prueba de Postman (PUT 23) fue porque no enviaste todos los campos
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
                 
         except Sensor.DoesNotExist:
@@ -180,9 +204,10 @@ class SensorDetailView(APIView):
             )
     
     def patch(self, request, sensor_id):
-        """Actualización parcial"""
+        """Actualización parcial (Permite actualizar solo algunos campos)"""
         try:
             sensor = Sensor.objects.get(pk=sensor_id)
+            # CORRECCIÓN: partial=True permite la actualización parcial (solo los campos enviados)
             serializer = SensorSerializer(sensor, data=request.data, partial=True)
             
             if serializer.is_valid():
@@ -215,6 +240,9 @@ class SensorDetailView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
+# ... (El resto de las clases IndexView, SensorStatsView, SensorFilterView y DeductStockView permanecen sin cambios)
+
+# ... (Código de SensorStatsView)
 @method_decorator(csrf_exempt, name='dispatch')
 class SensorStatsView(APIView):
     """Vista para obtener estadísticas de sensores"""
@@ -240,6 +268,7 @@ class SensorStatsView(APIView):
         }
         return Response(stats)
 
+# ... (Código de SensorFilterView)
 @method_decorator(csrf_exempt, name='dispatch')
 class SensorFilterView(APIView):
     """Vista para obtener opciones disponibles de filtrado"""
@@ -271,6 +300,8 @@ class SensorFilterView(APIView):
         }
         return Response(filters)
 
+
+# ... (Código de DeductStockView)
 @method_decorator(csrf_exempt, name='dispatch')
 class DeductStockView(APIView):
     """

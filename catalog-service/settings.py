@@ -28,7 +28,6 @@ INSTALLED_APPS = [
     'django_filters',
     'sensores',
     'categorias',
-    'productos',
     'inventario',
     'orders',
     'django.contrib.admin',
@@ -86,7 +85,8 @@ DATABASES = {
     }
 }
 
-JWT_SECRET_KEY = 'mi-clave-secreta-jwt-muy-segura-para-ecommerce'
+# Se asume que este es el campo correcto para la clave JWT.
+JWT_SECRET_KEY = os.getenv('JWT_SECRET', 'mi-clave-secreta-jwt-muy-segura-para-ecommerce')
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -108,6 +108,9 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+# ----------------------------------------------------
+# CONFIGURACIÓN DE ARCHIVOS ESTÁTICOS Y MEDIA
+# ----------------------------------------------------
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
@@ -128,11 +131,11 @@ REST_FRAMEWORK = {
     ],
 }
 
-# CONFIGURACIÓN DE CORS - ACTUALIZADA PARA DOCKER
+# CONFIGURACIÓN DE CORS
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "http://frontend:3000",  # ← Si tu frontend también está en Docker
+    "http://frontend:3000",
 ]
 CORS_ALLOW_ALL_ORIGINS = True  # Para desarrollo
 

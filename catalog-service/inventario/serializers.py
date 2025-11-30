@@ -1,11 +1,13 @@
 from rest_framework import serializers
 from .models import MovimientoInventario
-from productos.serializers import ProductoSerializer
+# CORRECCIÓN 1: Cambiar 'productos' por 'sensores' y 'ProductoSerializer' por 'SensorSerializer'
+from sensores.serializers import SensorSerializer
 
 
 class MovimientoInventarioSerializer(serializers.ModelSerializer):
+    # CORRECCIÓN 2: Usar el Serializador con el nombre correcto
     producto_nombre = serializers.CharField(source='producto.nombre', read_only=True)
-    producto_detalle = ProductoSerializer(source='producto', read_only=True)
+    producto_detalle = SensorSerializer(source='producto', read_only=True)
 
     class Meta:
         model = MovimientoInventario
@@ -31,4 +33,3 @@ class MovimientoInventarioSerializer(serializers.ModelSerializer):
                         f"No hay suficiente stock. Stock disponible: {producto.stock}"
                     )
         return data
-

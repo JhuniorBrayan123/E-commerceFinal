@@ -2,6 +2,5 @@ Django==4.2.7
 djangorestframework==3.14.0
 django-cors-headers==4.3.1
 django-filter==23.3  # ← AGREGAR django_filters
-mysqlclient==2.1.1
 PyMySQL==1.1.0
 Pillow

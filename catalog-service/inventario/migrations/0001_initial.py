@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('productos', '0001_initial'),
+        ('sensores', '0001_initial'),
     ]
 
     operations = [
@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('motivo', models.CharField(max_length=200, verbose_name='Motivo')),
                 ('fecha', models.DateTimeField(auto_now_add=True, verbose_name='Fecha')),
                 ('observaciones', models.TextField(blank=True, null=True, verbose_name='Observaciones')),
-                ('producto', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='movimientos', to='productos.producto', verbose_name='Producto')),
+                ('producto', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='movimientos', to='sensores.sensor', verbose_name='Producto')),
             ],
             options={
                 'verbose_name': 'Movimiento de Inventario',

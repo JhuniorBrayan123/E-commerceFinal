@@ -1,10 +1,12 @@
 from rest_framework import serializers
 from .models import Orden, ItemOrden
-from productos.serializers import ProductoSerializer
+# CORRECCIÓN 1: Cambiar la importación de 'productos' a 'sensores' y la clase a 'SensorSerializer'
+from sensores.serializers import SensorSerializer
 
 
 class ItemOrdenSerializer(serializers.ModelSerializer):
-    producto_detalle = ProductoSerializer(source='producto', read_only=True)
+    # CORRECCIÓN 2: Usar la clase SensorSerializer
+    producto_detalle = SensorSerializer(source='producto', read_only=True)
 
     class Meta:
         model = ItemOrden
@@ -20,14 +22,14 @@ class OrdenSerializer(serializers.ModelSerializer):
         model = Orden
         fields = [
             'id', 'usuario', 'usuario_username', 'total', 'estado',
-            'items', 'fecha_creacion', 'fecha_actualizacion'
+            'items', 'fecha_creacion', 'fecha_actualizacion', 'payment_service_id'
         ]
         read_only_fields = ['id', 'fecha_creacion', 'fecha_actualizacion']
 
 
 class CrearOrdenSerializer(serializers.Serializer):
     """
-    Serializer para crear órdenes desde Spring Boot
+    Serializador para crear órdenes desde Spring Boot
     """
     usuario_id = serializers.IntegerField()
     productos = serializers.ListField(
@@ -46,4 +48,3 @@ class CrearOrdenSerializer(serializers.Serializer):
             if item['cantidad'] <= 0:
                 raise serializers.ValidationError("La cantidad debe ser mayor a 0.")
         return value
-

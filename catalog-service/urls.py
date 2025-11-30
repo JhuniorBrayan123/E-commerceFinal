@@ -22,10 +22,10 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('categorias.urls')),
-    path('api/', include('productos.urls')),
+    # REMOVIDA: path('api/', include('productos.urls')), 
     path('api/', include('inventario.urls')),
     path('api/', include('orders.urls')),
-    path('api/', include('sensores.urls')),
+    path('api/', include('sensores.urls')), # <-- Esta es la ruta correcta
     path('api/', include('preferencias.urls')),
     path('api/', include('comentarios.urls')),
     path('api/', include('marketing.urls')),
@@ -33,5 +33,6 @@ urlpatterns = [
 
 # Servir archivos media en desarrollo
 if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    # urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
+    # urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -26,7 +26,7 @@ import com.example.payment_service.service.PaymentService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/payment")
+@RequestMapping("/api/payment")
 @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001", "http://127.0.0.1:3000", "http://127.0.0.1:3001"}, 
              allowedHeaders = "*", 
              methods = {org.springframework.web.bind.annotation.RequestMethod.GET, 

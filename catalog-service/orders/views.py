@@ -2,7 +2,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-from productos.models import Producto
+# CORRECCIÓN 1: Cambiar 'productos' a 'sensores' y 'Producto' a 'Sensor'
+from sensores.models import Sensor
 from inventario.models import MovimientoInventario
 from .models import Orden, ItemOrden
 from .serializers import CrearOrdenSerializer, OrdenSerializer
@@ -42,8 +43,10 @@ def crear_orden(request):
         cantidad = item_data['cantidad']
         
         try:
-            producto = Producto.objects.get(id=producto_id)
-        except Producto.DoesNotExist:
+            # CORRECCIÓN 2: Usar Sensor.objects.get
+            producto = Sensor.objects.get(id=producto_id)
+        # CORRECCIÓN 3: Usar Sensor.DoesNotExist
+        except Sensor.DoesNotExist:
             orden.delete()
             return Response(
                 {'error': f'Producto con id {producto_id} no encontrado'}, 
@@ -61,7 +64,7 @@ def crear_orden(request):
         # Crear item de orden
         ItemOrden.objects.create(
             orden=orden,
-            producto=producto,
+            producto=producto, # 'producto' es ahora un objeto Sensor
             cantidad=cantidad,
             precio_unitario=producto.precio,
             subtotal=producto.precio * cantidad
@@ -69,7 +72,7 @@ def crear_orden(request):
         
         # Registrar movimiento de inventario (salida)
         MovimientoInventario.objects.create(
-            producto=producto,
+            producto=producto, # 'producto' es ahora un objeto Sensor
             tipo='salida',
             cantidad=cantidad,
             motivo=f'Venta - Orden #{orden.id}',
@@ -79,6 +82,8 @@ def crear_orden(request):
     # Retornar la orden creada
     orden_serializer = OrdenSerializer(orden)
     return Response(orden_serializer.data, status=status.HTTP_201_CREATED)
+
+
 @api_view(['POST'])
 def sincronizar_orden_pago(request):
     """
@@ -86,14 +91,18 @@ def sincronizar_orden_pago(request):
     (por ahora solo devuelve un mensaje para que Django no falle)
     """
     return Response({"message": "Sincronización de pago recibida"})
+
+
 @api_view(['GET'])
 def obtener_info_producto(request, producto_id):
     """
     Devuelve información básica de un producto para que Spring Boot pueda consultarla
     """
     try:
-        producto = Producto.objects.get(id=producto_id)
-    except Producto.DoesNotExist:
+        # CORRECCIÓN 4: Usar Sensor.objects.get
+        producto = Sensor.objects.get(id=producto_id)
+    # CORRECCIÓN 5: Usar Sensor.DoesNotExist
+    except Sensor.DoesNotExist:
         return Response(
             {'error': 'Producto no encontrado'},
             status=status.HTTP_404_NOT_FOUND

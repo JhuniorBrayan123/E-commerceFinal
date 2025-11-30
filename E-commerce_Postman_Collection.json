@@ -1,0 +1,1666 @@
+{
+    "info": {
+        "_postman_id": "e-commerce-microservices-tests",
+        "name": "E-commerce Microservices - Integration Tests",
+        "description": "Colección completa de pruebas de integración para los microservicios de E-commerce (Auth, Catalog, Payment)",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Auth Service",
+            "item": [
+                {
+                    "name": "01 - Registro Exitoso",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has success field\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.success).to.eql(true);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has access_token\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data.tokens.access_token).to.exist;",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"test_new@example.com\",\n  \"password\": \"password123\",\n  \"first_name\": \"Test\",\n  \"last_name\": \"User\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{auth_base_url}}/auth/register",
+                            "host": [
+                                "{{auth_base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "02 - Registro Email Ya Existe",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 409 or 400\", function () {",
+                                    "    pm.expect([400, 409]).to.include(pm.response.code);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"usuario@example.com\",\n  \"password\": \"password123\",\n  \"first_name\": \"Juan\",\n  \"last_name\": \"Perez\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{auth_base_url}}/auth/register",
+                            "host": [
+                                "{{auth_base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "03 - Registro Campos Faltantes",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 400\", function () {",
+                                    "    pm.response.to.have.status(400);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"incomplete@example.com\",\n  \"password\": \"password123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{auth_base_url}}/auth/register",
+                            "host": [
+                                "{{auth_base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "04 - Registro Email Inválido",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 400\", function () {",
+                                    "    pm.response.to.have.status(400);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"notanemail\",\n  \"password\": \"password123\",\n  \"first_name\": \"Test\",\n  \"last_name\": \"User\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{auth_base_url}}/auth/register",
+                            "host": [
+                                "{{auth_base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "05 - Login Exitoso",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has token\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data.tokens.access_token).to.exist;",
+                                    "    pm.environment.set(\"jwt_token\", jsonData.data.tokens.access_token);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"usuario@example.com\",\n  \"password\": \"password123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{auth_base_url}}/auth/login",
+                            "host": [
+                                "{{auth_base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "06 - Login Credenciales Inválidas",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 401\", function () {",
+                                    "    pm.response.to.have.status(401);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"usuario@example.com\",\n  \"password\": \"wrongpassword\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{auth_base_url}}/auth/login",
+                            "host": [
+                                "{{auth_base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "07 - Login Usuario No Existente",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 404 or 401\", function () {",
+                                    "    pm.expect([401, 404]).to.include(pm.response.code);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"nonexistent@example.com\",\n  \"password\": \"password123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{auth_base_url}}/auth/login",
+                            "host": [
+                                "{{auth_base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "08 - Login Campos Faltantes",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 400\", function () {",
+                                    "    pm.response.to.have.status(400);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"usuario@example.com\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{auth_base_url}}/auth/login",
+                            "host": [
+                                "{{auth_base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Catalog Service",
+            "item": [
+                {
+                    "name": "09 - Listar Todos los Sensores",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has sensores array\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.sensores).to.be.an('array');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{catalog_base_url}}/sensors",
+                            "host": [
+                                "{{catalog_base_url}}"
+                            ],
+                            "path": [
+                                "sensors"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "10 - Filtrar por Tipo",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"All sensors are tipo humedad\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    jsonData.sensores.forEach(function(sensor) {",
+                                    "        pm.expect(sensor.tipo).to.eql('humedad');",
+                                    "    });",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{catalog_base_url}}/sensors?tipo=humedad",
+                            "host": [
+                                "{{catalog_base_url}}"
+                            ],
+                            "path": [
+                                "sensors"
+                            ],
+                            "query": [
+                                {
+                                    "key": "tipo",
+                                    "value": "humedad"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "11 - Filtrar por Marca",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{catalog_base_url}}/sensors?marca=DHT",
+                            "host": [
+                                "{{catalog_base_url}}"
+                            ],
+                            "path": [
+                                "sensors"
+                            ],
+                            "query": [
+                                {
+                                    "key": "marca",
+                                    "value": "DHT"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "12 - Filtrar por Rango de Precio",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"All sensors within price range\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    jsonData.sensores.forEach(function(sensor) {",
+                                    "        var precio = parseFloat(sensor.precio);",
+                                    "        pm.expect(precio).to.be.at.least(10);",
+                                    "        pm.expect(precio).to.be.at.most(50);",
+                                    "    });",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{catalog_base_url}}/sensors?precio_min=10&precio_max=50",
+                            "host": [
+                                "{{catalog_base_url}}"
+                            ],
+                            "path": [
+                                "sensors"
+                            ],
+                            "query": [
+                                {
+                                    "key": "precio_min",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "precio_max",
+                                    "value": "50"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "13 - Búsqueda por Texto",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{catalog_base_url}}/sensors?search=Temperatura",
+                            "host": [
+                                "{{catalog_base_url}}"
+                            ],
+                            "path": [
+                                "sensors"
+                            ],
+                            "query": [
+                                {
+                                    "key": "search",
+                                    "value": "Temperatura"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "14 - Paginación",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Results limited to 5\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.sensores.length).to.be.at.most(5);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{catalog_base_url}}/sensors?limit=5&offset=0",
+                            "host": [
+                                "{{catalog_base_url}}"
+                            ],
+                            "path": [
+                                "sensors"
+                            ],
+                            "query": [
+                                {
+                                    "key": "limit",
+                                    "value": "5"
+                                },
+                                {
+                                    "key": "offset",
+                                    "value": "0"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "15 - Obtener Sensor por ID",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has sensor details\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.id).to.exist;",
+                                    "    pm.expect(jsonData.nombre).to.exist;",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{catalog_base_url}}/sensors/1",
+                            "host": [
+                                "{{catalog_base_url}}"
+                            ],
+                            "path": [
+                                "sensors",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "16 - Sensor No Encontrado",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 404\", function () {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{catalog_base_url}}/sensors/99999",
+                            "host": [
+                                "{{catalog_base_url}}"
+                            ],
+                            "path": [
+                                "sensors",
+                                "99999"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "17 - ID Inválido",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 400 or 404\", function () {",
+                                    "    pm.expect([400, 404]).to.include(pm.response.code);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{catalog_base_url}}/sensors/abc",
+                            "host": [
+                                "{{catalog_base_url}}"
+                            ],
+                            "path": [
+                                "sensors",
+                                "abc"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "18 - Obtener Filtros Disponibles",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has filter options\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.tipos).to.exist;",
+                                    "    pm.expect(jsonData.marcas).to.exist;",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{catalog_base_url}}/sensors/filters",
+                            "host": [
+                                "{{catalog_base_url}}"
+                            ],
+                            "path": [
+                                "sensors",
+                                "filters"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "19 - Obtener Estadísticas",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has stats\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.total_sensores).to.exist;",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{catalog_base_url}}/stats",
+                            "host": [
+                                "{{catalog_base_url}}"
+                            ],
+                            "path": [
+                                "stats"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "20 - Crear Sensor",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 201\", function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"nombre\": \"Nuevo Sensor Test\",\n  \"tipo\": \"luz\",\n  \"marca\": \"TestBrand\",\n  \"modelo\": \"TB-001\",\n  \"precio\": \"15.00\",\n  \"descripcion\": \"Sensor de prueba\",\n  \"stock\": 10,\n  \"disponible\": true\n}"
+                        },
+                        "url": {
+                            "raw": "{{catalog_base_url}}/sensors",
+                            "host": [
+                                "{{catalog_base_url}}"
+                            ],
+                            "path": [
+                                "sensors"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "21 - Crear Sensor Sin Token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 401\", function () {",
+                                    "    pm.response.to.have.status(401);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"nombre\": \"Nuevo Sensor Test\",\n  \"tipo\": \"luz\",\n  \"marca\": \"TestBrand\",\n  \"precio\": \"15.00\",\n  \"stock\": 10,\n  \"disponible\": true\n}"
+                        },
+                        "url": {
+                            "raw": "{{catalog_base_url}}/sensors",
+                            "host": [
+                                "{{catalog_base_url}}"
+                            ],
+                            "path": [
+                                "sensors"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "22 - Crear Sensor Datos Inválidos",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 400\", function () {",
+                                    "    pm.response.to.have.status(400);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"nombre\": \"\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{catalog_base_url}}/sensors",
+                            "host": [
+                                "{{catalog_base_url}}"
+                            ],
+                            "path": [
+                                "sensors"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "23 - Actualizar Sensor",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"precio\": \"50.00\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{catalog_base_url}}/sensors/1",
+                            "host": [
+                                "{{catalog_base_url}}"
+                            ],
+                            "path": [
+                                "sensors",
+                                "1"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Payment Service",
+            "item": [
+                {
+                    "name": "24 - Crear Orden Exitosamente",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 201\", function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has orderId\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data.orderId).to.exist;",
+                                    "    pm.environment.set(\"order_id\", jsonData.data.orderId);",
+                                    "    if (jsonData.data.paymentToken) {",
+                                    "        pm.environment.set(\"payment_token\", jsonData.data.paymentToken);",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"items\": [\n    {\n      \"sensor_id\": 1,\n      \"nombre\": \"Sensor de Humedad DHT22\",\n      \"cantidad\": 1,\n      \"precio_unitario\": \"45.99\"\n    }\n  ],\n  \"total\": 45.99,\n  \"currency\": \"USD\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{payment_base_url}}/payment/order",
+                            "host": [
+                                "{{payment_base_url}}"
+                            ],
+                            "path": [
+                                "payment",
+                                "order"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "25 - Crear Orden Sin Token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 401\", function () {",
+                                    "    pm.response.to.have.status(401);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"items\": [\n    {\n      \"sensor_id\": 1,\n      \"nombre\": \"Sensor 1\",\n      \"cantidad\": 1,\n      \"precio_unitario\": \"45.99\"\n    }\n  ],\n  \"total\": 45.99,\n  \"currency\": \"USD\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{payment_base_url}}/payment/order",
+                            "host": [
+                                "{{payment_base_url}}"
+                            ],
+                            "path": [
+                                "payment",
+                                "order"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "26 - Crear Orden Lista Vacía",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 400\", function () {",
+                                    "    pm.response.to.have.status(400);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"items\": [],\n  \"total\": 0,\n  \"currency\": \"USD\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{payment_base_url}}/payment/order",
+                            "host": [
+                                "{{payment_base_url}}"
+                            ],
+                            "path": [
+                                "payment",
+                                "order"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "27 - Crear Orden Total Negativo",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 400\", function () {",
+                                    "    pm.response.to.have.status(400);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"items\": [\n    {\n      \"sensor_id\": 1,\n      \"nombre\": \"Sensor 1\",\n      \"cantidad\": 1,\n      \"precio_unitario\": \"45.99\"\n    }\n  ],\n  \"total\": -10,\n  \"currency\": \"USD\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{payment_base_url}}/payment/order",
+                            "host": [
+                                "{{payment_base_url}}"
+                            ],
+                            "path": [
+                                "payment",
+                                "order"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "28 - Confirmar Pago Exitoso",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Payment status is PAID\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data.status).to.eql('PAID');",
+                                    "    if (jsonData.data.paymentId) {",
+                                    "        pm.environment.set(\"payment_id\", jsonData.data.paymentId);",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"orderId\": {{order_id}},\n  \"paymentToken\": \"{{payment_token}}\",\n  \"paymentMethod\": \"STRIPE\",\n  \"amount\": 45.99,\n  \"currency\": \"USD\",\n  \"paymentData\": {\n    \"cardNumber\": \"4242424242424242\",\n    \"expMonth\": 12,\n    \"expYear\": 2025,\n    \"cvv\": \"123\"\n  }\n}"
+                        },
+                        "url": {
+                            "raw": "{{payment_base_url}}/payment/confirm",
+                            "host": [
+                                "{{payment_base_url}}"
+                            ],
+                            "path": [
+                                "payment",
+                                "confirm"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "29 - Confirmar Pago Tarjeta Rechazada",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 400 or 402\", function () {",
+                                    "    pm.expect([400, 402]).to.include(pm.response.code);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"orderId\": {{order_id}},\n  \"paymentMethod\": \"STRIPE\",\n  \"amount\": 45.99,\n  \"currency\": \"USD\",\n  \"paymentData\": {\n    \"cardNumber\": \"4000000000000002\",\n    \"expMonth\": 12,\n    \"expYear\": 2025,\n    \"cvv\": \"123\"\n  }\n}"
+                        },
+                        "url": {
+                            "raw": "{{payment_base_url}}/payment/confirm",
+                            "host": [
+                                "{{payment_base_url}}"
+                            ],
+                            "path": [
+                                "payment",
+                                "confirm"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "30 - Confirmar Pago Orden No Existe",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 404\", function () {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"orderId\": 999999,\n  \"paymentMethod\": \"STRIPE\",\n  \"amount\": 45.99,\n  \"currency\": \"USD\",\n  \"paymentData\": {\n    \"cardNumber\": \"4242424242424242\",\n    \"expMonth\": 12,\n    \"expYear\": 2025,\n    \"cvv\": \"123\"\n  }\n}"
+                        },
+                        "url": {
+                            "raw": "{{payment_base_url}}/payment/confirm",
+                            "host": [
+                                "{{payment_base_url}}"
+                            ],
+                            "path": [
+                                "payment",
+                                "confirm"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "31 - Confirmar Pago Orden Ya Pagada",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 409 or 400\", function () {",
+                                    "    pm.expect([400, 409]).to.include(pm.response.code);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"orderId\": {{order_id}},\n  \"paymentMethod\": \"STRIPE\",\n  \"amount\": 45.99,\n  \"currency\": \"USD\",\n  \"paymentData\": {\n    \"cardNumber\": \"4242424242424242\",\n    \"expMonth\": 12,\n    \"expYear\": 2025,\n    \"cvv\": \"123\"\n  }\n}"
+                        },
+                        "url": {
+                            "raw": "{{payment_base_url}}/payment/confirm",
+                            "host": [
+                                "{{payment_base_url}}"
+                            ],
+                            "path": [
+                                "payment",
+                                "confirm"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "32 - Obtener Estado de Orden",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has status\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.status).to.exist;",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{payment_base_url}}/payment/status/{{order_id}}",
+                            "host": [
+                                "{{payment_base_url}}"
+                            ],
+                            "path": [
+                                "payment",
+                                "status",
+                                "{{order_id}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "33 - Obtener Estado Orden Inexistente",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 404\", function () {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{payment_base_url}}/payment/status/99999",
+                            "host": [
+                                "{{payment_base_url}}"
+                            ],
+                            "path": [
+                                "payment",
+                                "status",
+                                "99999"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "34 - Obtener Detalle de Pago",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has payment details\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.paymentId).to.exist;",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{payment_base_url}}/payment/{{payment_id}}",
+                            "host": [
+                                "{{payment_base_url}}"
+                            ],
+                            "path": [
+                                "payment",
+                                "{{payment_id}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "35 - Obtener Pago por Orden",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has payment details\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.orderId).to.exist;",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{payment_base_url}}/payment/order/{{order_id}}",
+                            "host": [
+                                "{{payment_base_url}}"
+                            ],
+                            "path": [
+                                "payment",
+                                "order",
+                                "{{order_id}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "36 - Solicitar Reembolso Exitoso",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Status is REFUNDED\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.status).to.eql('REFUNDED');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"amount\": 45.99,\n  \"reason\": \"Test Refund\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{payment_base_url}}/payment/{{payment_id}}/refund",
+                            "host": [
+                                "{{payment_base_url}}"
+                            ],
+                            "path": [
+                                "payment",
+                                "{{payment_id}}",
+                                "refund"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "37 - Reembolso Monto Inválido",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 400\", function () {",
+                                    "    pm.response.to.have.status(400);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"amount\": 999999,\n  \"reason\": \"Fraud\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{payment_base_url}}/payment/{{payment_id}}/refund",
+                            "host": [
+                                "{{payment_base_url}}"
+                            ],
+                            "path": [
+                                "payment",
+                                "{{payment_id}}",
+                                "refund"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "38 - Reembolso Pago No Encontrado",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test(\"Status code is 404\", function () {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"amount\": 45.99,\n  \"reason\": \"Test\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{payment_base_url}}/payment/99999/refund",
+                            "host": [
+                                "{{payment_base_url}}"
+                            ],
+                            "path": [
+                                "payment",
+                                "99999",
+                                "refund"
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "auth_base_url",
+            "value": "http://localhost:8081/api",
+            "type": "string"
+        },
+        {
+            "key": "catalog_base_url",
+            "value": "http://localhost:8000/api",
+            "type": "string"
+        },
+        {
+            "key": "payment_base_url",
+            "value": "http://localhost:8080/api",
+            "type": "string"
+        },
+        {
+            "key": "jwt_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "order_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "payment_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "payment_token",
+            "value": "",
+            "type": "string"
+        }
+    ]
+}
