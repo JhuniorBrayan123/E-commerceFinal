@@ -5,5 +5,7 @@ from .models import Banner
 
 
 class Banner_ViewSet(ModelViewSet):
-    queryset = Banner.objects.all()
     serializer_class = BannerSerializer 
+    
+    def get_queryset(self):
+        return Banner.objects.filter(activo=True).order_by('orden')

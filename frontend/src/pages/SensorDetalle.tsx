@@ -103,13 +103,11 @@ const ProductoDetalle: React.FC = () => {
     }
   };
 
-
   const handleAgregarCarrito = () => {
     if (producto && cantidad > 0 && cantidad <= producto.stock) {
       carritoService.add(producto, cantidad, producto.stock);
       alert('Producto agregado al carrito');
-
-      navigate('/carrito');
+      // Usuario puede seguir comprando - no redirigir al carrito
     } else {
       alert('Cantidad inválida o stock insuficiente');
     }
@@ -186,8 +184,8 @@ const ProductoDetalle: React.FC = () => {
             <div className="mb-6 flex items-center gap-4">
               <span
                 className={`px-4 py-1.5 rounded-full text-sm font-semibold shadow ${producto.stock > 0
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-red-100 text-red-700'
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-red-100 text-red-700'
                   }`}
               >
                 {producto.stock > 0 ? "Disponible" : "No Disponible"}

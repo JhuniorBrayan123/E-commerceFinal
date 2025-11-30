@@ -13,7 +13,7 @@ const Carrito: React.FC = () => {
       const items = carritoService.get();
       setCarrito(items);
       setTotal(carritoService.getTotal());
-      
+
     };
     actualizarCarrito();
   }, []);
@@ -78,7 +78,7 @@ const Carrito: React.FC = () => {
               <div className="flex items-center space-x-4">
                 {item.imagen ? (
                   <img
-                    src={item.imagen_url}
+                    src={item.imagen}
                     alt={item.nombre}
                     className="w-24 h-24 object-cover rounded-lg"
                   />

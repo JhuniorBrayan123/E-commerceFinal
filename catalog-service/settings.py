@@ -13,8 +13,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-#zvzk4+1y(&ssrx0e@gtk+a#j+rap9!dv_=g3+bj)nbz7svb6_'
 
-# DEBUG para Docker - False en producción
-DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+# DEBUG para Docker - True en desarrollo local, False en producción
+DEBUG = True  # Cambiado temporalmente a True para desarrollo local
 
 ALLOWED_HOSTS = ['*']  # Para desarrollo, en producción especifica dominios
 
@@ -108,8 +108,18 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+# Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Directorios adicionales para archivos estáticos
+STATICFILES_DIRS = []
+
+# Buscadores de archivos estáticos - IMPORTANTE para que funcione el admin
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
 
 # Media files (imágenes de productos)
 MEDIA_URL = '/media/'

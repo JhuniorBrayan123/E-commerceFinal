@@ -66,11 +66,11 @@ export const categoriasService = {
 
 // Comentarios 
 export const comentariosService = {
-  getAll: (id:number) => api.get(`/comentarios/?producto_id=${id}`),
+  getAll: (id: number) => api.get(`/comentarios/?producto_id=${id}`),
   getById: (id: number) => api.get(`/comentarios/${id}/`),
   create: (data: any) => api.post("/comentarios/", data),
-  update: (id : number, data: any) => api.put(`/comentarios/${id}/`, data),
-  delete: (id: number)  => api.delete(`/comentarios/${id}/`), 
+  update: (id: number, data: any) => api.put(`/comentarios/${id}/`, data),
+  delete: (id: number) => api.delete(`/comentarios/${id}/`),
 }
 
 // Productos
@@ -114,6 +114,11 @@ export const inventarioService = {
 };
 
 // Carrito local
+export const bannersService = {
+  getAll: () => api.get("/banners/"),
+  getById: (id: number) => api.get(`/banners/${id}/`),
+};
+
 export const carritoService = {
   get: (): any[] => JSON.parse(localStorage.getItem("carrito") || "[]"),
   add: (producto: any, cantidad: number = 1, stock: number) => {
@@ -131,7 +136,7 @@ export const carritoService = {
     localStorage.setItem("carrito", JSON.stringify(carrito));
     return carrito;
   },
-  update: (productoId: number, cantidad: number, stock:number) => {
+  update: (productoId: number, cantidad: number, stock: number) => {
     const carrito = carritoService.get();
     const item = carrito.find((i) => i.id === productoId);
 
@@ -166,7 +171,7 @@ export default api;
 const PAYMENT_API = SERVICES.PAYMENT;
 
 export const cartService = {
-  addToCart: async (productId: number, quantity: number, stock :number) => {
+  addToCart: async (productId: number, quantity: number, stock: number) => {
     const res = await fetch(`${PAYMENT_API}/cart/add`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -247,23 +252,23 @@ export const orderService = {
     try {
       const url = `${PAYMENT_API}/payment/order`;
       const headers = getAuthHeaders();
-      
+
       console.log('orderService.createOrder - Enviando petición a:', url);
       console.log('orderService.createOrder - Headers:', headers);
       console.log('orderService.createOrder - Body:', JSON.stringify(orderData, null, 2));
-      
+
       const res = await fetch(url, {
         method: "POST",
         headers: headers,
         body: JSON.stringify(orderData),
       });
-      
+
       console.log('orderService.createOrder - Status:', res.status);
       console.log('orderService.createOrder - Status Text:', res.statusText);
-      
+
       const text = await res.text();
       console.log('orderService.createOrder - Response text:', text);
-      
+
       let data;
       try {
         data = text ? JSON.parse(text) : {};
@@ -272,29 +277,29 @@ export const orderService = {
         console.error('orderService.createOrder - Error parsing JSON:', parseError);
         throw new Error(`Error al parsear la respuesta del servidor: ${text.substring(0, 200)}`);
       }
-      
+
       if (!res.ok) {
         // Si hay un error, lanzar excepción con el mensaje
         const errorMessage = data.message || data.error?.message || data.error || `Error ${res.status}: ${res.statusText}`;
         console.error('orderService.createOrder - Error response:', errorMessage);
         throw new Error(errorMessage);
       }
-      
+
       console.log('orderService.createOrder - Success, returning data');
       return data;
     } catch (error: any) {
       console.error('orderService.createOrder - Exception caught:', error);
-      
+
       // Manejar errores de red específicos
       if (error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError')) {
         throw new Error("No se pudo conectar con el servicio de pagos. Verifica que el servicio esté corriendo en el puerto 8085.");
       }
-      
+
       // Si ya es un Error, re-lanzarlo
       if (error instanceof Error) {
         throw error;
       }
-      
+
       // Si no, crear un nuevo Error
       throw new Error("Error de conexión al crear la orden: " + (error.message || String(error)));
     }
@@ -321,9 +326,9 @@ export const paymentService = {
       headers: getAuthHeaders(),
       body: JSON.stringify(confirmData),
     });
-    
+
     const data = await res.json();
-    
+
     if (!res.ok) {
       // Extraer mensaje de error más detallado
       const errorMessage = data.error?.message || data.message || data.error?.code || "Error al procesar el pago";
@@ -333,7 +338,7 @@ export const paymentService = {
       (error as any).response = data;
       throw error;
     }
-    
+
     // Si success es false, también lanzar error
     if (data.success === false) {
       const errorMessage = data.error?.message || data.message || "Error al procesar el pago";
@@ -342,7 +347,7 @@ export const paymentService = {
       (error as any).response = data;
       throw error;
     }
-    
+
     return data;
   },
 

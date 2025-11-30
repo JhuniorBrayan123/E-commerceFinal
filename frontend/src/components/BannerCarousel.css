@@ -1,0 +1,139 @@
+.banner-carousel-container {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    /* Ajusta la altura según necesites */
+    overflow: hidden;
+    background-color: #f3f4f6;
+}
+
+.banner-carousel-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.5s ease-in-out;
+}
+
+.banner-slide {
+    min-width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.banner-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.banner-link,
+.banner-no-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    text-decoration: none;
+    color: inherit;
+}
+
+.banner-content {
+    position: absolute;
+    bottom: 40px;
+    left: 40px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 50%;
+    backdrop-filter: blur(4px);
+}
+
+.banner-content h3 {
+    margin: 0 0 10px 0;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.banner-content p {
+    margin: 0;
+    font-size: 16px;
+}
+
+/* Flechas de navegación */
+.banner-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s;
+    z-index: 10;
+}
+
+.banner-arrow:hover {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.banner-prev {
+    left: 20px;
+}
+
+.banner-next {
+    right: 20px;
+}
+
+/* Puntos de navegación */
+.banner-dots {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+}
+
+.banner-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.banner-dot.active {
+    background: white;
+    transform: scale(1.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .banner-carousel-container {
+        height: 250px;
+    }
+
+    .banner-content {
+        left: 20px;
+        bottom: 20px;
+        max-width: 80%;
+        padding: 15px;
+    }
+
+    .banner-content h3 {
+        font-size: 18px;
+    }
+
+    .banner-content p {
+        font-size: 14px;
+    }
+}
