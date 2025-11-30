@@ -1,0 +1,225 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extrahead %}
+{{ block.super }}
+<!-- 2. INTEGRAR SWEETALERT2 (CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+    /* 3. UI IMPROVEMENTS (Estados Vacíos y Transiciones) */
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+        text-align: center;
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+        border: 2px dashed #dee2e6;
+        margin: 2rem 0;
+    }
+
+    .empty-state svg {
+        width: 64px;
+        height: 64px;
+        color: #adb5bd;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: #6c757d;
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    /* Transiciones suaves para botones */
+    .btn,
+    .button,
+    input[type="submit"],
+    input[type="button"],
+    .submit-row input {
+        transition: all 0.3s ease !important;
+    }
+
+    .btn:hover,
+    .button:hover,
+    input[type="submit"]:hover,
+    input[type="button"]:hover,
+    .submit-row input:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 1. HACER RESPONSIVE EL SITIO (Mobile Fixes) */
+    @media (max-width: 768px) {
+
+        /* Navbar y Header - Fix para Jazzmin/AdminLTE */
+        .main-header {
+            max-height: none !important;
+            height: auto !important;
+        }
+
+        .main-header .navbar {
+            flex-wrap: wrap !important;
+            align-items: flex-start !important;
+            height: auto !important;
+            padding-bottom: 10px;
+        }
+
+        .navbar-nav {
+            flex-direction: column !important;
+            width: 100%;
+            margin: 0 !important;
+        }
+
+        .navbar-nav .nav-item {
+            width: 100%;
+            text-align: left;
+        }
+
+        .navbar-nav .nav-link {
+            padding: 10px 15px !important;
+        }
+
+        /* Asegurar que el menú de usuario no se oculte */
+        .navbar-nav.ml-auto {
+            margin-left: 0 !important;
+            margin-top: 10px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        /* Grilla de productos / Elementos en fila a columna */
+        .flex-row,
+        .d-flex,
+        .row {
+            flex-direction: column !important;
+        }
+
+        /* Ajuste de anchos */
+        .col,
+        .col-1,
+        .col-2,
+        .col-3,
+        .col-4,
+        .col-5,
+        .col-6,
+        .col-7,
+        .col-8,
+        .col-9,
+        .col-10,
+        .col-11,
+        .col-12 {
+            width: 100% !important;
+            max-width: 100% !important;
+            flex: 0 0 100% !important;
+            margin-bottom: 1rem;
+        }
+
+        /* Tablas con scroll horizontal */
+        .table-responsive,
+        .results,
+        #changelist-form {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Imágenes responsive */
+        img {
+            max-width: 100% !important;
+            height: auto !important;
+        }
+
+        /* Ajustes específicos de Jazzmin/Admin en móvil */
+        .content {
+            padding: 10px !important;
+        }
+
+        .object-tools {
+            float: none !important;
+            margin-bottom: 15px;
+        }
+
+        .object-tools li {
+            display: block;
+            margin-bottom: 5px;
+            width: 100%;
+        }
+
+        .object-tools a {
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* FIX CRÍTICO: Botones de guardado en columna */
+        .submit-row {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 10px !important;
+            height: auto !important;
+            padding: 15px !important;
+        }
+
+        .submit-row input,
+        .submit-row a,
+        .submit-row button {
+            width: 100% !important;
+            margin: 0 !important;
+            margin-bottom: 10px !important;
+            float: none !important;
+            display: block !important;
+        }
+
+        .submit-row p.deletelink-box {
+            float: none !important;
+            margin-top: 10px !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block footer %}
+{{ block.super }}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // 2A. Detectar mensajes de Django y mostrar Toasts
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+
+        {% if messages %}
+        {% for message in messages %}
+        Toast.fire({
+            icon: '{% if message.tags == "error" %}error{% elif message.tags == "warning" %}warning{% elif message.tags == "success" %}success{% else %}info{% endif %}',
+            title: '{{ message|escapejs }}'
+        });
+        {% endfor %}
+        {% endif %}
+
+        // 2B. Sobreescribir window.alert nativa
+        window.alert = function (message) {
+            Swal.fire({
+                title: 'Atención',
+                text: message,
+                icon: 'info',
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#3085d6',
+                buttonsStyling: true
+            });
+        };
+    });
+</script>
+{% endblock %}
