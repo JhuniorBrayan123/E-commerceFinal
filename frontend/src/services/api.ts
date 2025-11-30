@@ -99,6 +99,11 @@ export const productosService = {
 
 };
 
+// Marketing - Banners
+export const marketingService = {
+  getBanners: () => api.get("/banners/"),
+};
+
 // Inventario
 export const inventarioService = {
   getAll: (params?: any) => api.get("/inventario/", { params }),
@@ -248,26 +253,17 @@ export const orderService = {
       const url = `${PAYMENT_API}/payment/order`;
       const headers = getAuthHeaders();
       
-      console.log('orderService.createOrder - Enviando petición a:', url);
-      console.log('orderService.createOrder - Headers:', headers);
-      console.log('orderService.createOrder - Body:', JSON.stringify(orderData, null, 2));
-      
       const res = await fetch(url, {
         method: "POST",
         headers: headers,
         body: JSON.stringify(orderData),
       });
       
-      console.log('orderService.createOrder - Status:', res.status);
-      console.log('orderService.createOrder - Status Text:', res.statusText);
-      
       const text = await res.text();
-      console.log('orderService.createOrder - Response text:', text);
       
       let data;
       try {
         data = text ? JSON.parse(text) : {};
-        console.log('orderService.createOrder - Parsed data:', data);
       } catch (parseError) {
         console.error('orderService.createOrder - Error parsing JSON:', parseError);
         throw new Error(`Error al parsear la respuesta del servidor: ${text.substring(0, 200)}`);
@@ -280,7 +276,6 @@ export const orderService = {
         throw new Error(errorMessage);
       }
       
-      console.log('orderService.createOrder - Success, returning data');
       return data;
     } catch (error: any) {
       console.error('orderService.createOrder - Exception caught:', error);

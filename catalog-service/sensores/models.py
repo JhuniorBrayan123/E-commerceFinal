@@ -16,7 +16,7 @@ class Sensor(models.Model):
     alimentacion = models.CharField(max_length=50, verbose_name="Alimentación")
     protocolo_comunicacion = models.CharField(max_length=50, verbose_name="Protocolo de Comunicación")
     
-    # Imagen del producto
+    # Imagen del sensor
     imagen = models.ImageField(upload_to='sensores/', blank=True, null=True, verbose_name="Imagen del Sensor")
     
     # Stock y disponibilidad

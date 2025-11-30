@@ -3,6 +3,15 @@ function replaceDocument(docString) {
 
   doc.write(docString);
   doc.close();
+<<<<<<< HEAD
+=======
+
+  if (window.djdt) {
+    // If Django Debug Toolbar is available, reinitialize it so that
+    // it can show updated panels from new `docString`.
+    window.addEventListener("load", djdt.init);
+  }
+>>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
 }
 
 function doAjaxSubmit(e) {

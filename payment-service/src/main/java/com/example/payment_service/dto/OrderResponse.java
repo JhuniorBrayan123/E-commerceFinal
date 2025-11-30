@@ -52,8 +52,13 @@ public class OrderResponse {
         private BigDecimal total;
         private Payment.Currency currency;
         private String status;
-        private List<OrderItemResponse> items;
         private LocalDateTime createdAt;
+        private List<OrderItemResponse> items;
+
+        // Campos de cupones
+        private BigDecimal subtotal;
+        private BigDecimal discountAmount;
+        private String couponCode;
 
         // Getters and Setters
         public Long getOrderId() {
@@ -96,6 +101,14 @@ public class OrderResponse {
             this.status = status;
         }
 
+        public LocalDateTime getCreatedAt() {
+            return createdAt;
+        }
+
+        public void setCreatedAt(LocalDateTime createdAt) {
+            this.createdAt = createdAt;
+        }
+
         public List<OrderItemResponse> getItems() {
             return items;
         }
@@ -104,12 +117,28 @@ public class OrderResponse {
             this.items = items;
         }
 
-        public LocalDateTime getCreatedAt() {
-            return createdAt;
+        public BigDecimal getSubtotal() {
+            return subtotal;
         }
 
-        public void setCreatedAt(LocalDateTime createdAt) {
-            this.createdAt = createdAt;
+        public void setSubtotal(BigDecimal subtotal) {
+            this.subtotal = subtotal;
+        }
+
+        public BigDecimal getDiscountAmount() {
+            return discountAmount;
+        }
+
+        public void setDiscountAmount(BigDecimal discountAmount) {
+            this.discountAmount = discountAmount;
+        }
+
+        public String getCouponCode() {
+            return couponCode;
+        }
+
+        public void setCouponCode(String couponCode) {
+            this.couponCode = couponCode;
         }
     }
 
@@ -163,4 +192,3 @@ public class OrderResponse {
         }
     }
 }
-

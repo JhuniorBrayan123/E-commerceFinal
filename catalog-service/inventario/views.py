@@ -12,7 +12,7 @@ class MovimientoInventarioViewSet(viewsets.ModelViewSet):
     queryset = MovimientoInventario.objects.all()
     serializer_class = MovimientoInventarioSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ['producto', 'tipo']
+    filterset_fields = ['sensor', 'tipo']
     ordering_fields = ['fecha', 'cantidad']
     ordering = ['-fecha']
 
@@ -26,9 +26,10 @@ class MovimientoInventarioViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def historial(self, request):
-        producto_id = request.query_params.get('producto_id', None)
-        if producto_id:
-            movimientos = MovimientoInventario.objects.filter(producto_id=producto_id)
+        sensor_id = request.query_params.get('sensor_id', None)
+            
+        if sensor_id:
+            movimientos = MovimientoInventario.objects.filter(sensor_id=sensor_id)
             serializer = self.get_serializer(movimientos, many=True)
             return Response(serializer.data)
         movimientos = MovimientoInventario.objects.all()
@@ -37,22 +38,27 @@ class MovimientoInventarioViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def stock_actual(self, request):
-        producto_id = request.query_params.get('producto_id', None)
-        if producto_id:
+        sensor_id = request.query_params.get('sensor_id', None)
+            
+        if sensor_id:
             try:
+<<<<<<< HEAD
                 producto = Sensor.objects.get(id=producto_id)
+=======
+                sensor = Sensor.objects.get(id=sensor_id)
+>>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
                 return Response({
-                    'producto_id': producto.id,
-                    'producto_nombre': producto.nombre,
-                    'stock_actual': producto.stock
+                    'sensor_id': sensor.id,
+                    'sensor_nombre': sensor.nombre,
+                    'stock_actual': sensor.stock
                 })
             except Sensor.DoesNotExist:
                 return Response(
-                    {'error': 'Producto no encontrado'}, 
+                    {'error': 'Sensor no encontrado'}, 
                     status=status.HTTP_404_NOT_FOUND
                 )
         return Response(
-            {'error': 'producto_id es requerido'}, 
+            {'error': 'sensor_id es requerido'}, 
             status=status.HTTP_400_BAD_REQUEST
         )
 

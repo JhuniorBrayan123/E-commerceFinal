@@ -1,0 +1,13 @@
+CREATE TABLE `orders_itemorden` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `cantidad` int(11) NOT NULL,
+  `precio_unitario` decimal(10,2) NOT NULL,
+  `subtotal` decimal(10,2) NOT NULL,
+  `orden_id` bigint(20) NOT NULL,
+  `producto_id` bigint(20) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `orders_itemorden_orden_id_e68ccfe3_fk_orders_orden_id` (`orden_id`),
+  KEY `orders_itemorden_producto_id_dc6bb39b_fk_productos_producto_id` (`producto_id`),
+  CONSTRAINT `orders_itemorden_orden_id_e68ccfe3_fk_orders_orden_id` FOREIGN KEY (`orden_id`) REFERENCES `orders_orden` (`id`),
+  CONSTRAINT `orders_itemorden_producto_id_dc6bb39b_fk_productos_producto_id` FOREIGN KEY (`producto_id`) REFERENCES `productos_producto` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci

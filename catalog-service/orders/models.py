@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
+<<<<<<< HEAD
 # CORRECCIÓN CLAVE: Cambiar de 'productos' a 'sensores' y el modelo a 'Sensor'
+=======
+>>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
 from sensores.models import Sensor
 
 
@@ -14,7 +17,7 @@ class Orden(models.Model):
 
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ordenes', verbose_name="Usuario")
     
-    # NUEVO ➜ ID del servicio externo (Spring Boot o pasarela de pago)
+    # ID del servicio externo (Spring Boot o pasarela de pago)
     payment_service_id = models.CharField(max_length=100, blank=True, null=True)
 
     total = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Total")
@@ -33,21 +36,28 @@ class Orden(models.Model):
 
 class ItemOrden(models.Model):
     orden = models.ForeignKey(Orden, on_delete=models.CASCADE, related_name='items', verbose_name="Orden")
+<<<<<<< HEAD
     # CORRECCIÓN CLAVE: Cambiar la referencia de Producto a Sensor
     producto = models.ForeignKey(Sensor, on_delete=models.CASCADE, verbose_name="Producto")
 
     # NUEVOS CAMPOS ➜ Compatibilidad con microservicio o frontend desacoplado
     #producto_id = models.IntegerField(blank=True, null=True) 
     nombre_producto = models.CharField(max_length=255, blank=True, null=True)
+=======
+    sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, verbose_name="Sensor")
+>>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
 
+    # CAMBIO AQUÍ
+    sensor_id_ext = models.IntegerField(blank=True, null=True)
+    nombre_sensor = models.CharField(max_length=255, blank=True, null=True)
     cantidad = models.IntegerField(verbose_name="Cantidad")
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Precio Unitario")
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Subtotal")
 
     def save(self, *args, **kwargs):
-        # autocalcular subtotal
         self.subtotal = self.precio_unitario * self.cantidad
 
+<<<<<<< HEAD
         # completar valores automáticamente si vienen de Producto (que ahora es Sensor)
         if self.producto:
             # Asumiendo que has decidido dejar el campo producto_id
@@ -55,11 +65,18 @@ class ItemOrden(models.Model):
             #     self.producto_id = self.producto.id
             if not self.nombre_producto:
                 self.nombre_producto = self.producto.nombre
+=======
+        if self.sensor:
+            if not self.sensor_id_ext:
+                self.sensor_id_ext = self.sensor.id
+            if not self.nombre_sensor:
+                self.nombre_sensor = self.sensor.nombre
+>>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
 
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.producto.nombre} x{self.cantidad} - ${self.subtotal}"
+        return f"{self.sensor.nombre} x{self.cantidad} - ${self.subtotal}"
 
     class Meta:
         verbose_name = "Item de Orden"

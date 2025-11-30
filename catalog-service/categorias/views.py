@@ -10,7 +10,7 @@ class CategoriaViewSet(viewsets.ModelViewSet):
     serializer_class = CategoriaSerializer
 
     @action(detail=True, methods=['get'])
-    def productos(self, request, pk=None):
+    def sensores(self, request, pk=None):
         categoria = self.get_object()
         sensores = categoria.sensores.all()
         from sensores.serializers import SensorSerializer

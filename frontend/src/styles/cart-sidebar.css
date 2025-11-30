@@ -1,0 +1,180 @@
+/* ============================================
+   ESTILOS PARA CARRITO LATERAL
+   ============================================
+   Estos estilos están listos para usar cuando
+   implementes un carrito lateral que se desliza
+   desde la derecha.
+   ============================================ */
+
+/* Contenedor del carrito lateral */
+.cart-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  max-width: 400px;
+  height: 100vh;
+  background: white;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 0.3s ease-out;
+}
+
+/* Cuando el carrito está abierto */
+.cart-sidebar.open {
+  transform: translateX(0);
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* Overlay oscuro detrás del carrito */
+.cart-sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+}
+
+.cart-sidebar-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Header del carrito */
+.cart-sidebar-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.cart-sidebar-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.cart-sidebar-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.cart-sidebar-close:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+/* Contenido del carrito */
+.cart-sidebar-content {
+  padding: 1.5rem;
+}
+
+/* Footer del carrito (total, botones) */
+.cart-sidebar-footer {
+  padding: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  background: white;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+
+.cart-sidebar-total {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.cart-sidebar-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.cart-sidebar-button {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.cart-sidebar-button-primary {
+  background: #059669;
+  color: white;
+}
+
+.cart-sidebar-button-primary:hover {
+  background: #047857;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
+
+.cart-sidebar-button-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.cart-sidebar-button-secondary {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.cart-sidebar-button-secondary:hover {
+  background: #e5e7eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.cart-sidebar-button-secondary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .cart-sidebar {
+    max-width: 100%;
+  }
+}
+
+/* Animación de entrada */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Animación de salida */
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+

@@ -1,16 +1,23 @@
 from rest_framework import serializers
 from .models import Orden, ItemOrden
+<<<<<<< HEAD
 # CORRECCIÓN 1: Cambiar la importación de 'productos' a 'sensores' y la clase a 'SensorSerializer'
+=======
+>>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
 from sensores.serializers import SensorSerializer
 
 
 class ItemOrdenSerializer(serializers.ModelSerializer):
+<<<<<<< HEAD
     # CORRECCIÓN 2: Usar la clase SensorSerializer
     producto_detalle = SensorSerializer(source='producto', read_only=True)
+=======
+    sensor_detalle = SensorSerializer(source='sensor', read_only=True)
+>>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
 
     class Meta:
         model = ItemOrden
-        fields = ['id', 'producto', 'producto_detalle', 'cantidad', 'precio_unitario', 'subtotal']
+        fields = ['id', 'sensor', 'sensor_detalle', 'cantidad', 'precio_unitario', 'subtotal']
         read_only_fields = ['id', 'precio_unitario', 'subtotal']
 
 
@@ -32,19 +39,23 @@ class CrearOrdenSerializer(serializers.Serializer):
     Serializador para crear órdenes desde Spring Boot
     """
     usuario_id = serializers.IntegerField()
-    productos = serializers.ListField(
+    sensores = serializers.ListField(
         child=serializers.DictField(
             child=serializers.IntegerField()
         )
     )
     total = serializers.DecimalField(max_digits=10, decimal_places=2)
 
-    def validate_productos(self, value):
+    def validate_sensores(self, value):
         if not value:
-            raise serializers.ValidationError("Debe incluir al menos un producto.")
+            raise serializers.ValidationError("Debe incluir al menos un sensor.")
         for item in value:
-            if 'producto_id' not in item or 'cantidad' not in item:
-                raise serializers.ValidationError("Cada producto debe tener 'producto_id' y 'cantidad'.")
+            if 'sensor_id' not in item or 'cantidad' not in item:
+                raise serializers.ValidationError("Cada sensor debe tener 'sensor_id' y 'cantidad'.")
             if item['cantidad'] <= 0:
                 raise serializers.ValidationError("La cantidad debe ser mayor a 0.")
+<<<<<<< HEAD
         return value
+=======
+        return value
+>>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb

@@ -14,12 +14,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-#zvzk4+1y(&ssrx0e@gtk+a#j+rap9!dv_=g3+bj)nbz7svb6_'
 
 # DEBUG para Docker - False en producción
-DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
 ALLOWED_HOSTS = ['*']  # Para desarrollo, en producción especifica dominios
 
-# Application definition
+# ==========================================================================
+# 🔹 INSTALLED_APPS — Jazzmin agregado correctamente como PRIMERA app
+# ==========================================================================
 INSTALLED_APPS = [
+    'jazzmin',           # ← DEBE ESTAR PRIMERO SIEMPRE
     'marketing',
     'comentarios',
     'preferencias',
@@ -30,6 +33,9 @@ INSTALLED_APPS = [
     'categorias',
     'inventario',
     'orders',
+    'cupones',
+
+    # Django defaults
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,10 +44,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+# ==========================================================================
+# 🔹 MIDDLEWARE
+# ==========================================================================
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -51,10 +61,13 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'urls'
 
+# ==========================================================================
+# 🔹 TEMPLATES
+# ==========================================================================
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -68,7 +81,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'wsgi.application'
 
-# BASE DE DATOS MYSQL - CONFIGURACIÓN DOCKER
+# ==========================================================================
+# 🔹 BASE DE DATOS — NO SE TOCÓ NADA
+# ==========================================================================
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -76,7 +91,6 @@ DATABASES = {
         'USER': os.getenv('MYSQL_USER', 'root'),
         'PASSWORD': os.getenv('MYSQL_PASSWORD', ''),
         'HOST': os.getenv('MYSQL_HOST', 'localhost'),
-
         'PORT': os.getenv('MYSQL_PORT', '3306'),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
@@ -85,7 +99,10 @@ DATABASES = {
     }
 }
 
+<<<<<<< HEAD
 # Se asume que este es el campo correcto para la clave JWT.
+=======
+>>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
 JWT_SECRET_KEY = os.getenv('JWT_SECRET', 'mi-clave-secreta-jwt-muy-segura-para-ecommerce')
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -103,24 +120,31 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-pe'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+<<<<<<< HEAD
 # ----------------------------------------------------
 # CONFIGURACIÓN DE ARCHIVOS ESTÁTICOS Y MEDIA
 # ----------------------------------------------------
+=======
+# ==========================================================================
+# 🔹 STATIC & MEDIA (Correctos)
+# ==========================================================================
+>>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Media files (imágenes de productos)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Django REST Framework configuration
+# ==========================================================================
+# 🔹 Django REST Framework
+# ==========================================================================
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
@@ -131,27 +155,83 @@ REST_FRAMEWORK = {
     ],
 }
 
+<<<<<<< HEAD
 # CONFIGURACIÓN DE CORS
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://frontend:3000",
+=======
+# ==========================================================================
+# 🔹 CORS — NO SE MODIFICÓ NADA DEL COMPORTAMIENTO
+# ==========================================================================
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://frontend:3000",  # Si el frontend está en Docker
+>>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
 ]
+
 CORS_ALLOW_ALL_ORIGINS = True  # Para desarrollo
 
-# Permitir métodos HTTP
+# Métodos permitidos
 CORS_ALLOW_METHODS = [
-    'GET',
-    'POST',
-    'PUT',
-    'PATCH',
-    'DELETE',
-    'OPTIONS'
+    'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'
 ]
 
-# Permitir headers
+# Headers permitidos
 CORS_ALLOW_HEADERS = [
     'content-type',
     'authorization',
     'x-requested-with',
 ]
+
+# ==========================================================================
+# 🔹 CONFIGURACIÓN DE JAZZMIN — COMPLETAMENTE AGREGADA
+# ==========================================================================
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_fixed": True,
+    "sidebar_fixed": True,
+    "sidebar": "sidebar-dark-success",
+    "accent": "accent-success",
+    "navbar_colour": "navbar-dark",
+    "brand_colour": "navbar-dark",
+    "sidebar_nav_small_text": False,
+    "body_small_text": False,
+}
+
+JAZZMIN_SETTINGS = {
+    "site_title": "E-commerce ",
+    "site_header": "Admin E-commerce",
+    "site_brand": "Shop admin",
+    "welcome_message": "¡Hola, Administrador! 👋 Gestiona tu tienda desde aquí.",
+    "site_icon": "fas fa-store",
+
+    "order_with_respect_to": [
+        "auth",
+        "categorias",
+        "inventario",
+        "orders",
+        "preferencias",
+        "sensores",
+    ],
+
+    "app_icons": {
+        "auth": "fas fa-users-cog",
+        "categorias": "fas fa-tags",
+        "inventario": "fas fa-warehouse",
+        "orders": "fas fa-receipt",
+        "preferencias": "fas fa-star",
+        "sensores": "fas fa-microchip",
+    },
+
+    "index_context": {
+        "dashboard_cards": [
+            {"title": "Ventas Hoy", "value": "S/ XXXX.XX", "icon": "fas fa-chart-line", "color": "success"},
+            {"title": "Órdenes Pendientes", "value": "XX", "icon": "fas fa-clock", "color": "warning"},
+            {"title": "Stock Crítico", "value": "XX", "icon": "fas fa-exclamation-triangle", "color": "danger"},
+            {"title": "Categorías Totales", "value": "XX", "icon": "fas fa-tags", "color": "info"},
+        ]
+    }
+}

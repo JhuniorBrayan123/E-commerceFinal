@@ -12,9 +12,14 @@ class JWTService
 
     public static function init()
     {
+<<<<<<< HEAD
         self::$secret_key = getenv('JWT_SECRET') ?: 'fallback_secret_key';
         // Debug logging - remove in production
         error_log("JWT_SECRET loaded: " . substr(self::$secret_key, 0, 10) . "... (length: " . strlen(self::$secret_key) . ")");
+=======
+        // Usar variable de entorno JWT_SECRET, con fallback al valor por defecto
+        self::$secret_key = getenv('JWT_SECRET') ?: 'mi-clave-secreta-jwt-muy-segura-para-ecommerce';
+>>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
     }
 
     // Generar JWT token

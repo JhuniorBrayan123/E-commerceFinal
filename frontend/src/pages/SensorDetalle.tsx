@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { useParams, useNavigate } from 'react-router-dom';
 import { comentariosService, carritoService, sensoresService } from '../services/api';
+import { getImageUrl } from '../utils/imageUtils';
 
 const ProductoDetalle: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,7 +21,12 @@ const ProductoDetalle: React.FC = () => {
     const fetchProducto = async () => {
       try {
         const res = await sensoresService.getById(parseInt(id!));
-        setProducto(res.data);
+        const productoData = res.data;
+        // Asegurar que la imagen tenga la URL correcta
+        if (productoData.imagen && !productoData.imagen.startsWith('http')) {
+          productoData.imagen = getImageUrl(productoData.imagen);
+        }
+        setProducto(productoData);
         const comRes = await comentariosService.getAll(parseInt(id!));
         setComentarios(comRes.data.results);
 
@@ -141,30 +147,37 @@ const ProductoDetalle: React.FC = () => {
 
   return (
 
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Boton volver */}
       <button
         onClick={() => navigate('/sensores')}
-        className="text-primary-600 hover:text-primary-700 mb-6 flex items-center gap-2"
+        className="text-primary-600 hover:text-primary-700 mb-4 sm:mb-6 flex items-center gap-2 text-sm sm:text-base"
       >
         <span className="text-xl">←</span> Volver a productos
       </button>
 
       {/* Contenedor del producto */}
-      <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 p-10">
+      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10 p-4 sm:p-6 md:p-10">
 
           {/* Imagen */}
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center w-full">
             {producto.imagen ? (
               <img
-                src={producto.imagen}
+                src={producto.imagen.startsWith('http') ? producto.imagen : getImageUrl(producto.imagen)}
                 alt={producto.nombre}
-                className="w-full h-[450px] object-cover rounded-2xl shadow-md"
+                className="w-full h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] object-contain rounded-xl sm:rounded-2xl shadow-md bg-gray-50"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  const parent = target.parentElement;
+                  if (parent) {
+                    parent.innerHTML = `<div class="w-full h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] bg-gray-200 flex items-center justify-center rounded-xl sm:rounded-2xl shadow-md"><span class="text-gray-400 text-lg sm:text-xl text-center px-4">${producto.nombre}</span></div>`;
+                  }
+                }}
               />
             ) : (
-              <div className="w-full h-[450px] bg-gray-200 flex items-center justify-center rounded-2xl shadow-md">
-                <span className="text-gray-400 text-xl">{producto.nombre}</span>
+              <div className="w-full h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] bg-gray-200 flex items-center justify-center rounded-xl sm:rounded-2xl shadow-md">
+                <span className="text-gray-400 text-lg sm:text-xl text-center px-4">{producto.nombre}</span>
               </div>
             )}
           </div>

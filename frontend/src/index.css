@@ -11,6 +11,108 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ============================================
+   ANIMACIONES Y TRANSICIONES GLOBALES
+   ============================================ */
+
+/* Fade In para transiciones de página */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.page-transition {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+/* Scale Up con Fade In para modales */
+@keyframes scaleUpFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-enter {
+  animation: scaleUpFadeIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Slide in desde la derecha para carrito lateral */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.cart-slide-in {
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* ============================================
+   ANIMACIONES DE BOTONES
+   ============================================ */
+
+/* Botones con hover y active */
+.btn-animated {
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-animated:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-animated:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   ANIMACIONES DE CARDS DE PRODUCTOS
+   ============================================ */
+
+.product-card {
+  transition: all 0.3s ease-in-out;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.product-card-image {
+  transition: transform 0.3s ease-in-out;
+  overflow: hidden;
+}
+
+.product-card:hover .product-card-image img {
+  transform: scale(1.05);
+}
+
+/* ============================================
+   ANIMACIONES DE INPUTS
+   ============================================ */
+
+.input-animated {
+  transition: all 0.3s ease-in-out;
+}
+
+.input-animated:focus {
+  transform: scale(1.01);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

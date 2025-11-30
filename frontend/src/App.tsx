@@ -4,9 +4,10 @@ import {
   Routes,
   Route,
   Navigate,
+  useNavigate,
 } from "react-router-dom";
-import Login from "./components/Login";
-import Register from "./components/Register";
+import LoginModal from "./components/LoginModal";
+import PageTransition from "./components/PageTransition";
 import { authService } from "./services/authService";
 import Layout from "./components/Layout";
 import Navbar from "./components/Navbar";
@@ -16,12 +17,12 @@ import Categorias from "./pages/Categorias";
 import Sensores from "./pages/Sensores";
 import SensorDetalle from "./pages/SensorDetalle";
 import Carrito from "./pages/Carrito";
-import Inventario from "./pages/Inventario";
 import CRUDCategorias from "./pages/CRUDCategorias";
 import Checkout from "./pages/Checkout";
 import PaymentMethod from "./pages/PaymentMethod";
 import ConfirmPayment from "./pages/ConfirmPayment";
 import PaymentResult from "./pages/PaymentResult";
+import BannerCarousel from "./components/BannerCarousel";
 
 
 // 👇👇 NUEVO IMPORT QUE TE PEDÍ 👇👇
@@ -37,9 +38,8 @@ interface User {
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentAuthView, setCurrentAuthView] = useState<"login" | "register">(
-    "login"
-  );
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [loginModalView, setLoginModalView] = useState<"login" | "register">("login");
 
   useEffect(() => {
     checkAuth();
@@ -72,10 +72,17 @@ function App() {
 
   const handleLoginSuccess = (token: string, userData: User) => {
     setUser(userData);
+    setIsLoginModalOpen(false);
   };
 
   const handleRegisterSuccess = (token: string, userData: User) => {
     setUser(userData);
+    setIsLoginModalOpen(false);
+  };
+
+  const openLoginModal = (view: "login" | "register" = "login") => {
+    setLoginModalView(view);
+    setIsLoginModalOpen(true);
   };
 
   const handleLogout = () => {
@@ -88,12 +95,15 @@ function App() {
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
     setUser(null);
-    setCurrentAuthView("login");
   };
 
   const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     if (!user) {
-      return <Navigate to="/auth" replace />;
+      // Abrir modal de login en lugar de redirigir
+      if (!isLoginModalOpen) {
+        openLoginModal("login");
+      }
+      return null;
     }
     return <>{children}</>;
   };
@@ -101,31 +111,15 @@ function App() {
   const AuthenticatedLayout = ({ children }: { children: React.ReactNode }) => {
     return (
       <div className="min-h-screen flex flex-col">
-        <Navbar user={user} onLogout={handleLogout} />
+        <Navbar user={user} onLogout={handleLogout} onOpenLogin={() => openLoginModal("login")} />
+        {/* Banner Carousel - Debajo del Navbar en todas las páginas */}
+        <div className="w-full bg-gray-50 py-4 sm:py-6">
+          <BannerCarousel />
+        </div>
         <main className="flex-grow container mx-auto px-4 py-8">
           {children}
         </main>
         <Footer />
-      </div>
-    );
-  };
-
-  const AuthPage = () => {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="container mx-auto px-4 py-8">
-          {currentAuthView === "login" ? (
-            <Login
-              onLoginSuccess={handleLoginSuccess}
-              onSwitchToRegister={() => setCurrentAuthView("register")}
-            />
-          ) : (
-            <Register
-              onRegisterSuccess={handleRegisterSuccess}
-              onSwitchToLogin={() => setCurrentAuthView("login")}
-            />
-          )}
-        </div>
       </div>
     );
   };
@@ -140,14 +134,18 @@ function App() {
 
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      {!user ? (
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+        initialView={loginModalView}
+      />
+
+      <PageTransition>
         <Routes>
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="*" element={<Navigate to="/auth" replace />} />
-        </Routes>
-      ) : (
-        <Routes>
-          {/* Rutas públicas */}
+
+          {/* Rutas públicas - accesibles sin login */}
           <Route
             path="/"
             element={
@@ -157,153 +155,129 @@ function App() {
             }
           />
 
-          <Route
-            path="/categorias"
-            element={
+        <Route
+          path="/categorias"
+          element={
+            <AuthenticatedLayout>
+              <Categorias />
+            </AuthenticatedLayout>
+          }
+        />
+
+        <Route
+          path="/categorias/:id"
+          element={
+            <AuthenticatedLayout>
+              <Categorias />
+            </AuthenticatedLayout>
+          }
+        />
+
+        <Route
+          path="/soporte"
+          element={
+            <AuthenticatedLayout>
+              <SupportPage />
+            </AuthenticatedLayout>
+          }
+        />
+
+        <Route
+          path="/sensores/:stringParam/:id"
+          element={
+            <AuthenticatedLayout>
+              <Sensores />
+            </AuthenticatedLayout>
+          }
+        />
+
+        <Route
+          path="/sensores"
+          element={
+            <AuthenticatedLayout>
+              <Sensores />
+            </AuthenticatedLayout>
+          }
+        />
+
+        <Route
+          path="/sensores/:id"
+          element={
+            <AuthenticatedLayout>
+              <SensorDetalle />
+            </AuthenticatedLayout>
+          }
+        />
+
+        <Route
+          path="/carrito"
+          element={
+            <AuthenticatedLayout>
+              <Carrito />
+            </AuthenticatedLayout>
+          }
+        />
+
+        {/* Rutas protegidas - requieren login */}
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute>
               <AuthenticatedLayout>
-                <Categorias />
+                <Checkout />
               </AuthenticatedLayout>
-            }
-          />
+            </ProtectedRoute>
+          }
+        />
 
-          <Route
-            path="/categorias/:id"
-            element={
+        <Route
+          path="/payment-method"
+          element={
+            <ProtectedRoute>
               <AuthenticatedLayout>
-                <Categorias />
+                <PaymentMethod />
               </AuthenticatedLayout>
-            }
-          />
+            </ProtectedRoute>
+          }
+        />
 
-          {/* 👇👇 NUEVA RUTA /soporte 👇👇 */}
-          <Route
-            path="/soporte"
-            element={
+        <Route
+          path="/confirm-payment"
+          element={
+            <ProtectedRoute>
               <AuthenticatedLayout>
-                <SupportPage />
+                <ConfirmPayment />
               </AuthenticatedLayout>
-            }
-          />
+            </ProtectedRoute>
+          }
+        />
 
-          {/* Rutas protegidas */}
-          <Route
-            path="/carrito"
-            element={
-              <ProtectedRoute>
-                <AuthenticatedLayout>
-                  <Carrito />
-                </AuthenticatedLayout>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/checkout"
-            element={
-              <ProtectedRoute>
-                <AuthenticatedLayout>
-                  <Checkout />
-                </AuthenticatedLayout>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/payment-method"
-            element={
-              <ProtectedRoute>
-                <AuthenticatedLayout>
-                  <PaymentMethod />
-                </AuthenticatedLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/confirm-payment"
-            element={
-              <ProtectedRoute>
-                <AuthenticatedLayout>
-                  <ConfirmPayment />
-                </AuthenticatedLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/payment-result"
-            element={
-              <ProtectedRoute>
-                <AuthenticatedLayout>
-                  <PaymentResult />
-                </AuthenticatedLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/sensores/:stringParam/:id"
-            element={
+        <Route
+          path="/payment-result"
+          element={
+            <ProtectedRoute>
               <AuthenticatedLayout>
-                <Sensores />
+                <PaymentResult />
               </AuthenticatedLayout>
-            }
-          />
-          <Route
-            path="/sensores"
-            element={
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/categorias"
+          element={
+            <ProtectedRoute>
               <AuthenticatedLayout>
-                <Sensores />
+                <CRUDCategorias />
               </AuthenticatedLayout>
-            }
-          />
-          <Route
-            path="/sensores/:id"
-            element={
-              <AuthenticatedLayout>
-                <SensorDetalle />
-              </AuthenticatedLayout>
-            }
-          />
-          <Route
-            path="/inventario"
-            element={
-              <ProtectedRoute>
-                <AuthenticatedLayout>
-                  <Inventario />
-                </AuthenticatedLayout>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/admin/categorias"
-            element={
-              <ProtectedRoute>
-                <AuthenticatedLayout>
-                  <CRUDCategorias />
-                </AuthenticatedLayout>
-              </ProtectedRoute>
-            }
-          />
-
-
-          <Route
-            path="/sensores/:id"
-            element={
-              <ProtectedRoute>
-                <AuthenticatedLayout>
-                  <SensorDetalle />
-                </AuthenticatedLayout>
-              </ProtectedRoute>
-            }
-          />
-
-
+            </ProtectedRoute>
+          }
+        />
 
           {/* Redirección por defecto */}
-
-          <Route path="/auth" element={<Navigate to="/" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      )}
+      </PageTransition>
     </Router>
   );
 }

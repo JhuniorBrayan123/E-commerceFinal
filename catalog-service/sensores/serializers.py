@@ -3,17 +3,17 @@ from .models import Sensor
 
 class SensorSerializer(serializers.ModelSerializer):
     categoria_nombre = serializers.CharField(source='categoria.nombre', read_only=True)
+    imagen = serializers.SerializerMethodField()
     
     class Meta:
         model = Sensor
         fields = '__all__'
     
-    def get_imagen_url(self, obj):
-        """Genera la URL completa de la imagen"""
+    def get_imagen(self, obj):
+        """Genera la URL de la imagen - retorna ruta relativa para que el frontend la procese"""
         if obj.imagen:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.imagen.url)
+            # Retornar la ruta relativa (ej: /media/sensores/imagen.jpg)
+            # El frontend usará getImageUrl() para construir la URL completa
             return obj.imagen.url
         return None
     
