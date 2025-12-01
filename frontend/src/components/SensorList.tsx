@@ -44,7 +44,7 @@ const SensorList: React.FC = () => {
   // Configuración de filtros disponibles
   const availableFilters: FilterConfig[] = [
     { id: "search", label: "Buscar", type: "search", placeholder: "Nombre, marca, modelo..." },
-    { id: "categoria_nombre", label: "Tipo de Sensor", type: "select" },
+    { id: "categoria", label: "Categoría", type: "select" },
     { id: "marca", label: "Marca", type: "select" },
     {
       id: "disponible", label: "Disponibilidad", type: "select", options: [
@@ -73,13 +73,13 @@ const SensorList: React.FC = () => {
   ];
 
   // Filtros activos por defecto (no se pueden eliminar)
-  const defaultFilters = new Set(["search", "ordering"]);
+  const defaultFilters = new Set(["search", "ordering", "categoria"]);
   const [activeFilters, setActiveFilters] = useState<Set<string>>(defaultFilters);
 
   // Valores de los filtros
   const [filterValues, setFilterValues] = useState<Record<string, string>>({
     search: "",
-    categoria_nombre: "",
+    categoria: "",
     marca: "",
     disponible: "",
     precio_min: "",
@@ -197,9 +197,9 @@ const SensorList: React.FC = () => {
       });
     }
 
-    // Aplicar filtro de tipo
-    if (activeFilters.has("categoria") && filterValues.categoria_nombre) {
-      filtered = filtered.filter(sensor => sensor.categoria_nombre === filterValues.categoria_nombre);
+    // Aplicar filtro de categoría
+    if (activeFilters.has("categoria") && filterValues.categoria) {
+      filtered = filtered.filter(sensor => sensor.categoria === parseInt(filterValues.categoria));
     }
 
     // Aplicar filtro de marca
@@ -328,7 +328,7 @@ const SensorList: React.FC = () => {
     setActiveFilters(defaultFilters);
     setFilterValues({
       search: "",
-      categoria_nombre: "",
+      categoria: "",
 
       marca: "",
       disponible: "",
@@ -394,8 +394,19 @@ const SensorList: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Sidebar de Filtros */}
         <div className="lg:col-span-1">
-          <div className="filters-section bg-white p-6 rounded-lg shadow-sm sticky top-4">
-            <h3 className="text-xl font-bold text-green-900 mb-4">Filtros</h3>
+          {/* Mobile Filter Toggle */}
+          <button
+            className="lg:hidden w-full mb-4 flex items-center justify-between bg-white p-4 rounded-lg shadow-sm font-bold text-green-900"
+            onClick={() => document.getElementById('mobile-filters')?.classList.toggle('hidden')}
+          >
+            <span>Filtros y Búsqueda</span>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <div id="mobile-filters" className="hidden lg:block filters-section bg-white p-6 rounded-lg shadow-sm sticky top-4">
+            <h3 className="text-xl font-bold text-green-900 mb-4 hidden lg:block">Filtros</h3>
 
             <div className="flex flex-col gap-6">
               {/* Buscador */}
@@ -411,13 +422,13 @@ const SensorList: React.FC = () => {
                 />
               </div>
 
-              {/* Tipo de Sensor */}
+              {/* Categoría */}
               <div className="filter-group">
-                <label htmlFor="categoria_nombre" className="font-semibold text-gray-700 mb-2 block">Tipo de Sensor</label>
+                <label htmlFor="categoria" className="font-semibold text-gray-700 mb-2 block">Categoría</label>
                 <select
-                  id="categoria_nombre"
-                  value={filterValues.categoria_nombre}
-                  onChange={(e) => handleFilterValueChange("categoria_nombre", e.target.value)}
+                  id="categoria"
+                  value={filterValues.categoria}
+                  onChange={(e) => handleFilterValueChange("categoria", e.target.value)}
                   className="filter-select w-full"
                 >
                   <option value="">Todos</option>
@@ -574,15 +585,11 @@ const SensorList: React.FC = () => {
                       src={getImageUrl(sensor.imagen)}
                       alt={sensor.nombre}
                       className="w-full h-40 sm:h-48 object-cover rounded-t-lg"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = "none";
-                      const parent = target.parentElement;
-                      if (parent) {
-                        parent.innerHTML = '<div class="w-full h-40 sm:h-48 bg-gray-200 flex items-center justify-center rounded-t-lg"><span class="text-gray-400 text-sm">Sin imagen</span></div>';
-                      }
-                    }}
-                  />
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect width="200" height="200" fill="%23e5e7eb"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="%239ca3af"%3ESin imagen%3C/text%3E%3C/svg%3E';
+                      }}
+                    />
                   </div>
                 ) : (
                   <div className="w-full h-40 sm:h-48 bg-gray-200 flex items-center justify-center rounded-t-lg">
@@ -607,7 +614,7 @@ const SensorList: React.FC = () => {
 
                   <div className="mt-auto pt-4 border-t border-gray-100">
                     <div className="flex justify-between items-end mb-3">
-                      <p className="text-xl font-bold text-gray-900">S/. {sensor.precio}</p>
+                      <p className="text-xl font-bold text-gray-900">S/ {sensor.precio}</p>
                       <p className="text-sm text-gray-500">Stock: {sensor.stock}</p>
                     </div>
 

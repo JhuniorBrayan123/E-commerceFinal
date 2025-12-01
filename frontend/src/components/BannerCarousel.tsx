@@ -7,6 +7,7 @@ import { getBannerUrl } from "../utils/imageUtils";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import "swiper/css/autoplay";
 
 interface Banner {
   id: number;
