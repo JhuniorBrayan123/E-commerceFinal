@@ -282,6 +282,8 @@ function App() {
             }
           />
 
+
+
           {/* Redirección por defecto */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
