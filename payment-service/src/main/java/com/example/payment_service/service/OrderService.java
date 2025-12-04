@@ -36,7 +36,8 @@ public class OrderService {
     private final JwtService jwtService;
     private final PaymentService paymentService;
     private final CatalogService catalogService;
-    private final CouponService couponService; // ← NUEVO
+    private final CouponService couponService;
+    private final com.example.payment_service.repository.SensorRepository sensorRepository; // ← NUEVO REPO
 
     private static final String PAYMENT_TOKEN_PREFIX = "pay_token_";
     private static final SecureRandom random = new SecureRandom();
@@ -47,14 +48,16 @@ public class OrderService {
             JwtService jwtService,
             PaymentService paymentService,
             CatalogService catalogService,
-            CouponService couponService // ← NUEVO
+            CouponService couponService,
+            com.example.payment_service.repository.SensorRepository sensorRepository // ← INYECCIÓN
     ) {
         this.orderRepository = orderRepository;
         this.paymentRepository = paymentRepository;
         this.jwtService = jwtService;
         this.paymentService = paymentService;
         this.catalogService = catalogService;
-        this.couponService = couponService; // ← NUEVO
+        this.couponService = couponService;
+        this.sensorRepository = sensorRepository;
     }
 
     /**
@@ -107,7 +110,13 @@ public class OrderService {
         List<OrderItem> items = request.getItems().stream().map(itemRequest -> {
             OrderItem item = new OrderItem();
             item.setOrder(savedOrder);
-            item.setSensorId(itemRequest.getSensorId());
+
+            // BUSCAR Y ASIGNAR SENSOR REAL (Validación implícita)
+            com.example.payment_service.model.Sensor sensor = sensorRepository.findById(itemRequest.getSensorId())
+                    .orElseThrow(() -> PaymentException.notFound("SENSOR_NOT_FOUND",
+                            "Sensor no encontrado: " + itemRequest.getSensorId()));
+
+            item.setSensor(sensor);
             item.setNombre(itemRequest.getNombre());
             item.setCantidad(itemRequest.getCantidad());
             item.setPrecioUnitario(itemRequest.getPrecioUnitario());

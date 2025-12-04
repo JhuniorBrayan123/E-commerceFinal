@@ -81,7 +81,7 @@ const PaymentResult: React.FC = () => {
               <div className="flex justify-between">
                 <span className="text-gray-600">Monto:</span>
                 <span className="font-semibold">
-                  ${result.paymentData.amount || '0.00'}
+                  S/ {result.paymentData.amount || '0.00'}
                 </span>
               </div>
               <div className="flex justify-between">

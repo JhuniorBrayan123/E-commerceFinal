@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { comentariosService, carritoService, sensoresService } from '../services/api';
 import { getImageUrl } from '../utils/imageUtils';
+import { mostrarToast, mostrarAlerta } from '../utils/alerts';
 
 const ProductoDetalle: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -113,11 +114,11 @@ const ProductoDetalle: React.FC = () => {
   const handleAgregarCarrito = () => {
     if (producto && cantidad > 0 && cantidad <= producto.stock) {
       carritoService.add(producto, cantidad, producto.stock);
-      alert('Producto agregado al carrito');
+      mostrarToast('¡Agregado al carrito!', 'success');
 
       navigate('/carrito');
     } else {
-      alert('Cantidad inválida o stock insuficiente');
+      mostrarAlerta('Stock insuficiente', 'warning', 'Por favor selecciona una cantidad válida');
     }
   };
 
@@ -199,8 +200,8 @@ const ProductoDetalle: React.FC = () => {
             <div className="mb-6 flex items-center gap-4">
               <span
                 className={`px-4 py-1.5 rounded-full text-sm font-semibold shadow ${producto.stock > 0
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-red-100 text-red-700'
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-red-100 text-red-700'
                   }`}
               >
                 {producto.stock > 0 ? "Disponible" : "No Disponible"}
@@ -296,7 +297,7 @@ const ProductoDetalle: React.FC = () => {
             {/* Subtotal */}
             <div className="mb-8">
               <p className="text-xl font-semibold text-gray-800">
-                Subtotal: ${(producto.precio * cantidad).toFixed(2)}
+                Subtotal: S/ {(producto.precio * cantidad).toFixed(2)}
               </p>
             </div>
 
@@ -331,7 +332,8 @@ const ProductoDetalle: React.FC = () => {
                 <p className="text-gray-800">{c.contenido}</p>
 
                 {/* Solo el autor puede editar/eliminar */}
-                {c.id_user === user?.id && (
+                {/* Usamos == para permitir coincidencia si uno es string y el otro number */}
+                {user && c.id_user == user.id && (
                   <div className="flex gap-3 text-sm">
                     <button
                       className="text-blue-600 hover:underline"
@@ -363,27 +365,43 @@ const ProductoDetalle: React.FC = () => {
             {editando ? "Editar Comentario" : "Escribir un Comentario"}
           </h3>
 
-          <textarea
-            value={contenido}
-            onChange={(e) => setContenido(e.target.value)}
-            className="w-full border border-gray-300 rounded-xl p-3 h-28 mb-3"
-            placeholder="Escribe tu comentario aquí..."
-          />
+          {user ? (
+            <>
+              <textarea
+                value={contenido}
+                onChange={(e) => setContenido(e.target.value)}
+                className="w-full border border-gray-300 rounded-xl p-3 h-28 mb-3"
+                placeholder="Escribe tu comentario aquí..."
+              />
 
-          <button
-            className="bg-primary-600 text-white px-6 py-2 rounded-xl hover:bg-primary-700 mr-3"
-            onClick={editando ? guardarEdicion : crearComentario}
-          >
-            {editando ? "Guardar Cambios" : "Publicar Comentario"}
-          </button>
+              <button
+                className="bg-primary-600 text-white px-6 py-2 rounded-xl hover:bg-primary-700 mr-3"
+                onClick={editando ? guardarEdicion : crearComentario}
+              >
+                {editando ? "Guardar Cambios" : "Publicar Comentario"}
+              </button>
 
-          {editando && (
-            <button
-              className="text-gray-600 hover:underline"
-              onClick={cancelarEdicion}
-            >
-              Cancelar
-            </button>
+              {editando && (
+                <button
+                  className="text-gray-600 hover:underline"
+                  onClick={cancelarEdicion}
+                >
+                  Cancelar
+                </button>
+              )}
+            </>
+          ) : (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
+              <p className="text-gray-700 mb-4">
+                Inicie sesión para enviar su comentario.
+              </p>
+              <button
+                onClick={() => navigate('/login')}
+                className="text-primary-600 font-semibold hover:underline"
+              >
+                Ir al Login
+              </button>
+            </div>
           )}
         </div>
       </div>

@@ -24,12 +24,14 @@ public class OrderItem {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    // NOTA: Eliminada la relación con Payment para evitar "Found shared references to a collection"
-    // Los items pertenecen solo al Order. Para obtener los items de un pago, consulta el Order usando orderId
-    
+    // NOTA: Eliminada la relación con Payment para evitar "Found shared references
+    // to a collection"
+    // Los items pertenecen solo al Order. Para obtener los items de un pago,
+    // consulta el Order usando orderId
 
-    @Column(name = "sensor_id", nullable = false)
-    private Long sensorId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sensor_id", nullable = false)
+    private Sensor sensor;
 
     @Column(name = "nombre", nullable = false, length = 255)
     private String nombre;
@@ -60,12 +62,17 @@ public class OrderItem {
         this.order = order;
     }
 
-    public Long getSensorId() {
-        return sensorId;
+    public Sensor getSensor() {
+        return sensor;
     }
 
-    public void setSensorId(Long sensorId) {
-        this.sensorId = sensorId;
+    public void setSensor(Sensor sensor) {
+        this.sensor = sensor;
+    }
+
+    // Helper para mantener compatibilidad
+    public Long getSensorId() {
+        return sensor != null ? sensor.getId() : null;
     }
 
     public String getNombre() {
@@ -100,4 +107,3 @@ public class OrderItem {
         this.subtotal = subtotal;
     }
 }
-

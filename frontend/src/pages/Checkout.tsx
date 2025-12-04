@@ -11,10 +11,18 @@ interface OrderItem {
   precioUnitario: number;
 }
 
+interface AppliedCoupon {
+  code: string;
+  discount: number;
+  type: 'percentage' | 'fixed';
+}
+
 const Checkout: React.FC = () => {
   const navigate = useNavigate();
   const [carrito, setCarrito] = useState<any[]>([]);
+  const [subtotal, setSubtotal] = useState(0);
   const [total, setTotal] = useState(0);
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,7 +43,26 @@ const Checkout: React.FC = () => {
       return;
     }
     setCarrito(items);
-    setTotal(carritoService.getTotal());
+
+    // Calcular subtotal
+    const currentSubtotal = carritoService.getTotal();
+    setSubtotal(currentSubtotal);
+
+    // Recuperar cupón aplicado
+    const appliedCouponStr = localStorage.getItem('appliedCoupon');
+    if (appliedCouponStr) {
+      try {
+        const coupon = JSON.parse(appliedCouponStr);
+        setAppliedCoupon(coupon);
+        // Calcular total con descuento
+        setTotal(Math.max(0, currentSubtotal - coupon.discount));
+      } catch (e) {
+        console.error("Error parsing coupon:", e);
+        setTotal(currentSubtotal);
+      }
+    } else {
+      setTotal(currentSubtotal);
+    }
   }, [navigate]);
 
   const handleCreateOrder = async () => {
@@ -43,10 +70,6 @@ const Checkout: React.FC = () => {
     setError(null);
 
     try {
-      // Recuperar cupón aplicado desde localStorage
-      const appliedCouponStr = localStorage.getItem('appliedCoupon');
-      const appliedCoupon = appliedCouponStr ? JSON.parse(appliedCouponStr) : null;
-
       // Preparar items de la orden con el formato correcto para el backend
       const items = carrito.map((item) => {
         const precio = parseFloat(item.precio);
@@ -156,11 +179,7 @@ const Checkout: React.FC = () => {
                     className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.style.display = "none";
-                      const parent = target.parentElement;
-                      if (parent) {
-                        parent.innerHTML = '<div class="w-20 h-20 sm:w-24 sm:h-24 bg-gray-200 rounded-lg flex items-center justify-center"><span class="text-gray-400 text-xs">Sin imagen</span></div>';
-                      }
+                      target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect width="100" height="100" fill="%23e5e7eb"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="12" fill="%239ca3af"%3ESin imagen%3C/text%3E%3C/svg%3E';
                     }}
                   />
                 ) : (
@@ -170,6 +189,9 @@ const Checkout: React.FC = () => {
                 )}
                 <div className="flex-grow w-full sm:w-auto">
                   <h3 className="text-lg sm:text-xl font-semibold break-words">{item.nombre}</h3>
+                  {item.descripcion && (
+                    <p className="text-gray-600 text-xs sm:text-sm mt-1 line-clamp-2">{item.descripcion}</p>
+                  )}
                   <p className="text-gray-600 text-xs sm:text-sm mt-1">Cantidad: {item.cantidad}</p>
                   <p className="text-primary-600 font-bold mt-2 text-sm sm:text-base">
                     S/ {item.precio} x {item.cantidad} = S/ {(parseFloat(item.precio) * item.cantidad).toFixed(2)}
@@ -187,8 +209,16 @@ const Checkout: React.FC = () => {
             <div className="space-y-2 mb-4">
               <div className="flex justify-between">
                 <span>Subtotal:</span>
-                <span>S/ {total.toFixed(2)}</span>
+                <span>S/ {subtotal.toFixed(2)}</span>
               </div>
+
+              {appliedCoupon && (
+                <div className="flex justify-between text-green-600 font-medium">
+                  <span>Descuento ({appliedCoupon.code}):</span>
+                  <span>-S/ {appliedCoupon.discount.toFixed(2)}</span>
+                </div>
+              )}
+
               <div className="flex justify-between">
                 <span>Envío:</span>
                 <span>Gratis</span>

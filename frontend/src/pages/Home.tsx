@@ -15,13 +15,13 @@ const Home: React.FC = () => {
           categoriasService.getAll(),
           sensoresService.getAll({ disponible: 'true', ordering: '-fecha_creacion' }),
         ]);
-        
+
         // Manejar diferentes formatos de respuesta para categorías
         const categoriasData = Array.isArray(catRes.data)
           ? catRes.data
           : catRes.data?.categorias || catRes.data?.results || [];
         setCategorias(Array.isArray(categoriasData) ? categoriasData.slice(0, 5) : []);
-        
+
         // Obtener los primeros 8 sensores disponibles
         const sensoresData = sensoresRes.data?.sensores || sensoresRes.data?.results || sensoresRes.data || [];
         setSensoresDestacados(Array.isArray(sensoresData) ? sensoresData.slice(0, 8) : []);
@@ -55,7 +55,8 @@ const Home: React.FC = () => {
             className="btn-animated bg-white text-primary-800 px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold hover:bg-gray-100 inline-block"
           >
             Ver Sensores
-          </Link>
+          </Link >
+
         </div>
       </section>
 
@@ -82,7 +83,7 @@ const Home: React.FC = () => {
           </Link>
         </div>
       </section>
-      
+
       <section>
         <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Todo nuestro catalogo</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
@@ -98,15 +99,11 @@ const Home: React.FC = () => {
                     src={getImageUrl(sensor.imagen_url || sensor.imagen)}
                     alt={sensor.nombre}
                     className="w-full h-40 sm:h-48 object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = "none";
-                    const parent = target.parentElement;
-                    if (parent) {
-                      parent.innerHTML = '<div class="w-full h-40 sm:h-48 bg-gray-200 flex items-center justify-center"><span class="text-gray-400 text-sm">Sin imagen</span></div>';
-                    }
-                  }}
-                />
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect width="200" height="200" fill="%23e5e7eb"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="%239ca3af"%3ESin imagen%3C/text%3E%3C/svg%3E';
+                    }}
+                  />
                 </div>
               ) : (
                 <div className="w-full h-40 sm:h-48 bg-gray-200 flex items-center justify-center">
@@ -122,7 +119,7 @@ const Home: React.FC = () => {
                 </div>
                 <p className="text-gray-600 text-xs sm:text-sm mb-2 line-clamp-2">{sensor.descripcion}</p>
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
-                  <span className="text-xl sm:text-2xl font-bold text-primary-600">${sensor.precio}</span>
+                  <span className="text-xl sm:text-2xl font-bold text-primary-600">S/ {sensor.precio}</span>
                   <span className="text-xs sm:text-sm text-gray-500">Stock: {sensor.stock}</span>
                 </div>
                 <div className="text-xs text-gray-500 mt-1 line-clamp-1">

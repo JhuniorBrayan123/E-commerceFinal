@@ -2,7 +2,6 @@ package com.example.payment_service.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -110,7 +109,7 @@ public class PaymentServiceImpl implements PaymentService {
                 items = java.util.Collections.emptyList();
             }
             log.info("📦 Items procesados: {}", items.size());
-            items.forEach(item -> log.info("   - Sensor: {}, Cantidad: {}", item.getSensorId(), item.getCantidad()));
+            items.forEach(item -> log.info("   - Cantidad: {}Sensor: {}, ", item.getSensorId(), item.getCantidad()));
 
             // NOTA: El stock ya fue descontado ANTES de procesar el pago (en OrderService.confirmPayment)
             // No es necesario descontarlo de nuevo aquí
@@ -118,22 +117,22 @@ public class PaymentServiceImpl implements PaymentService {
 
             // Publicar evento para notificaciones (el stock ya está descontado)
             // Convertir OrderItem → PaymentItemDto (sin entidades JPA)
-List<PaymentItemDto> itemDtos = items.stream()
-        .map(it -> new PaymentItemDto(
-                it.getSensorId(),
-                it.getCantidad(),
-                it.getNombre(),
-                it.getPrecioUnitario()
-        ))
-        .collect(Collectors.toList());
+                List<PaymentItemDto> itemDtos = items.stream()
+                        .map(it -> new PaymentItemDto(
+                                it.getSensorId(),
+                                it.getCantidad(),
+                                it.getNombre(),
+                                it.getPrecioUnitario()
+                        ))
+                        .collect(Collectors.toList());
 
-// Publicar evento con DTOs (seguro, sin colecciones compartidas)
-PaymentCompletedEvent evt = new PaymentCompletedEvent(
-        payment.getOrderId(),
-        payment.getId(),
-        itemDtos,
-        jwtToken
-);
+                // Publicar evento con DTOs (seguro, sin colecciones compartidas)
+                PaymentCompletedEvent evt = new PaymentCompletedEvent(
+                        payment.getOrderId(),
+                        payment.getId(),
+                        itemDtos,
+                        jwtToken
+                );
 
             eventPublisher.publishEvent(evt);
             log.info("📢 Evento PaymentCompleted publicado para payment {}", payment.getId());

@@ -109,11 +109,8 @@ const Carrito: React.FC = () => {
                     className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.style.display = "none";
-                      const parent = target.parentElement;
-                      if (parent) {
-                        parent.innerHTML = '<div class="w-20 h-20 sm:w-24 sm:h-24 bg-gray-200 rounded-lg flex items-center justify-center"><span class="text-gray-400 text-xs">Sin imagen</span></div>';
-                      }
+                      target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect width="100" height="100" fill="%23e5e7eb"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="12" fill="%239ca3af"%3ESin imagen%3C/text%3E%3C/svg%3E';
+                      target.className = "w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg";
                     }}
                   />
                 ) : (
@@ -129,7 +126,7 @@ const Carrito: React.FC = () => {
                     {item.nombre}
                   </Link>
                   <p className="text-gray-600 text-sm mt-1">{item.descripcion}</p>
-                  <p className="text-primary-600 font-bold mt-2">${item.precio}</p>
+                  <p className="text-primary-600 font-bold mt-2">S/ {item.precio}</p>
                   {item.tipo_display && (
                     <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded mt-1 inline-block">
                       {item.tipo_display}
@@ -153,7 +150,7 @@ const Carrito: React.FC = () => {
                     </button>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold">${(item.precio * item.cantidad).toFixed(2)}</p>
+                    <p className="font-bold">S/ {(item.precio * item.cantidad).toFixed(2)}</p>
                   </div>
                   <button
                     onClick={() => handleEliminar(item.id)}
@@ -182,13 +179,13 @@ const Carrito: React.FC = () => {
             <div className="space-y-2 mb-4">
               <div className="flex justify-between">
                 <span>Subtotal:</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>S/ {subtotal.toFixed(2)}</span>
               </div>
 
               {appliedCoupon && (
                 <div className="flex justify-between text-green-600">
                   <span>Descuento ({appliedCoupon.code}):</span>
-                  <span>-${discountAmount.toFixed(2)}</span>
+                  <span>-S/ {discountAmount.toFixed(2)}</span>
                 </div>
               )}
 
@@ -199,7 +196,7 @@ const Carrito: React.FC = () => {
 
               <div className="border-t pt-2 flex justify-between font-bold text-xl">
                 <span>Total:</span>
-                <span>${finalTotal.toFixed(2)}</span>
+                <span>S/ {finalTotal.toFixed(2)}</span>
               </div>
             </div>
 

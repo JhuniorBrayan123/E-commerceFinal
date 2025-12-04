@@ -27,6 +27,7 @@ import BannerCarousel from "./components/BannerCarousel";
 
 // 👇👇 NUEVO IMPORT QUE TE PEDÍ 👇👇
 import SupportPage from "./pages/SupportPage";
+import MisPedidos from "./pages/MisPedidos";
 
 interface User {
   id: number;
@@ -112,10 +113,6 @@ function App() {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar user={user} onLogout={handleLogout} onOpenLogin={() => openLoginModal("login")} />
-        {/* Banner Carousel - Debajo del Navbar en todas las páginas */}
-        <div className="w-full bg-gray-50 py-4 sm:py-6">
-          <BannerCarousel />
-        </div>
         <main className="flex-grow container mx-auto px-4 py-8">
           {children}
         </main>
@@ -155,124 +152,137 @@ function App() {
             }
           />
 
-        <Route
-          path="/categorias"
-          element={
-            <AuthenticatedLayout>
-              <Categorias />
-            </AuthenticatedLayout>
-          }
-        />
-
-        <Route
-          path="/categorias/:id"
-          element={
-            <AuthenticatedLayout>
-              <Categorias />
-            </AuthenticatedLayout>
-          }
-        />
-
-        <Route
-          path="/soporte"
-          element={
-            <AuthenticatedLayout>
-              <SupportPage />
-            </AuthenticatedLayout>
-          }
-        />
-
-        <Route
-          path="/sensores/:stringParam/:id"
-          element={
-            <AuthenticatedLayout>
-              <Sensores />
-            </AuthenticatedLayout>
-          }
-        />
-
-        <Route
-          path="/sensores"
-          element={
-            <AuthenticatedLayout>
-              <Sensores />
-            </AuthenticatedLayout>
-          }
-        />
-
-        <Route
-          path="/sensores/:id"
-          element={
-            <AuthenticatedLayout>
-              <SensorDetalle />
-            </AuthenticatedLayout>
-          }
-        />
-
-        <Route
-          path="/carrito"
-          element={
-            <AuthenticatedLayout>
-              <Carrito />
-            </AuthenticatedLayout>
-          }
-        />
-
-        {/* Rutas protegidas - requieren login */}
-        <Route
-          path="/checkout"
-          element={
-            <ProtectedRoute>
+          <Route
+            path="/categorias"
+            element={
               <AuthenticatedLayout>
-                <Checkout />
+                <Categorias />
               </AuthenticatedLayout>
-            </ProtectedRoute>
-          }
-        />
+            }
+          />
 
-        <Route
-          path="/payment-method"
-          element={
-            <ProtectedRoute>
+          <Route
+            path="/categorias/:id"
+            element={
               <AuthenticatedLayout>
-                <PaymentMethod />
+                <Categorias />
               </AuthenticatedLayout>
-            </ProtectedRoute>
-          }
-        />
+            }
+          />
 
-        <Route
-          path="/confirm-payment"
-          element={
-            <ProtectedRoute>
+          <Route
+            path="/soporte"
+            element={
               <AuthenticatedLayout>
-                <ConfirmPayment />
+                <SupportPage />
               </AuthenticatedLayout>
-            </ProtectedRoute>
-          }
-        />
+            }
+          />
 
-        <Route
-          path="/payment-result"
-          element={
-            <ProtectedRoute>
+          <Route
+            path="/sensores/:stringParam/:id"
+            element={
               <AuthenticatedLayout>
-                <PaymentResult />
+                <Sensores />
               </AuthenticatedLayout>
-            </ProtectedRoute>
-          }
-        />
+            }
+          />
 
-        <Route
-          path="/admin/categorias"
-          element={
-            <ProtectedRoute>
+          <Route
+            path="/sensores"
+            element={
               <AuthenticatedLayout>
-                <CRUDCategorias />
+                <Sensores />
               </AuthenticatedLayout>
-            </ProtectedRoute>
-          }
-        />
+            }
+          />
+
+          <Route
+            path="/sensores/:id"
+            element={
+              <AuthenticatedLayout>
+                <SensorDetalle />
+              </AuthenticatedLayout>
+            }
+          />
+
+          <Route
+            path="/carrito"
+            element={
+              <AuthenticatedLayout>
+                <Carrito />
+              </AuthenticatedLayout>
+            }
+          />
+
+          <Route
+            path="/mis-pedidos"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <MisPedidos />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Rutas protegidas - requieren login */}
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <Checkout />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/payment-method"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <PaymentMethod />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/confirm-payment"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <ConfirmPayment />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/payment-result"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <PaymentResult />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/categorias"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <CRUDCategorias />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
+
+
 
           {/* Redirección por defecto */}
           <Route path="*" element={<Navigate to="/" replace />} />

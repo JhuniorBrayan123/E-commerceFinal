@@ -9,4 +9,4 @@ class Comentario(models.Model):
     fecha_actualizacion = models.DateTimeField(auto_now=True, verbose_name="Fecha de Actualización")
 
     def __str__(self):
-        return f"Usuario {self.id_user} - Sensor {self.id_sensor.nombre}"
+        return f"Usuario {self.id_user} - contenido {self.contenido}"
