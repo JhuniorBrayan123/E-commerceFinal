@@ -1,10 +1,14 @@
-# docker-compose.yml
+# docker-compose.yml (Integración de todos los servicios)
 version: '3.8'
+
 services:
+  # 1. SERVICIO DE AUTENTICACIÓN (Tu servicio actual)
   auth-service:
-    build: .
+    build: 
+      context: ./auth-service # Asumiendo que el Dockerfile para Auth está en ./auth-service
+    container_name: auth_service
     ports:
-      - "8081:80"  # Mapea puerto 8081 local al 80 del contenedor
+      - "8081:80"
     environment:
       - DB_HOST=mysql-auth
       - DB_NAME=auth_db
@@ -14,18 +18,57 @@ services:
     depends_on:
       - mysql-auth
     volumes:
-      - ./logs:/var/www/html/logs
+      - ./auth-service/logs:/var/www/html/logs # Corregido la ruta del volumen local si aplica
 
+  # 2. BASE DE DATOS PARA AUTENTICACIÓN
   mysql-auth:
     image: mysql:8.0
+    container_name: mysql_auth
     environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=auth_db
-    ports:
-      - "3307:3306"  # Puerto diferente para no conflictos
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: auth_db
+    # No es necesario mapear el puerto 3307 al host a menos que necesites acceso externo.
+    # Si lo necesitas: ports: ["3307:3306"]
     volumes:
-      - mysql_data:/var/lib/mysql
-      - ./src/Database/Migrations:/docker-entrypoint-initdb.d
+      - mysql_auth_data:/var/lib/mysql
+      - ./auth-service/src/Database/Migrations:/docker-entrypoint-initdb.d
+
+
+
+  # 3. SERVICIO DJANGO (CATÁLOGO / E-COMMERCE PRINCIPAL)
+  django-app:
+    build:
+      context: ./catalog-service # Ruta donde está tu Dockerfile de Django
+    container_name: django_backend
+    # El CMD lo puedes definir aquí o dejar el del Dockerfile. 
+    # Usamos el comando del Dockerfile:
+    # command: sh -c "..." 
+    volumes:
+      - ./catalog-service:/app 
+      - django_static_data:/app/staticfiles
+      - django_media_data:/app/media
+    ports:
+      - "8000:8000" # Mapea 8000 local al 8000 del contenedor
+    env_file:
+      - ./catalog-service/.env # Carga las variables de BD para Django
+    depends_on:
+      - mysql-ecommerce # Depende de la BD principal
+      - auth-service    # Depende del servicio de autenticación si lo consume
+
+  # 4. BASE DE DATOS PARA DJANGO (CATÁLOGO)
+  mysql-ecommerce:
+    image: mysql:8.0
+    container_name: mysql_ecommerce
+    environment:
+      MYSQL_ROOT_PASSWORD: password # Usa contraseñas seguras aquí
+      MYSQL_DATABASE: ecommerce_db
+      MYSQL_USER: ecommerce_user
+      MYSQL_PASSWORD: tu_password
+    volumes:
+      - mysql_ecommerce_data:/var/lib/mysql
 
 volumes:
-  mysql_data:
+  mysql_auth_data:
+  mysql_ecommerce_data:
+  django_static_data:
+  django_media_data:

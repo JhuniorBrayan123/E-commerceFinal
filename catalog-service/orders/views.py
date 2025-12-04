@@ -2,10 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-<<<<<<< HEAD
 # CORRECCIÓN 1: Cambiar 'productos' a 'sensores' y 'Producto' a 'Sensor'
-=======
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
 from sensores.models import Sensor
 from inventario.models import MovimientoInventario
 from .models import Orden, ItemOrden
@@ -46,13 +43,10 @@ def crear_orden(request):
         cantidad = item_data['cantidad']
         
         try:
-<<<<<<< HEAD
             # CORRECCIÓN 2: Usar Sensor.objects.get
-            producto = Sensor.objects.get(id=producto_id)
+            producto = Sensor.objects.get(id=sensor_id)
         # CORRECCIÓN 3: Usar Sensor.DoesNotExist
-=======
             sensor = Sensor.objects.get(id=sensor_id)
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
         except Sensor.DoesNotExist:
             orden.delete()
             return Response(
@@ -71,11 +65,8 @@ def crear_orden(request):
         # Crear item de orden
         ItemOrden.objects.create(
             orden=orden,
-<<<<<<< HEAD
             producto=producto, # 'producto' es ahora un objeto Sensor
-=======
             sensor=sensor,
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
             cantidad=cantidad,
             precio_unitario=sensor.precio,
             subtotal=sensor.precio * cantidad
@@ -83,11 +74,8 @@ def crear_orden(request):
         
         # Registrar movimiento de inventario (salida)
         MovimientoInventario.objects.create(
-<<<<<<< HEAD
             producto=producto, # 'producto' es ahora un objeto Sensor
-=======
             sensor=sensor,
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
             tipo='salida',
             cantidad=cantidad,
             motivo=f'Venta - Orden #{orden.id}',
@@ -98,10 +86,7 @@ def crear_orden(request):
     orden_serializer = OrdenSerializer(orden)
     return Response(orden_serializer.data, status=status.HTTP_201_CREATED)
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
 @api_view(['POST'])
 def sincronizar_orden_pago(request):
     """
@@ -110,23 +95,17 @@ def sincronizar_orden_pago(request):
     """
     return Response({"message": "Sincronización de pago recibida"})
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
 @api_view(['GET'])
 def obtener_info_sensor(request, sensor_id):
     """
     Devuelve información básica de un sensor para que Spring Boot pueda consultarla
     """
     try:
-<<<<<<< HEAD
         # CORRECCIÓN 4: Usar Sensor.objects.get
-        producto = Sensor.objects.get(id=producto_id)
+        producto = Sensor.objects.get(id=sensor_id)
     # CORRECCIÓN 5: Usar Sensor.DoesNotExist
-=======
         sensor = Sensor.objects.get(id=sensor_id)
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
     except Sensor.DoesNotExist:
         return Response(
             {'error': 'Sensor no encontrado'},
@@ -141,9 +120,7 @@ def obtener_info_sensor(request, sensor_id):
         "categoria": sensor.categoria.nombre if sensor.categoria else None
     }
 
-<<<<<<< HEAD
     return Response(data, status=status.HTTP_200_OK)
-=======
     return Response(data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
@@ -175,4 +152,3 @@ def mis_pedidos(request):
     
     return Response(serializer.data, status=status.HTTP_200_OK)
 
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb

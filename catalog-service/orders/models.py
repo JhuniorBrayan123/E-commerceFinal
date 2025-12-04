@@ -1,9 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-<<<<<<< HEAD
-# CORRECCIÓN CLAVE: Cambiar de 'productos' a 'sensores' y el modelo a 'Sensor'
-=======
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
 from sensores.models import Sensor
 
 
@@ -25,6 +21,7 @@ class Orden(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de Creación")
     fecha_actualizacion = models.DateTimeField(auto_now=True, verbose_name="Fecha de Actualización")
 
+    # CORRECCIÓN SINTAXIS: __str__
     def __str__(self):
         return f"Orden #{self.id} - {self.usuario.username} - ${self.total}"
 
@@ -36,18 +33,26 @@ class Orden(models.Model):
 
 class ItemOrden(models.Model):
     orden = models.ForeignKey(Orden, on_delete=models.CASCADE, related_name='items', verbose_name="Orden")
-<<<<<<< HEAD
-    # CORRECCIÓN CLAVE: Cambiar la referencia de Producto a Sensor
-    producto = models.ForeignKey(Sensor, on_delete=models.CASCADE, verbose_name="Producto")
+    
+    # Campo 1 (Producto): Se asume que apunta a Sensor o a un modelo base.
+    # CORRECCIÓN E304/E305: related_name único para 'producto'.
+    producto = models.ForeignKey(
+        Sensor, 
+        on_delete=models.CASCADE, 
+        related_name='ordenes_item_producto_rel', 
+        verbose_name="Producto"
+    )
 
-    # NUEVOS CAMPOS ➜ Compatibilidad con microservicio o frontend desacoplado
-    #producto_id = models.IntegerField(blank=True, null=True) 
-    nombre_producto = models.CharField(max_length=255, blank=True, null=True)
-=======
-    sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, verbose_name="Sensor")
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
+    # Campo 2 (Sensor):
+    # CORRECCIÓN E304/E305: related_name único para 'sensor'.
+    sensor = models.ForeignKey(
+        Sensor, 
+        on_delete=models.CASCADE, 
+        related_name='ordenes_item_sensor_rel', 
+        verbose_name="Sensor"
+    )
 
-    # CAMBIO AQUÍ
+    # CAMBIO AQUÍ (Se mantiene)
     sensor_id_ext = models.IntegerField(blank=True, null=True)
     nombre_sensor = models.CharField(max_length=255, blank=True, null=True)
     cantidad = models.IntegerField(verbose_name="Cantidad")
@@ -55,28 +60,21 @@ class ItemOrden(models.Model):
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Subtotal")
 
     def save(self, *args, **kwargs):
+        # Se asegura que subtotal se calcule antes de guardar
         self.subtotal = self.precio_unitario * self.cantidad
 
-<<<<<<< HEAD
-        # completar valores automáticamente si vienen de Producto (que ahora es Sensor)
-        if self.producto:
-            # Asumiendo que has decidido dejar el campo producto_id
-            # if not self.producto_id:
-            #     self.producto_id = self.producto.id
-            if not self.nombre_producto:
-                self.nombre_producto = self.producto.nombre
-=======
         if self.sensor:
             if not self.sensor_id_ext:
                 self.sensor_id_ext = self.sensor.id
             if not self.nombre_sensor:
                 self.nombre_sensor = self.sensor.nombre
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
 
         super().save(*args, **kwargs)
 
+    # CORRECCIÓN SINTAXIS: __str__
     def __str__(self):
-        return f"{self.sensor.nombre} x{self.cantidad} - ${self.subtotal}"
+        nombre = self.sensor.nombre if self.sensor else self.nombre_sensor or "Sensor Eliminado"
+        return f"{nombre} x{self.cantidad} - ${self.subtotal}"
 
     class Meta:
         verbose_name = "Item de Orden"

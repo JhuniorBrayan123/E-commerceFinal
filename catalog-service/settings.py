@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'inventario',
     'orders',
     'cupones',
+    'rest_framework_simplejwt',
 
     # Django defaults
     'django.contrib.admin',
@@ -80,7 +81,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'wsgi.application'
-
 # ==========================================================================
 # 🔹 BASE DE DATOS — NO SE TOCÓ NADA
 # ==========================================================================
@@ -99,10 +99,8 @@ DATABASES = {
     }
 }
 
-<<<<<<< HEAD
+
 # Se asume que este es el campo correcto para la clave JWT.
-=======
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
 JWT_SECRET_KEY = os.getenv('JWT_SECRET', 'mi-clave-secreta-jwt-muy-segura-para-ecommerce')
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -125,15 +123,12 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-<<<<<<< HEAD
 # ----------------------------------------------------
 # CONFIGURACIÓN DE ARCHIVOS ESTÁTICOS Y MEDIA
 # ----------------------------------------------------
-=======
 # ==========================================================================
 # 🔹 STATIC & MEDIA (Correctos)
 # ==========================================================================
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
@@ -148,6 +143,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+    
+    # 🎯 CORRECCIÓN: CLASES DE AUTENTICACIÓN
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication', # Opcional: Para el Admin
+    ),
+    
+    # ✅ CLASES DE FILTRADO (Mantén solo los filtros aquí)
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
@@ -155,13 +158,13 @@ REST_FRAMEWORK = {
     ],
 }
 
-<<<<<<< HEAD
 # CONFIGURACIÓN DE CORS
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://frontend:3000",
-=======
+]
+
 # ==========================================================================
 # 🔹 CORS — NO SE MODIFICÓ NADA DEL COMPORTAMIENTO
 # ==========================================================================
@@ -169,7 +172,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://frontend:3000",  # Si el frontend está en Docker
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True  # Para desarrollo

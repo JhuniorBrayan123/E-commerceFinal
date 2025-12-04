@@ -22,11 +22,8 @@ class Migration(migrations.Migration):
                 ('motivo', models.CharField(max_length=200, verbose_name='Motivo')),
                 ('fecha', models.DateTimeField(auto_now_add=True, verbose_name='Fecha')),
                 ('observaciones', models.TextField(blank=True, null=True, verbose_name='Observaciones')),
-<<<<<<< HEAD
                 ('producto', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='movimientos', to='sensores.sensor', verbose_name='Producto')),
-=======
                 ('sensor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='movimientos', to='sensores.sensor', verbose_name='Sensor')),
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
             ],
             options={
                 'verbose_name': 'Movimiento de Inventario',

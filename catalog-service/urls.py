@@ -15,10 +15,7 @@ urlpatterns = [
     
     # 2. Tus URLs de API (sin cambios)
     path('api/', include('categorias.urls')),
-<<<<<<< HEAD
     # REMOVIDA: path('api/', include('productos.urls')), 
-=======
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
     path('api/', include('inventario.urls')),
     path('api/', include('orders.urls')),
     path('api/', include('sensores.urls')), # <-- Esta es la ruta correcta
@@ -32,8 +29,4 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-<<<<<<< HEAD
     # urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-=======
-
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb

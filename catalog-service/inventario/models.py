@@ -28,13 +28,26 @@ class MovimientoInventario(models.Model):
         ('USD', 'Dólares (USD)'),
     ]
 
-<<<<<<< HEAD
-    # La única línea que requiere el cambio de Producto a Sensor
-    producto = models.ForeignKey(Sensor, on_delete=models.CASCADE, related_name='movimientos', verbose_name="Producto")
-=======
     # Campos básicos del movimiento
-    sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, related_name='movimientos', verbose_name="Sensor")
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
+    
+    # Campo 1 (Producto): Se asume que apunta a Sensor o a un modelo base.
+    # CORRECCIÓN E304/E305: related_name único para 'producto'.
+    producto = models.ForeignKey(
+        Sensor, 
+        on_delete=models.CASCADE, 
+        related_name='movimientos_producto_rel', 
+        verbose_name="Producto"
+    )
+    
+    # Campo 2 (Sensor):
+    # CORRECCIÓN E304/E305: related_name único para 'sensor'.
+    sensor = models.ForeignKey(
+        Sensor, 
+        on_delete=models.CASCADE, 
+        related_name='movimientos_sensor_rel', 
+        verbose_name="Sensor"
+    )
+    
     tipo = models.CharField(max_length=10, choices=TIPO_CHOICES, verbose_name="Tipo de Movimiento")
     motivo= models.CharField(max_length=100, verbose_name="Motivo", help_text="Motivo del movimiento de inventario", null=True, blank=True)
     cantidad = models.IntegerField(verbose_name="Cantidad")
@@ -50,16 +63,8 @@ class MovimientoInventario(models.Model):
     total_amount = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, verbose_name="Monto Total", help_text="Monto total de la transacción")
     currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='PEN', verbose_name="Moneda")
 
+    # CORRECCIÓN SINTAXIS: __str__
     def __str__(self):
-<<<<<<< HEAD
-        # Esta línea ahora usa self.producto que es un Sensor
-        return f"{self.tipo.upper()} - {self.producto.nombre} - {self.cantidad} unidades"
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        # Aquí también funciona porque self.producto es el objeto Sensor
-        # Actualizar stock del producto automáticamente
-=======
         if self.tipo == 'salida' and self.order_id:
             return f"VENTA #{self.order_id} - {self.sensor.nombre} - {self.cantidad} unidades - {self.payment_status}"
         return f"{self.tipo.upper()} - {self.sensor.nombre} - {self.cantidad} unidades"
@@ -67,7 +72,7 @@ class MovimientoInventario(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         # Actualizar stock del sensor automáticamente
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
+        # Nota: Mejorar la lógica de save para distinguir entre creación y actualización
         if self.tipo == 'entrada':
             self.sensor.stock += self.cantidad
         elif self.tipo == 'salida':
@@ -78,11 +83,5 @@ class MovimientoInventario(models.Model):
 
     class Meta:
         verbose_name = "Movimiento de Inventario"
-<<<<<<< HEAD
-        verbose_name_plural = "Movimientos de Inventario"
-        ordering = ['-fecha']
-=======
         verbose_name_plural = "Movimientos de Inventario / Historial de Compras"
         ordering = ['-fecha']
-
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb

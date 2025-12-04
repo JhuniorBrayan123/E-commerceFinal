@@ -1,19 +1,13 @@
 from rest_framework import serializers
 from .models import Orden, ItemOrden
-<<<<<<< HEAD
 # CORRECCIÓN 1: Cambiar la importación de 'productos' a 'sensores' y la clase a 'SensorSerializer'
-=======
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
 from sensores.serializers import SensorSerializer
 
 
 class ItemOrdenSerializer(serializers.ModelSerializer):
-<<<<<<< HEAD
     # CORRECCIÓN 2: Usar la clase SensorSerializer
     producto_detalle = SensorSerializer(source='producto', read_only=True)
-=======
     sensor_detalle = SensorSerializer(source='sensor', read_only=True)
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
 
     class Meta:
         model = ItemOrden
@@ -54,8 +48,5 @@ class CrearOrdenSerializer(serializers.Serializer):
                 raise serializers.ValidationError("Cada sensor debe tener 'sensor_id' y 'cantidad'.")
             if item['cantidad'] <= 0:
                 raise serializers.ValidationError("La cantidad debe ser mayor a 0.")
-<<<<<<< HEAD
         return value
-=======
         return value
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb

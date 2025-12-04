@@ -42,11 +42,8 @@ class MovimientoInventarioViewSet(viewsets.ModelViewSet):
             
         if sensor_id:
             try:
-<<<<<<< HEAD
-                producto = Sensor.objects.get(id=producto_id)
-=======
+                producto = Sensor.objects.get(id=sensor_id)
                 sensor = Sensor.objects.get(id=sensor_id)
->>>>>>> 68ad260fce0b60c78ddb09b2d6b4fe40aa1026eb
                 return Response({
                     'sensor_id': sensor.id,
                     'sensor_nombre': sensor.nombre,
