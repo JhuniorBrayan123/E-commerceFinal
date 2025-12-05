@@ -90,13 +90,14 @@ const PaymentMethod: React.FC = () => {
           {/* Método: Stripe (Tarjeta) */}
           <div
             className={`border-2 rounded-lg p-6 cursor-pointer transition ${selectedMethod === "STRIPE"
-                ? "border-primary-600 bg-primary-50"
-                : "border-gray-300 hover:border-gray-400"
+              ? "border-primary-600 bg-primary-50"
+              : "border-gray-300 hover:border-gray-400"
               }`}
             onClick={() => handleMethodSelect("STRIPE")}
           >
             <div className="flex items-center space-x-4">
               <input
+                id="radio-payment-stripe"
                 type="radio"
                 name="paymentMethod"
                 value="STRIPE"
@@ -121,6 +122,7 @@ const PaymentMethod: React.FC = () => {
                     Número de Tarjeta
                   </label>
                   <input
+                    id="input-card-number"
                     type="text"
                     placeholder="4242 4242 4242 4242"
                     maxLength={19}
@@ -141,6 +143,7 @@ const PaymentMethod: React.FC = () => {
                       Mes
                     </label>
                     <input
+                      id="input-card-exp-month"
                       type="text"
                       placeholder="12"
                       maxLength={2}
@@ -159,6 +162,7 @@ const PaymentMethod: React.FC = () => {
                       Año
                     </label>
                     <input
+                      id="input-card-exp-year"
                       type="text"
                       placeholder="2025"
                       maxLength={4}
@@ -177,6 +181,7 @@ const PaymentMethod: React.FC = () => {
                       CVV
                     </label>
                     <input
+                      id="input-card-cvv"
                       type="text"
                       placeholder="123"
                       maxLength={4}
@@ -187,7 +192,7 @@ const PaymentMethod: React.FC = () => {
                           .slice(0, 4);
                         handlePaymentDataChange("cvv", value);
                       }}
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
+                      className="w-full px-4 py2 border rounded-lg focus:ring-2 focus:ring-primary-600 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -201,13 +206,14 @@ const PaymentMethod: React.FC = () => {
           {/* Método: Yape */}
           <div
             className={`border-2 rounded-lg p-6 cursor-pointer transition ${selectedMethod === "YAPE"
-                ? "border-primary-600 bg-primary-50"
-                : "border-gray-300 hover:border-gray-400"
+              ? "border-primary-600 bg-primary-50"
+              : "border-gray-300 hover:border-gray-400"
               }`}
             onClick={() => handleMethodSelect("YAPE")}
           >
             <div className="flex items-center space-x-4">
               <input
+                id="radio-payment-yape"
                 type="radio"
                 name="paymentMethod"
                 value="YAPE"
@@ -227,13 +233,14 @@ const PaymentMethod: React.FC = () => {
           {/* Método: PayPal */}
           <div
             className={`border-2 rounded-lg p-6 cursor-pointer transition ${selectedMethod === "PAYPAL"
-                ? "border-primary-600 bg-primary-50"
-                : "border-gray-300 hover:border-gray-400"
+              ? "border-primary-600 bg-primary-50"
+              : "border-gray-300 hover:border-gray-400"
               }`}
             onClick={() => handleMethodSelect("PAYPAL")}
           >
             <div className="flex items-center space-x-4">
               <input
+                id="radio-payment-paypal"
                 type="radio"
                 name="paymentMethod"
                 value="PAYPAL"
@@ -264,6 +271,7 @@ const PaymentMethod: React.FC = () => {
               </div>
             </div>
             <button
+              id="btn-continue-payment"
               onClick={() => {
                 try {
                   handleContinue();
@@ -278,6 +286,7 @@ const PaymentMethod: React.FC = () => {
               Continuar
             </button>
             <button
+              id="btn-back-checkout"
               onClick={() => {
                 try {
                   navigate("/checkout");

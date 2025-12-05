@@ -229,6 +229,7 @@ const Checkout: React.FC = () => {
               </div>
             </div>
             <button
+              id="btn-create-order"
               onClick={handleCreateOrder}
               disabled={loading}
               className="btn-animated w-full bg-primary-600 text-white py-3 rounded-lg font-semibold hover:bg-primary-700 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:shadow-none"
@@ -236,6 +237,7 @@ const Checkout: React.FC = () => {
               {loading ? 'Creando orden...' : 'Crear Orden y Continuar'}
             </button>
             <button
+              id="btn-back-cart"
               onClick={() => navigate('/carrito')}
               className="btn-animated w-full mt-3 bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold hover:bg-gray-300"
             >

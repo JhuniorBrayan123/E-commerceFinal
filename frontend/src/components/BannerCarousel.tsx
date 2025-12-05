@@ -31,7 +31,10 @@ const BannerCarousel = () => {
         if (response.data) {
           if (Array.isArray(response.data)) {
             bannersData = response.data;
-          } else if (response.data.results && Array.isArray(response.data.results)) {
+          } else if (
+            response.data.results &&
+            Array.isArray(response.data.results)
+          ) {
             bannersData = response.data.results;
           } else if (response.data.data && Array.isArray(response.data.data)) {
             bannersData = response.data.data;
@@ -62,7 +65,7 @@ const BannerCarousel = () => {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="w-full ">
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
         navigation
@@ -78,7 +81,7 @@ const BannerCarousel = () => {
             <img
               src={getBannerUrl(banner.imagen)}
               alt={banner.titulo}
-              className="w-full h-[200px] sm:h-[250px] md:h-[300px] lg:h-[350px] xl:h-[400px] object-cover rounded-lg"
+              className="w-full h-auto rounded-lg object-contain"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 const parent = target.parentElement;

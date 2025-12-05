@@ -3,8 +3,14 @@
 import React, { useState } from "react";
 
 const SupportArea: React.FC = () => {
-  const supportEmail = "agrocode@gmail.com";
+  const supportEmail = "aagrocode@gmail.com";
   const supportPhone = "+51 989 604 884";
+
+  const supportWhatsApp = "51989604884";
+  const whatsappMessage = encodeURIComponent(
+    "Hola, necesito ayuda con mi pedido."
+  );
+
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
 
   const faqs = [
@@ -49,7 +55,7 @@ const SupportArea: React.FC = () => {
         </div>
 
         {/* Contact Cards Grid */}
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
+        <div className="grid md:grid-cols-4 gap-8 mb-16">
           {/* Email Card */}
           <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-green-100">
             <div className="h-2 bg-gradient-to-r from-green-500 to-green-600"></div>
@@ -69,14 +75,17 @@ const SupportArea: React.FC = () => {
                   />
                 </svg>
               </div>
+
               <h3 className="text-2xl font-bold text-gray-800 mb-3">
                 Correo Electrónico
               </h3>
               <p className="text-gray-600 mb-4 text-sm">
                 Escríbenos y te responderemos en menos de 24 horas
               </p>
+
               <a
-                href={`mailto:${supportEmail}`}
+                href={`https://mail.google.com/mail/?view=cm&fs=1&to=${supportEmail}`}
+                target="_blank"
                 className="text-green-600 font-semibold hover:text-green-700 break-words block hover:underline"
               >
                 {supportEmail}
@@ -103,12 +112,14 @@ const SupportArea: React.FC = () => {
                   />
                 </svg>
               </div>
+
               <h3 className="text-2xl font-bold text-gray-800 mb-3">
                 Teléfono
               </h3>
               <p className="text-gray-600 mb-4 text-sm">
                 Llámanos para asistencia inmediata
               </p>
+
               <a
                 href={`tel:${supportPhone}`}
                 className="text-blue-600 font-semibold hover:text-blue-700 text-lg hover:underline"
@@ -118,8 +129,45 @@ const SupportArea: React.FC = () => {
             </div>
           </div>
 
-          {/* Schedule Card */}
-          <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-purple-100">
+          {/* WhatsApp Card */}
+          <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-green-200">
+            <div className="h-2 bg-gradient-to-r from-green-500 to-green-600"></div>
+            <div className="p-8">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <svg
+                  className="w-8 h-8 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M16.72 13.06a4 4 0 01-1.05 1.42c-.14.14-.31.26-.49.35l-.02.02a3.69 3.69 0 01-.77.31c-.52.14-1.07.17-1.6.1a7.98 7.98 0 01-3.45-1.48l-.12-.09-.12-.09a7.89 7.89 0 01-1.48-3.45 4.23 4.23 0 01.1-1.6 3.7 3.7 0 01.31-.77l.02-.02c.09-.18.21-.35.35-.49a4 4 0 011.42-1.05c.38-.15.77-.15 1.11.09l.06.05 1.27 1.27c.17.17.21.44.09.66l-.75 1.35a.5.5 0 00.05.56c.35.42.76.83 1.18 1.18a.5.5 0 00.56.05l1.35-.75a.5.5 0 01.66.09l1.27 1.27.05.06c.24.34.24.73.09 1.11z"
+                  />
+                </svg>
+              </div>
+
+              <h3 className="text-2xl font-bold text-gray-800 mb-3">
+                WhatsApp
+              </h3>
+              <p className="text-gray-600 mb-4 text-sm">
+                Envíanos un mensaje rápido
+              </p>
+
+              <a
+                href={`https://wa.me/${supportWhatsApp}?text=${whatsappMessage}`}
+                target="_blank"
+                className="text-green-600 font-semibold hover:text-green-700 text-lg hover:underline"
+              >
+                Enviar WhatsApp
+              </a>
+            </div>
+          </div>
+
+          {/* HORARIO DE ATENCIÓN CARD (AGREGADO) */}
+          <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-purple-200">
             <div className="h-2 bg-gradient-to-r from-purple-500 to-purple-600"></div>
             <div className="p-8">
               <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
@@ -137,14 +185,20 @@ const SupportArea: React.FC = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3">Horario</h3>
-              <p className="text-gray-600 mb-2 text-sm">
-                Estamos disponibles para ti
+
+              <h3 className="text-2xl font-bold text-gray-800 mb-3">
+                Horario de Atención
+              </h3>
+              <p className="text-gray-600 mb-4 text-sm">
+                Estamos disponibles todos los días
               </p>
-              <div className="space-y-1 text-purple-600 font-semibold">
-                <p>Lunes - Viernes</p>
-                <p className="text-2xl">9:00 AM - 6:00 PM</p>
-              </div>
+
+              <p className="text-purple-700 text-xl font-bold">
+                Lunes - Domingo
+              </p>
+              <p className="text-purple-600 font-semibold">
+                8:00 AM - 10:00 PM
+              </p>
             </div>
           </div>
         </div>
@@ -168,6 +222,7 @@ const SupportArea: React.FC = () => {
                   <h3 className="text-lg font-bold text-gray-800 pr-4">
                     {faq.question}
                   </h3>
+
                   <svg
                     className={`w-6 h-6 text-green-600 transition-transform duration-300 flex-shrink-0 ${
                       openFAQ === index ? "rotate-180" : ""
@@ -209,7 +264,8 @@ const SupportArea: React.FC = () => {
             excepcional.
           </p>
           <a
-            href={`mailto:${supportEmail}`}
+            href={`https://mail.google.com/mail/?view=cm&fs=1&to=${supportEmail}`}
+            target="_blank"
             className="inline-block bg-white text-green-700 font-bold px-8 py-4 rounded-xl hover:bg-green-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
           >
             Enviar un mensaje

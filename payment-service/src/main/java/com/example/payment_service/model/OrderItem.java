@@ -29,9 +29,10 @@ public class OrderItem {
     // Los items pertenecen solo al Order. Para obtener los items de un pago,
     // consulta el Order usando orderId
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sensor_id", nullable = false)
-    private Sensor sensor;
+    // Almacenar solo el ID del sensor (el sensor existe en catalog-service, no
+    // aquí)
+    @Column(name = "sensor_id", nullable = false)
+    private Long sensorId;
 
     @Column(name = "nombre", nullable = false, length = 255)
     private String nombre;
@@ -62,17 +63,12 @@ public class OrderItem {
         this.order = order;
     }
 
-    public Sensor getSensor() {
-        return sensor;
-    }
-
-    public void setSensor(Sensor sensor) {
-        this.sensor = sensor;
-    }
-
-    // Helper para mantener compatibilidad
     public Long getSensorId() {
-        return sensor != null ? sensor.getId() : null;
+        return sensorId;
+    }
+
+    public void setSensorId(Long sensorId) {
+        this.sensorId = sensorId;
     }
 
     public String getNombre() {

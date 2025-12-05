@@ -49,8 +49,7 @@ const ProductoDetalle: React.FC = () => {
 
     try {
       const data = {
-        id_user: user.id,
-        id_producto: producto.id,
+        id_sensor: producto.id,
         contenido,
       };
 
@@ -82,8 +81,7 @@ const ProductoDetalle: React.FC = () => {
     try {
       await comentariosService.update(comentarioEdit.id, {
         contenido,
-        id_user: comentarioEdit.id_user,
-        id_producto: producto.id,
+        id_sensor: producto.id,
       });
 
       cancelarEdicion();
@@ -332,7 +330,7 @@ const ProductoDetalle: React.FC = () => {
                 <p className="text-gray-800">{c.contenido}</p>
 
                 {/* Solo el autor puede editar/eliminar */}
-                {c.id_user === user?.id && (
+                {c.usuario_id === user?.id && (
                   <div className="flex gap-3 text-sm">
                     <button
                       className="text-blue-600 hover:underline"

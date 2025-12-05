@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { carritoService } from '../services/api';
+import React, { useEffect } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { carritoService } from "../services/api";
 
 interface PaymentResultProps {
   success: boolean;
@@ -16,15 +16,15 @@ const PaymentResult: React.FC = () => {
 
   useEffect(() => {
     if (!result) {
-      navigate('/carrito');
+      navigate("/carrito");
       return;
     }
 
     // Si el pago fue exitoso, limpiar el carrito
     if (result.success) {
       carritoService.clear();
-      localStorage.removeItem('currentOrderId');
-      localStorage.removeItem('currentPaymentToken');
+      localStorage.removeItem("currentOrderId");
+      localStorage.removeItem("currentPaymentToken");
     }
   }, [result, navigate]);
 
@@ -57,7 +57,7 @@ const PaymentResult: React.FC = () => {
             ¡Pago Exitoso!
           </h1>
           <p className="text-gray-600 mb-8">
-            Tu pago ha sido procesado correctamente. Recibirás un correo de confirmación pronto.
+            Tu pago ha sido procesado correctamente. Gracias por tu compra.
           </p>
 
           {/* Detalles del pago */}
@@ -66,34 +66,38 @@ const PaymentResult: React.FC = () => {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-gray-600">Orden ID:</span>
-                <span className="font-semibold">#{result.paymentData.orderId || result.orderId}</span>
+                <span className="font-semibold">
+                  #{result.paymentData.orderId || result.orderId}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Pago ID:</span>
-                <span className="font-semibold">#{result.paymentData.paymentId}</span>
+                <span className="font-semibold">
+                  #{result.paymentData.paymentId}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Transacción ID:</span>
                 <span className="font-mono text-sm">
-                  {result.paymentData.transactionId || 'N/A'}
+                  {result.paymentData.transactionId || "N/A"}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Monto:</span>
                 <span className="font-semibold">
-                  S/ {result.paymentData.amount || '0.00'}
+                  S/ {result.paymentData.amount || "0.00"}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Método de Pago:</span>
                 <span className="font-semibold">
-                  {result.paymentData.paymentMethod || 'N/A'}
+                  {result.paymentData.paymentMethod || "N/A"}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Estado:</span>
                 <span className="font-semibold text-green-600">
-                  {result.paymentData.status || 'PAID'}
+                  {result.paymentData.status || "PAID"}
                 </span>
               </div>
             </div>
@@ -140,11 +144,10 @@ const PaymentResult: React.FC = () => {
           </svg>
         </div>
 
-        <h1 className="text-4xl font-bold text-red-600 mb-4">
-          Pago Fallido
-        </h1>
+        <h1 className="text-4xl font-bold text-red-600 mb-4">Pago Fallido</h1>
         <p className="text-gray-600 mb-4">
-          {result.error?.message || 'No se pudo procesar tu pago. Por favor, intenta nuevamente.'}
+          {result.error?.message ||
+            "No se pudo procesar tu pago. Por favor, intenta nuevamente."}
         </p>
 
         {result.error?.code && (
@@ -170,17 +173,17 @@ const PaymentResult: React.FC = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
             onClick={() => {
-              const orderId = localStorage.getItem('currentOrderId');
-              const paymentToken = localStorage.getItem('currentPaymentToken');
+              const orderId = localStorage.getItem("currentOrderId");
+              const paymentToken = localStorage.getItem("currentPaymentToken");
               if (orderId && paymentToken) {
-                navigate('/payment-method', {
+                navigate("/payment-method", {
                   state: {
                     orderId: parseInt(orderId),
                     paymentToken,
                   },
                 });
               } else {
-                navigate('/carrito');
+                navigate("/carrito");
               }
             }}
             className="bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 transition"
@@ -200,4 +203,3 @@ const PaymentResult: React.FC = () => {
 };
 
 export default PaymentResult;
-

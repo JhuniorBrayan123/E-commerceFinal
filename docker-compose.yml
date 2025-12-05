@@ -21,7 +21,7 @@ services:
   payment-service:
     build: ./payment-service
     ports:
-      - "8085:8080"
+      - "8085:8080" # Puerto externo 8085 -> Puerto interno 8080 (Spring Boot)
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/ecommerce_db
       SPRING_DATASOURCE_USERNAME: root

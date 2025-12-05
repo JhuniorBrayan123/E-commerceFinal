@@ -1,13 +1,15 @@
 package com.example.payment_service.gateway;
 
+import java.time.Duration;
+import java.util.concurrent.ThreadLocalRandom;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import com.example.payment_service.dto.PaymentRequest;
 import com.example.payment_service.dto.PaymentResponse;
 import com.example.payment_service.dto.RefundRequest;
 import com.example.payment_service.exception.PaymentException;
-import java.time.Duration;
-import java.util.concurrent.ThreadLocalRandom;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 @Component
 public class PaypalGateway implements PaymentGateway {
@@ -18,6 +20,11 @@ public class PaypalGateway implements PaymentGateway {
     public PaypalGateway(
             @Value("${payment.gateways.paypal.min-delay-ms:100}") long minDelayMs,
             @Value("${payment.gateways.paypal.max-delay-ms:400}") long maxDelayMs) {
+        // Validar que minDelay < maxDelay para evitar IllegalArgumentException en nextLong()
+        if (minDelayMs >= maxDelayMs) {
+            throw new IllegalArgumentException(
+                    "minDelayMs (" + minDelayMs + ") debe ser menor que maxDelayMs (" + maxDelayMs + ")");
+        }
         this.minDelay = Duration.ofMillis(minDelayMs);
         this.maxDelay = Duration.ofMillis(maxDelayMs);
     }

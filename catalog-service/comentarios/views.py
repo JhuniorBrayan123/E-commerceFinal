@@ -8,6 +8,9 @@ class Comentario_ViewSet(ModelViewSet):
     queryset = Comentario.objects.all()
     serializer_class = ComentarioSerializer 
 
+    def perform_create(self, serializer):
+        serializer.save(usuario=self.request.user)
+
     def get_queryset(self):
         sensor_id = self.request.query_params.get("sensor_id", None)
         queryset = Comentario.objects.all()
@@ -15,4 +18,4 @@ class Comentario_ViewSet(ModelViewSet):
         if sensor_id:
             queryset = queryset.filter(id_sensor=sensor_id)
 
-        return queryset
+        return queryset.order_by('-fecha_creacion')

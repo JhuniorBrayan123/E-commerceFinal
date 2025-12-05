@@ -10,7 +10,15 @@ spring:
     username: root
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver
-
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: TU_EMAIL
+    password: TU_PASSWORD_APP
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      
   jpa:
     hibernate:
       ddl-auto: update

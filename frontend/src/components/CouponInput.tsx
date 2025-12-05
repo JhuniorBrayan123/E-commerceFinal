@@ -95,6 +95,7 @@ const CouponInput: React.FC<CouponInputProps> = ({
                         </div>
                     </div>
                     <button
+                        id="btn-remove-coupon"
                         onClick={handleRemove}
                         className="text-green-600 hover:text-green-800 text-sm font-medium"
                     >
@@ -112,6 +113,7 @@ const CouponInput: React.FC<CouponInputProps> = ({
             </label>
             <div className="flex gap-2">
                 <input
+                    id="input-coupon-code"
                     type="text"
                     value={code}
                     onChange={(e) => setCode(e.target.value.toUpperCase())}
@@ -122,6 +124,7 @@ const CouponInput: React.FC<CouponInputProps> = ({
                     maxLength={50}
                 />
                 <button
+                    id="btn-apply-coupon"
                     onClick={handleApply}
                     disabled={loading || !code.trim()}
                     className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium"

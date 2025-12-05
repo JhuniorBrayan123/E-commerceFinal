@@ -5,7 +5,7 @@ from random import randint, choice
 import decimal
 
 class Command(BaseCommand):
-    help = "Carga 40 sensores de ejemplo en la base de datos"
+    help = "Carga 50 sensores de ejemplo en la base de datos"
 
     def handle(self, *args, **kwargs):
 
@@ -69,18 +69,32 @@ class Command(BaseCommand):
                 "alimentacion": "5V",
                 "protocolo_comunicacion": "Ultrasonido",
                 "imagen": "sensores/distancia.jpg"
+            },
+            {
+                "nombre": "Sensor de Luz BH1750",
+                "marca": "ROHS",
+                "modelo": "BH1750",
+                "precio": "4.50",
+                "descripcion": "Sensor de luz ambiental digital.",
+                "rango_medicion": "0-65535 lx",
+                "precision": "±1 lx",
+                "alimentacion": "3.3-5V",
+                "protocolo_comunicacion": "I2C",
+                "imagen": "sensores/luz.jpg"
             }
         ]
 
-        for i in range(40):  # 40 sensores 🔥
+        categorias_ids = [1, 7, 8, 9]  # IDs de categorías reales
+
+        for i in range(50):  # 50 sensores
             data = choice(sensores_data)
-            categoria_id = randint(1, 5)  # Categorías 1-5
+            categoria_id = choice(categorias_ids)
 
             try:
                 categoria = Categoria.objects.get(id=categoria_id)
             except Categoria.DoesNotExist:
                 self.stdout.write(self.style.ERROR(
-                    f"⚠ ERROR: La categoría ID {categoria_id} no existe. Crea las categorías 1-5 primero."
+                    f"⚠ ERROR: La categoría ID {categoria_id} no existe. Crea las categorías primero."
                 ))
                 return
 
@@ -99,7 +113,7 @@ class Command(BaseCommand):
                 protocolo_comunicacion=data["protocolo_comunicacion"],
                 stock=stock_random,
                 disponible=stock_random > 0,
-                imagen=data["imagen"]  # rutas en MEDIA/sensores/
+                imagen=data["imagen"]
             )
 
-        self.stdout.write(self.style.SUCCESS("\n🔥 40 sensores agregados correctamente 🚀"))
+        self.stdout.write(self.style.SUCCESS("\n🔥 50 sensores agregados correctamente 🚀"))

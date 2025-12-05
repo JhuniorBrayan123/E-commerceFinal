@@ -1,5 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from rest_framework import status
@@ -32,6 +33,7 @@ class SensoresView(APIView):
     GET: Lista sensores con filtros opcionales
     POST: Crear un nuevo sensor
     """
+    permission_classes = [AllowAny]
     
     def get(self, request):
         # Obtener parámetros de filtro, búsqueda y ordenamiento
@@ -146,6 +148,7 @@ class SensorDetailView(APIView):
     PATCH: Actualización parcial
     DELETE: Eliminar un sensor
     """
+    permission_classes = [AllowAny]
     
     def get(self, request, sensor_id):
         try:
@@ -218,6 +221,7 @@ class SensorDetailView(APIView):
 @method_decorator(csrf_exempt, name='dispatch')
 class SensorStatsView(APIView):
     """Vista para obtener estadísticas de sensores"""
+    permission_classes = [AllowAny]
     
     def get(self, request):
         total_sensores = Sensor.objects.count()
@@ -243,6 +247,7 @@ class SensorStatsView(APIView):
 @method_decorator(csrf_exempt, name='dispatch')
 class SensorFilterView(APIView):
     """Vista para obtener opciones disponibles de filtrado"""
+    permission_classes = [AllowAny]
     
     def get(self, request):
         categorias = [

@@ -76,6 +76,7 @@ const Carrito: React.FC = () => {
         <h1 className="text-4xl font-bold mb-4">Carrito de Compras</h1>
         <p className="text-gray-600 mb-8">Tu carrito está vacío</p>
         <Link
+          id="link-see-sensors"
           to="/sensores"
           className="btn-animated bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 inline-block"
         >
@@ -90,6 +91,7 @@ const Carrito: React.FC = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">Carrito de Compras</h1>
         <button
+          id="btn-empty-cart"
           onClick={handleVaciar}
           className="btn-animated text-red-600 hover:text-red-700 font-semibold text-sm sm:text-base whitespace-nowrap"
         >
@@ -136,13 +138,15 @@ const Carrito: React.FC = () => {
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
                     <button
+                      id={`btn-decrease-${item.id}`}
                       onClick={() => handleActualizarCantidad(item.id, item.cantidad - 1, '-', item.stock)}
                       className="btn-animated px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
                     >
                       -
                     </button>
-                    <span className="w-12 text-center">{item.cantidad}</span>
+                    <span id={`quantity-${item.id}`} className="w-12 text-center">{item.cantidad}</span>
                     <button
+                      id={`btn-increase-${item.id}`}
                       onClick={() => handleActualizarCantidad(item.id, item.cantidad + 1, '+', item.stock)}
                       className="btn-animated px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
                     >
@@ -153,6 +157,7 @@ const Carrito: React.FC = () => {
                     <p className="font-bold">S/ {(item.precio * item.cantidad).toFixed(2)}</p>
                   </div>
                   <button
+                    id={`btn-remove-${item.id}`}
                     onClick={() => handleEliminar(item.id)}
                     className="btn-animated text-red-600 hover:text-red-700"
                   >
@@ -201,6 +206,7 @@ const Carrito: React.FC = () => {
             </div>
 
             <button
+              id="btn-proceed-checkout"
               onClick={handleProceedToCheckout}
               className="btn-animated w-full bg-primary-600 text-white py-3 rounded-lg font-semibold hover:bg-primary-700"
             >
