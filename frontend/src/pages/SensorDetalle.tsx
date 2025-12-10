@@ -190,7 +190,7 @@ const ProductoDetalle: React.FC = () => {
             {/* Precio */}
             <div className="mb-6">
               <span className="text-5xl font-bold text-primary-600 block drop-shadow-sm">
-                ${producto.precio}
+                S/ {producto.precio}
               </span>
             </div>
 

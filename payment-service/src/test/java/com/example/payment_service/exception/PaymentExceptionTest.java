@@ -24,10 +24,10 @@ class PaymentExceptionTest {
         PaymentException exception = PaymentException.unauthorized("AUTH_ERROR", "No autorizado");
 
         // Then
-        assertEquals("AUTH_ERROR", exception.getErrorCode());
-        assertEquals("No autorizado", exception.getMessage());
-        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
-        assertNull(exception.getCause());
+        assertEquals("AUTH_ERROR", exception.getErrorCode(), "❌ Test #63 FALLÓ: errorCode debe ser AUTH_ERROR");
+        assertEquals("No autorizado", exception.getMessage(), "❌ Test #63 FALLÓ: mensaje debe ser 'No autorizado'");
+        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus(), "❌ Test #63 FALLÓ: status debe ser UNAUTHORIZED");
+        assertNull(exception.getCause(), "❌ Test #63 FALLÓ: cause debe ser null");
         System.out.println(" PASÓ: Excepción UNAUTHORIZED creada correctamente");
     }
 
@@ -47,10 +47,10 @@ class PaymentExceptionTest {
         PaymentException exception = PaymentException.conflict("CONFLICT_ERROR", "Conflicto detectado");
 
         // Then
-        assertEquals("CONFLICT_ERROR", exception.getErrorCode());
-        assertEquals("Conflicto detectado", exception.getMessage());
-        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
-        assertNull(exception.getCause());
+        assertEquals("CONFLICT_ERROR", exception.getErrorCode(), "❌ Test #64 FALLÓ: errorCode debe ser CONFLICT_ERROR");
+        assertEquals("Conflicto detectado", exception.getMessage(), "❌ Test #64 FALLÓ: mensaje debe ser 'Conflicto detectado'");
+        assertEquals(HttpStatus.CONFLICT, exception.getStatus(), "❌ Test #64 FALLÓ: status debe ser CONFLICT");
+        assertNull(exception.getCause(), "❌ Test #64 FALLÓ: cause debe ser null");
         System.out.println(" PASÓ: Excepción CONFLICT creada correctamente");
     }
 
@@ -70,10 +70,10 @@ class PaymentExceptionTest {
         PaymentException exception = PaymentException.notFound("NOT_FOUND", "Recurso no encontrado");
 
         // Then
-        assertEquals("NOT_FOUND", exception.getErrorCode());
-        assertEquals("Recurso no encontrado", exception.getMessage());
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
-        assertNull(exception.getCause());
+        assertEquals("NOT_FOUND", exception.getErrorCode(), "❌ Test #65 FALLÓ: errorCode debe ser NOT_FOUND");
+        assertEquals("Recurso no encontrado", exception.getMessage(), "❌ Test #65 FALLÓ: mensaje debe ser 'Recurso no encontrado'");
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus(), "❌ Test #65 FALLÓ: status debe ser NOT_FOUND");
+        assertNull(exception.getCause(), "❌ Test #65 FALLÓ: cause debe ser null");
         System.out.println(" PASÓ: Excepción NOT_FOUND creada correctamente");
     }
 
@@ -93,10 +93,10 @@ class PaymentExceptionTest {
         PaymentException exception = PaymentException.badRequest("INVALID_INPUT", "Solicitud inválida");
 
         // Then
-        assertEquals("INVALID_INPUT", exception.getErrorCode());
-        assertEquals("Solicitud inválida", exception.getMessage());
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
-        assertNull(exception.getCause());
+        assertEquals("INVALID_INPUT", exception.getErrorCode(), "❌ Test #66 FALLÓ: errorCode debe ser INVALID_INPUT");
+        assertEquals("Solicitud inválida", exception.getMessage(), "❌ Test #66 FALLÓ: mensaje debe ser 'Solicitud inválida'");
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus(), "❌ Test #66 FALLÓ: status debe ser BAD_REQUEST");
+        assertNull(exception.getCause(), "❌ Test #66 FALLÓ: cause debe ser null");
         System.out.println(" PASÓ: Excepción BAD_REQUEST creada correctamente");
     }
 
@@ -116,10 +116,10 @@ class PaymentExceptionTest {
         PaymentException exception = PaymentException.gatewayError("GATEWAY_ERROR", "Error en gateway");
 
         // Then
-        assertEquals("GATEWAY_ERROR", exception.getErrorCode());
-        assertEquals("Error en gateway", exception.getMessage());
-        assertEquals(HttpStatus.BAD_GATEWAY, exception.getStatus());
-        assertNull(exception.getCause());
+        assertEquals("GATEWAY_ERROR", exception.getErrorCode(), "❌ Test #67 FALLÓ: errorCode debe ser GATEWAY_ERROR");
+        assertEquals("Error en gateway", exception.getMessage(), "❌ Test #67 FALLÓ: mensaje debe ser 'Error en gateway'");
+        assertEquals(HttpStatus.BAD_GATEWAY, exception.getStatus(), "❌ Test #67 FALLÓ: status debe ser BAD_GATEWAY");
+        assertNull(exception.getCause(), "❌ Test #67 FALLÓ: cause debe ser null");
         System.out.println(" PASÓ: Excepción BAD_GATEWAY creada correctamente");
     }
 
@@ -141,11 +141,11 @@ class PaymentExceptionTest {
         PaymentException exception = PaymentException.gatewayError("GATEWAY_ERROR", "Error en gateway", originalCause);
 
         // Then
-        assertEquals("GATEWAY_ERROR", exception.getErrorCode());
-        assertEquals("Error en gateway", exception.getMessage());
-        assertEquals(HttpStatus.BAD_GATEWAY, exception.getStatus());
-        assertEquals(originalCause, exception.getCause());
-        assertEquals("Error original", exception.getCause().getMessage());
+        assertEquals("GATEWAY_ERROR", exception.getErrorCode(), "❌ Test #68 FALLÓ: errorCode debe ser GATEWAY_ERROR");
+        assertEquals("Error en gateway", exception.getMessage(), "❌ Test #68 FALLÓ: mensaje debe ser 'Error en gateway'");
+        assertEquals(HttpStatus.BAD_GATEWAY, exception.getStatus(), "❌ Test #68 FALLÓ: status debe ser BAD_GATEWAY");
+        assertEquals(originalCause, exception.getCause(), "❌ Test #68 FALLÓ: cause debe ser igual a originalCause");
+        assertEquals("Error original", exception.getCause().getMessage(), "❌ Test #68 FALLÓ: mensaje de cause debe ser 'Error original'");
         System.out.println(" PASÓ: Excepción con causa preservada correctamente");
     }
 
@@ -165,10 +165,10 @@ class PaymentExceptionTest {
         PaymentException exception = PaymentException.forbidden("FORBIDDEN", "Acceso denegado");
 
         // Then
-        assertEquals("FORBIDDEN", exception.getErrorCode());
-        assertEquals("Acceso denegado", exception.getMessage());
-        assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
-        assertNull(exception.getCause());
+        assertEquals("FORBIDDEN", exception.getErrorCode(), "❌ Test #69 FALLÓ: errorCode debe ser FORBIDDEN");
+        assertEquals("Acceso denegado", exception.getMessage(), "❌ Test #69 FALLÓ: mensaje debe ser 'Acceso denegado'");
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatus(), "❌ Test #69 FALLÓ: status debe ser FORBIDDEN");
+        assertNull(exception.getCause(), "❌ Test #69 FALLÓ: cause debe ser null");
         System.out.println(" PASÓ: Excepción FORBIDDEN creada correctamente");
     }
 
@@ -187,7 +187,7 @@ class PaymentExceptionTest {
         PaymentException exception = PaymentException.badRequest("TEST_CODE", "Mensaje de prueba");
 
         // Then
-        assertEquals("TEST_CODE", exception.getErrorCode());
+        assertEquals("TEST_CODE", exception.getErrorCode(), "❌ Test #70 FALLÓ: errorCode debe ser TEST_CODE");
         System.out.println(" PASÓ: getErrorCode() retorna código correcto");
     }
 
@@ -207,7 +207,7 @@ class PaymentExceptionTest {
         PaymentException exception = PaymentException.notFound("TEST", "Test");
 
         // Then
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus(), "❌ Test #71 FALLÓ: status debe ser NOT_FOUND");
         System.out.println(" PASÓ: getStatus() retorna HttpStatus correcto");
     }
 
@@ -227,7 +227,7 @@ class PaymentExceptionTest {
         PaymentException exception = PaymentException.unauthorized("CODE", "Mensaje personalizado");
 
         // Then
-        assertEquals("Mensaje personalizado", exception.getMessage());
+        assertEquals("Mensaje personalizado", exception.getMessage(), "❌ Test #72 FALLÓ: mensaje debe ser 'Mensaje personalizado'");
         System.out.println(" PASÓ: getMessage() retorna mensaje correcto");
     }
 
@@ -246,7 +246,7 @@ class PaymentExceptionTest {
         PaymentException exception = PaymentException.badRequest("TEST", "Test");
 
         // Then
-        assertTrue(exception instanceof RuntimeException, "Debe ser instancia de RuntimeException");
+        assertTrue(exception instanceof RuntimeException, "❌ Test #73 FALLÓ: debe ser instancia de RuntimeException");
         System.out.println(" PASÓ: PaymentException extiende RuntimeException correctamente");
     }
 }

@@ -107,72 +107,101 @@ class AuthController
     // Login de usuario
     public function login()
     {
-        $data = json_decode(file_get_contents("php://input"), true);
+        try {
+            $rawInput = @file_get_contents("php://input");
+            if ($rawInput === false || empty($rawInput)) {
+                error_log("Error: No se pudo leer php://input o está vacío");
+                http_response_code(400);
+                return json_encode([
+                    'success' => false,
+                    'message' => 'No se recibieron datos'
+                ]);
+            }
 
-        // Validar datos requeridos
-        if (empty($data['email']) || empty($data['password'])) {
-            http_response_code(400);
+            error_log("Raw input recibido: " . substr($rawInput, 0, 100));
+            $data = json_decode($rawInput, true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                http_response_code(400);
+                return json_encode([
+                    'success' => false,
+                    'message' => 'Error al decodificar JSON: ' . json_last_error_msg()
+                ]);
+            }
+
+            // Validar datos requeridos
+            if (empty($data['email']) || empty($data['password'])) {
+                http_response_code(400);
+                return json_encode([
+                    'success' => false,
+                    'message' => 'Email y contraseña obligatorios'
+                ]);
+            }
+
+            // Buscar usuario
+            if (!$this->user->findByEmail($data['email'])) {
+                http_response_code(401);
+                return json_encode([
+                    'success' => false,
+                    'message' => 'Credenciales inválidas'
+                ]);
+            }
+
+            // Verificar password
+            if (!$this->user->verifyPassword($data['password'])) {
+                http_response_code(401);
+                return json_encode([
+                    'success' => false,
+                    'message' => 'Credenciales inválidas'
+                ]);
+            }
+
+            // Verificar si el usuario está activo
+            if (!$this->user->is_active) {
+                http_response_code(403);
+                return json_encode([
+                    'success' => false,
+                    'message' => 'Usuario desactivado'
+                ]);
+            }
+
+            // Generar tokens
+            $access_token = JWTService::generateToken($this->user->id, $this->user->email);
+            $refresh_token = JWTService::generateRefreshToken();
+
+            // Guardar refresh token
+            $this->refreshToken->user_id = $this->user->id;
+            $this->refreshToken->token = $refresh_token;
+            $this->refreshToken->expires_at = date('Y-m-d H:i:s', time() + (getenv('REFRESH_TOKEN_EXPIRE') ?: 604800));
+            $this->refreshToken->is_revoked = 0;
+            $this->refreshToken->create();
+
+            http_response_code(200);
             return json_encode([
-                'success' => false,
-                'message' => 'Email y contraseña obligatorios'
-            ]);
-        }
-
-        // Buscar usuario
-        if (!$this->user->findByEmail($data['email'])) {
-            http_response_code(401);
-            return json_encode([
-                'success' => false,
-                'message' => 'Credenciales inválidas'
-            ]);
-        }
-
-        // Verificar password
-        if (!$this->user->verifyPassword($data['password'])) {
-            http_response_code(401);
-            return json_encode([
-                'success' => false,
-                'message' => 'Credenciales inválidas'
-            ]);
-        }
-
-        // Verificar si el usuario está activo
-        if (!$this->user->is_active) {
-            http_response_code(403);
-            return json_encode([
-                'success' => false,
-                'message' => 'Usuario desactivado'
-            ]);
-        }
-
-        // Generar tokens
-        $access_token = JWTService::generateToken($this->user->id, $this->user->email);
-        $refresh_token = JWTService::generateRefreshToken();
-
-        // Guardar refresh token
-        $this->refreshToken->user_id = $this->user->id;
-        $this->refreshToken->token = $refresh_token;
-        $this->refreshToken->expires_at = date('Y-m-d H:i:s', time() + (getenv('REFRESH_TOKEN_EXPIRE') ?: 604800));
-        $this->refreshToken->is_revoked = 0;
-        $this->refreshToken->create();
-
-        http_response_code(200);
-        return json_encode([
-            'success' => true,
-            'message' => 'Login exitoso',
-            'data' => [
-                'user' => [
-                    'id' => $this->user->id,
-                    'email' => $this->user->email,
-                    'first_name' => $this->user->first_name,
-                    'last_name' => $this->user->last_name
-                ],
-                'tokens' => [
-                    'access_token' => $access_token,
-                    'refresh_token' => $refresh_token,
-                    'expires_in' => getenv('JWT_EXPIRE') ?: 3600
+                'success' => true,
+                'message' => 'Login exitoso',
+                'data' => [
+                    'user' => [
+                        'id' => $this->user->id,
+                        'email' => $this->user->email,
+                        'first_name' => $this->user->first_name,
+                        'last_name' => $this->user->last_name
+                    ],
+                    'tokens' => [
+                        'access_token' => $access_token,
+                        'refresh_token' => $refresh_token,
+                        'expires_in' => getenv('JWT_EXPIRE') ?: 3600
+                    ]
                 ]
-            ]
-        ]);
+            ]);
+        } catch (Exception $e) {
+            error_log("Error en login: " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
+            http_response_code(500);
+            return json_encode([
+                'success' => false,
+                'message' => 'Error interno del servidor'
+            ]);
+        }
     }
 }

@@ -84,12 +84,11 @@ const ProductoDetalle: React.FC = () => {
           <div>
             <h1 className="text-4xl font-bold mb-4">{producto.nombre}</h1>
             <div className="mb-4">
-              <span className="text-4xl font-bold text-primary-600">${producto.precio}</span>
+              <span className="text-4xl font-bold text-primary-600">S/ {producto.precio}</span>
             </div>
             <div className="mb-4">
-              <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                producto.estado === 'activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-              }`}>
+              <span className={`px-3 py-1 rounded-full text-sm font-semibold ${producto.estado === 'activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                }`}>
                 {producto.estado}
               </span>
               <span className="ml-4 text-gray-600">
@@ -97,7 +96,7 @@ const ProductoDetalle: React.FC = () => {
               </span>
             </div>
             <p className="text-gray-700 mb-6">{producto.descripcion}</p>
-            
+
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Cantidad (Stock disponible: {producto.stock})
@@ -130,7 +129,7 @@ const ProductoDetalle: React.FC = () => {
 
             <div className="mb-6">
               <p className="text-lg font-semibold">
-                Subtotal: ${(producto.precio * cantidad).toFixed(2)}
+                Subtotal: S/ {(producto.precio * cantidad).toFixed(2)}
               </p>
             </div>
 
@@ -171,8 +170,8 @@ const ProductoDetalle: React.FC = () => {
       </div>
     </div>
 
-    
-    
+
+
   );
 };
 

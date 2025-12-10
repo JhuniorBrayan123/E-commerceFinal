@@ -21,13 +21,13 @@ class JWTServiceTest extends TestCase
 
         $resultado = JWTService::generateToken($user_id, $email);
 
-        $this->assertNotEmpty($resultado);
-        $this->assertIsString($resultado);
+        $this->assertNotEmpty($resultado, '❌ Test #8 FALLÓ: token no debe estar vacío');
+        $this->assertIsString($resultado, '❌ Test #8 FALLÓ: token debe ser string');
 
         // JWT tienen 3 partes separadas por puntos
         $partes = explode('.', $resultado);
         $esperadoPartes = 3; // JWT tiene 3 partes: header.payload.signature
-        $this->assertCount($esperadoPartes, $partes);
+        $this->assertCount($esperadoPartes, $partes, '❌ Test #8 FALLÓ: token debe tener 3 partes separadas por puntos');
     }
 
     /**
@@ -47,11 +47,11 @@ class JWTServiceTest extends TestCase
         $token = JWTService::generateToken($user_id, $email);
         $resultado = JWTService::verifyToken($token);
 
-        $this->assertIsArray($resultado);
-        $this->assertArrayHasKey('user_id', $resultado);
+        $this->assertIsArray($resultado, '❌ Test #9 FALLÓ: resultado debe ser array');
+        $this->assertArrayHasKey('user_id', $resultado, '❌ Test #9 FALLÓ: resultado debe tener key "user_id"');
 
         $esperado = $user_id;
-        $this->assertEquals($esperado, $resultado['user_id']);
+        $this->assertEquals($esperado, $resultado['user_id'], '❌ Test #9 FALLÓ: user_id debe coincidir');
     }
 
     /**
@@ -71,11 +71,11 @@ class JWTServiceTest extends TestCase
         $token = JWTService::generateToken($user_id, $email);
         $resultado = JWTService::verifyToken($token);
 
-        $this->assertIsArray($resultado);
-        $this->assertArrayHasKey('email', $resultado);
+        $this->assertIsArray($resultado, '❌ Test #10 FALLÓ: resultado debe ser array');
+        $this->assertArrayHasKey('email', $resultado, '❌ Test #10 FALLÓ: resultado debe tener key "email"');
 
         $esperado = $email;
-        $this->assertEquals($esperado, $resultado['email']);
+        $this->assertEquals($esperado, $resultado['email'], '❌ Test #10 FALLÓ: email debe coincidir');
     }
 
     /**
@@ -98,18 +98,18 @@ class JWTServiceTest extends TestCase
         $payload = json_decode(base64_decode(strtr($partes[1], '-_', '+/')), true);
 
         // Verificar claims estándar
-        $this->assertArrayHasKey('iss', $payload);
-        $this->assertEquals('auth-service', $payload['iss']);
+        $this->assertArrayHasKey('iss', $payload, '❌ Test #11 FALLÓ: payload debe tener key "iss"');
+        $this->assertEquals('auth-service', $payload['iss'], '❌ Test #11 FALLÓ: issuer debe ser "auth-service"');
 
-        $this->assertArrayHasKey('iat', $payload);
-        $this->assertArrayHasKey('exp', $payload);
+        $this->assertArrayHasKey('iat', $payload, '❌ Test #11 FALLÓ: payload debe tener key "iat"');
+        $this->assertArrayHasKey('exp', $payload, '❌ Test #11 FALLÓ: payload debe tener key "exp"');
 
         // Verificar que exp es mayor que iat
-        $this->assertGreaterThan($payload['iat'], $payload['exp']);
+        $this->assertGreaterThan($payload['iat'], $payload['exp'], '❌ Test #11 FALLÓ: exp debe ser mayor que iat');
 
         // Verificar algoritmo en header
-        $this->assertArrayHasKey('alg', $header);
-        $this->assertEquals('HS256', $header['alg']);
+        $this->assertArrayHasKey('alg', $header, '❌ Test #11 FALLÓ: header debe tener key "alg"');
+        $this->assertEquals('HS256', $header['alg'], '❌ Test #11 FALLÓ: algoritmo debe ser HS256');
     }
 
     /**
@@ -129,13 +129,13 @@ class JWTServiceTest extends TestCase
         $token = JWTService::generateToken($user_id, $email);
         $resultado = JWTService::verifyToken($token);
 
-        $this->assertIsArray($resultado);
+        $this->assertIsArray($resultado, '❌ Test #12 FALLÓ: resultado debe ser array');
 
         $esperadoUserId = $user_id;
-        $this->assertEquals($esperadoUserId, $resultado['user_id']);
+        $this->assertEquals($esperadoUserId, $resultado['user_id'], '❌ Test #12 FALLÓ: user_id debe coincidir');
 
         $esperadoEmail = $email;
-        $this->assertEquals($esperadoEmail, $resultado['email']);
+        $this->assertEquals($esperadoEmail, $resultado['email'], '❌ Test #12 FALLÓ: email debe coincidir');
     }
 
     /**
@@ -145,6 +145,7 @@ class JWTServiceTest extends TestCase
      * - Eliminar putenv('JWT_EXPIRE=-1')
      * - El test fallará porque el token será válido y verifyToken retornará datos en lugar de false
      */
+    //importante "Prueba el manejo de expiración. Genera un token con expiración inmediata, espera 2 segundos, y verifica que se rechaza. Esto asegura que los tokens no sean válidos indefinidamente."
     public function testVerifyTokenReturnsFalseWithExpiredToken()
     {
         echo "Test #13: verifyToken() debe retornar false con token expirado\n";
@@ -172,7 +173,7 @@ class JWTServiceTest extends TestCase
         }
 
         $esperado = false;
-        $this->assertEquals($esperado, $resultado);
+        $this->assertEquals($esperado, $resultado, '❌ Test #13 FALLÓ: verifyToken debe retornar false para token expirado');
     }
 
     /**
@@ -191,7 +192,7 @@ class JWTServiceTest extends TestCase
         $resultado = JWTService::verifyToken($invalidToken);
 
         $esperado = false;
-        $this->assertEquals($esperado, $resultado);
+        $this->assertEquals($esperado, $resultado, '❌ Test #14 FALLÓ: verifyToken debe retornar false para token inválido');
     }
 
     /**
@@ -201,6 +202,7 @@ class JWTServiceTest extends TestCase
      * - No manipular el token (dejarlo válido)
      * - El test fallará porque verifyToken retornará datos en lugar de false
      */
+    //importante "Este test verifica que si alguien modifica un token, el sistema lo rechaza. Genera un token válido, cambia un carácter, y confirma que verifyToken retorna false. Esto protege contra manipulación de tokens."
     public function testVerifyTokenReturnsFalseWithTamperedToken()
     {
         echo "Test #15: verifyToken() debe retornar false con token manipulado\n";
@@ -216,7 +218,7 @@ class JWTServiceTest extends TestCase
         $resultado = JWTService::verifyToken($tokenManipulado);
 
         $esperado = false;
-        $this->assertEquals($esperado, $resultado);
+        $this->assertEquals($esperado, $resultado, '❌ Test #15 FALLÓ: verifyToken debe retornar false para token manipulado');
     }
 
     /**
@@ -232,13 +234,13 @@ class JWTServiceTest extends TestCase
 
         $resultado = JWTService::generateRefreshToken();
 
-        $this->assertIsString($resultado);
+        $this->assertIsString($resultado, '❌ Test #16 FALLÓ: refresh token debe ser string');
 
         $esperadoLongitud = 128; // 64 bytes * 2 caracteres por byte
-        $this->assertEquals($esperadoLongitud, strlen($resultado));
+        $this->assertEquals($esperadoLongitud, strlen($resultado), '❌ Test #16 FALLÓ: refresh token debe tener 128 caracteres');
 
         // Debe ser hexadecimal (solo contiene 0-9 y a-f)
-        $this->assertTrue(ctype_xdigit($resultado));
+        $this->assertTrue(ctype_xdigit($resultado), '❌ Test #16 FALLÓ: refresh token debe ser hexadecimal');
     }
 
     /**
@@ -274,6 +276,6 @@ class JWTServiceTest extends TestCase
         }
 
         $esperado = false;
-        $this->assertEquals($esperado, $resultado);
+        $this->assertEquals($esperado, $resultado, '❌ Test #17 FALLÓ: verifyToken debe retornar false con secret key incorrecta');
     }
 }

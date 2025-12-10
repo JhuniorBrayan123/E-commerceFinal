@@ -3,11 +3,13 @@ FROM python:3.11.4-slim
 WORKDIR /app
 
 # INSTALAR DEPENDENCIAS DEL SISTEMA PARA MYSQL
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     default-libmysqlclient-dev \
     build-essential \
     pkg-config \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
 # Copiar requirements primero para cachear dependencias
 COPY requirements.txt .

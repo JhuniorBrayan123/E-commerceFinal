@@ -72,9 +72,9 @@ class OrderViewTest(APITestCase):
         
         response = self.client.post('/api/orders/create/', data, format='json')
         
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertIn('error', response.data)
-        self.assertIn('Usuario no encontrado', response.data['error'])
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND, '❌ Test #75 FALLÓ: status_code debe ser 404 NOT_FOUND')
+        self.assertIn('error', response.data, '❌ Test #75 FALLÓ: response debe contener key "error"')
+        self.assertIn('Usuario no encontrado', response.data['error'], '❌ Test #75 FALLÓ: mensaje debe contener "Usuario no encontrado"')
 
     def test_rechaza_sensor_sin_stock(self):
         """
@@ -95,9 +95,9 @@ class OrderViewTest(APITestCase):
         
         response = self.client.post('/api/orders/create/', data, format='json')
         
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('error', response.data)
-        self.assertIn('Stock insuficiente', response.data['error'])
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST, '❌ Test #76 FALLÓ: status_code debe ser 400 BAD_REQUEST')
+        self.assertIn('error', response.data, '❌ Test #76 FALLÓ: response debe contener key "error"')
+        self.assertIn('Stock insuficiente', response.data['error'], '❌ Test #76 FALLÓ: mensaje debe contener "Stock insuficiente"')
 
     def test_crea_orden_con_datos_validos(self):
         """
@@ -118,15 +118,15 @@ class OrderViewTest(APITestCase):
         
         response = self.client.post('/api/orders/create/', data, format='json')
         
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertIn('id', response.data)
-        self.assertEqual(response.data['usuario'], self.user.id)
-        self.assertEqual(response.data['estado'], 'pendiente')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, '❌ Test #77 FALLÓ: status_code debe ser 201 CREATED')
+        self.assertIn('id', response.data, '❌ Test #77 FALLÓ: response debe contener key "id"')
+        self.assertEqual(response.data['usuario'], self.user.id, '❌ Test #77 FALLÓ: usuario debe coincidir')
+        self.assertEqual(response.data['estado'], 'pendiente', '❌ Test #77 FALLÓ: estado debe ser "pendiente"')
         
         # Verificar que la orden se creó en la base de datos
         orden = Orden.objects.get(id=response.data['id'])
-        self.assertEqual(orden.total, Decimal('190.00'))
-        self.assertEqual(orden.usuario, self.user)
+        self.assertEqual(orden.total, Decimal('190.00'), '❌ Test #77 FALLÓ: total debe ser 190.00')
+        self.assertEqual(orden.usuario, self.user, '❌ Test #77 FALLÓ: usuario de la orden debe coincidir')
 
     def test_mis_pedidos_retorna_ordenes_del_usuario(self):
         """
@@ -160,11 +160,11 @@ class OrderViewTest(APITestCase):
         # Obtener órdenes del primer usuario
         response = self.client.get(f'/api/mis-pedidos/?user_id={self.user.id}')
         
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIsInstance(response.data, list)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, '❌ Test #78 FALLÓ: status_code debe ser 200 OK')
+        self.assertIsInstance(response.data, list, '❌ Test #78 FALLÓ: response.data debe ser una lista')
         # Debe retornar solo la orden del usuario 1
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['id'], orden_user1.id)
+        self.assertEqual(len(response.data), 1, '❌ Test #78 FALLÓ: debe retornar solo 1 orden')
+        self.assertEqual(response.data[0]['id'], orden_user1.id, '❌ Test #78 FALLÓ: debe retornar la orden del usuario correcto')
         # No debe incluir la orden del otro usuario
         orden_ids = [orden['id'] for orden in response.data]
-        self.assertNotIn(orden_user2.id, orden_ids)
+        self.assertNotIn(orden_user2.id, orden_ids, '❌ Test #78 FALLÓ: no debe incluir órdenes de otros usuarios')

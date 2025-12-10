@@ -1,0 +1,17 @@
+target/
+!target/*.jar
+*.class
+*.log
+.git
+.gitignore
+*.md
+HELP.md
+compile-errors.txt
+.mvn/
+mvnw
+mvnw.cmd
+src/test/
+*.iml
+.idea/
+.vscode/
+

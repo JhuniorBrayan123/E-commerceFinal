@@ -62,12 +62,12 @@ const Checkout: React.FC<CheckoutProps> = ({ total, carrito, onPaymentSuccess })
           {carrito.map((item) => (
             <li key={item.id} className="flex justify-between py-1 border-b border-gray-200">
               <span>{item.nombre} x {item.cantidad}</span>
-              <span>${(item.precio * item.cantidad).toFixed(2)}</span>
+              <span>S/ {(item.precio * item.cantidad).toFixed(2)}</span>
             </li>
           ))}
         </ul>
         <div className="text-right font-bold text-xl text-primary-700">
-          Total: ${total.toFixed(2)}
+          Total: S/ {total.toFixed(2)}
         </div>
       </div>
 
@@ -139,7 +139,7 @@ const Checkout: React.FC<CheckoutProps> = ({ total, carrito, onPaymentSuccess })
           type="submit"
           className="w-full bg-primary-600 text-white py-3 rounded-lg font-semibold hover:bg-primary-700 transition"
         >
-          Pagar ${total.toFixed(2)}
+          Pagar S/ {total.toFixed(2)}
         </button>
       </form>
     </div>

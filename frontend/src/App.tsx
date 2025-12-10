@@ -5,6 +5,7 @@ import {
   Route,
   Navigate,
   useNavigate,
+  useLocation,
 } from "react-router-dom";
 import LoginModal from "./components/LoginModal";
 import PageTransition from "./components/PageTransition";
@@ -36,11 +37,14 @@ interface User {
   last_name: string;
 }
 
-function App() {
+// Componente interno que tiene acceso a useNavigate
+function AppContent() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [loginModalView, setLoginModalView] = useState<"login" | "register">("login");
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     checkAuth();
@@ -96,6 +100,9 @@ function App() {
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
     setUser(null);
+
+    // ← SOLUCIÓN: Redirigir a home después de logout
+    navigate("/");
   };
 
   const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -130,7 +137,7 @@ function App() {
   }
 
   return (
-    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <>
       {/* Login Modal */}
       <LoginModal
         isOpen={isLoginModalOpen}
@@ -286,6 +293,15 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </PageTransition>
+    </>
+  );
+}
+
+// Componente principal que envuelve con Router
+function App() {
+  return (
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <AppContent />
     </Router>
   );
 }

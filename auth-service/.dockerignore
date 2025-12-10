@@ -1,0 +1,10 @@
+vendor/
+.env
+.git
+.gitignore
+tests/
+phpunit.xml
+.phpunit.result.cache
+test_output.txt
+logs/
+README.md

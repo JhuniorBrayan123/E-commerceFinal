@@ -64,11 +64,11 @@ class StripeGatewayTest {
         PaymentResponse response = stripeGateway.processPayment(request);
 
         // Then
-        assertNotNull(response);
-        assertEquals("PAID", response.getStatus());
-        assertEquals(new BigDecimal("100.00"), response.getAmount());
-        assertEquals("stripe", response.getGateway());
-        assertTrue(response.getTransactionId().startsWith("stripe_tx_"));
+        assertNotNull(response, "❌ Test #36 FALLÓ: response no debe ser null");
+        assertEquals("PAID", response.getStatus(), "❌ Test #36 FALLÓ: status debe ser PAID");
+        assertEquals(new BigDecimal("100.00"), response.getAmount(), "❌ Test #36 FALLÓ: amount debe ser 100.00");
+        assertEquals("stripe", response.getGateway(), "❌ Test #36 FALLÓ: gateway debe ser stripe");
+        assertTrue(response.getTransactionId().startsWith("stripe_tx_"), "❌ Test #36 FALLÓ: transactionId debe empezar con stripe_tx_");
     }
 
     /**
@@ -88,10 +88,11 @@ class StripeGatewayTest {
 
         // When & Then
         PaymentException exception = assertThrows(PaymentException.class,
-                () -> stripeGateway.processPayment(request));
+                () -> stripeGateway.processPayment(request),
+                "❌ Test #37 FALLÓ: no lanzó la excepción esperada");
 
-        assertEquals("STRIPE_LIMIT", exception.getErrorCode());
-        assertEquals("Stripe rechazo el monto solicitado", exception.getMessage());
+        assertEquals("STRIPE_LIMIT", exception.getErrorCode(), "❌ Test #37 FALLÓ: errorCode debe ser STRIPE_LIMIT");
+        assertEquals("Stripe rechazo el monto solicitado", exception.getMessage(), "❌ Test #37 FALLÓ: mensaje de excepción incorrecto");
     }
 
     /**
@@ -114,8 +115,8 @@ class StripeGatewayTest {
         PaymentResponse response = stripeGateway.processPayment(request);
 
         // Then
-        assertNotNull(response.getTransactionId());
-        assertTrue(response.getTransactionId().startsWith("stripe_tx_"));
+        assertNotNull(response.getTransactionId(), "❌ Test #38 FALLÓ: transactionId no debe ser null");
+        assertTrue(response.getTransactionId().startsWith("stripe_tx_"), "❌ Test #38 FALLÓ: transactionId debe empezar con stripe_tx_");
     }
 
     /**
@@ -137,9 +138,9 @@ class StripeGatewayTest {
         PaymentResponse response = stripeGateway.processPayment(request);
 
         // Then
-        assertNotNull(response);
-        assertEquals("PAID", response.getStatus());
-        assertEquals(new BigDecimal("5000.00"), response.getAmount());
+        assertNotNull(response, "❌ Test #39 FALLÓ: response no debe ser null");
+        assertEquals("PAID", response.getStatus(), "❌ Test #39 FALLÓ: status debe ser PAID");
+        assertEquals(new BigDecimal("5000.00"), response.getAmount(), "❌ Test #39 FALLÓ: amount debe ser 5000.00");
     }
 
     /**
@@ -161,10 +162,10 @@ class StripeGatewayTest {
         PaymentResponse response = stripeGateway.processRefund(request);
 
         // Then
-        assertNotNull(response);
-        assertEquals("REFUNDED", response.getStatus());
-        assertEquals(new BigDecimal("100.00"), response.getAmount());
-        assertEquals("stripe", response.getGateway());
+        assertNotNull(response, "❌ Test #40 FALLÓ: response no debe ser null");
+        assertEquals("REFUNDED", response.getStatus(), "❌ Test #40 FALLÓ: status debe ser REFUNDED");
+        assertEquals(new BigDecimal("100.00"), response.getAmount(), "❌ Test #40 FALLÓ: amount debe ser 100.00");
+        assertEquals("stripe", response.getGateway(), "❌ Test #40 FALLÓ: gateway debe ser stripe");
     }
 
     /**
@@ -187,8 +188,8 @@ class StripeGatewayTest {
         PaymentResponse response = stripeGateway.processRefund(request);
 
         // Then
-        assertNotNull(response.getTransactionId());
-        assertTrue(response.getTransactionId().startsWith("stripe_refund_"));
+        assertNotNull(response.getTransactionId(), "❌ Test #41 FALLÓ: transactionId no debe ser null");
+        assertTrue(response.getTransactionId().startsWith("stripe_refund_"), "❌ Test #41 FALLÓ: transactionId debe empezar con stripe_refund_");
     }
 
     /**
@@ -212,7 +213,7 @@ class StripeGatewayTest {
         boolean isValid = stripeGateway.validateWebhook(payload, signature);
 
         // Then
-        assertTrue(isValid);
+        assertTrue(isValid, "❌ Test #42 FALLÓ: validateWebhook debe retornar true con signature válida");
     }
 
     /**
@@ -259,7 +260,7 @@ class StripeGatewayTest {
         boolean isValid = stripeGateway.validateWebhook(payload, signature);
 
         // Then
-        assertFalse(isValid);
+        assertFalse(isValid, "❌ Test #44 FALLÓ: validateWebhook debe retornar false cuando signature no empieza con whsec");
     }
 
     /**
@@ -282,7 +283,7 @@ class StripeGatewayTest {
         boolean isValid = stripeGateway.validateWebhook(payload, signature);
 
         // Then
-        assertFalse(isValid);
+        assertFalse(isValid, "❌ Test #45 FALLÓ: validateWebhook debe retornar false cuando signature está vacía");
     }
 
     /**
@@ -301,7 +302,7 @@ class StripeGatewayTest {
         String gatewayName = stripeGateway.getGatewayName();
 
         // Then
-        assertEquals("stripe", gatewayName);
+        assertEquals("stripe", gatewayName, "❌ Test #46 FALLÓ: gatewayName debe ser stripe");
     }
 
     /**
@@ -324,9 +325,9 @@ class StripeGatewayTest {
         PaymentResponse response = stripeGateway.processPayment(request);
 
         // Then
-        assertNotNull(response);
-        assertEquals("PAID", response.getStatus());
-        assertEquals(new BigDecimal("-100.00"), response.getAmount());
+        assertNotNull(response, "❌ Test #47 FALLÓ: response no debe ser null");
+        assertEquals("PAID", response.getStatus(), "❌ Test #47 FALLÓ: status debe ser PAID");
+        assertEquals(new BigDecimal("-100.00"), response.getAmount(), "❌ Test #47 FALLÓ: amount debe ser -100.00");
     }
 
     /**
@@ -349,10 +350,10 @@ class StripeGatewayTest {
         PaymentResponse response = stripeGateway.processPayment(request);
 
         // Then
-        assertNotNull(response);
-        assertEquals("PAID", response.getStatus());
-        assertEquals(new BigDecimal("100.00"), response.getAmount());
-        assertEquals(Payment.Currency.PEN, request.getCurrency());
+        assertNotNull(response, "❌ Test #48 FALLÓ: response no debe ser null");
+        assertEquals("PAID", response.getStatus(), "❌ Test #48 FALLÓ: status debe ser PAID");
+        assertEquals(new BigDecimal("100.00"), response.getAmount(), "❌ Test #48 FALLÓ: amount debe ser 100.00");
+        assertEquals(Payment.Currency.PEN, request.getCurrency(), "❌ Test #48 FALLÓ: currency debe ser PEN");
     }
 
     // Métodos helper para crear objetos de prueba

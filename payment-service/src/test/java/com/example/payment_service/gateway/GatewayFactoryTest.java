@@ -46,8 +46,8 @@ class GatewayFactoryTest {
         PaymentGateway result = gatewayFactory.getGateway(Payment.PaymentMethod.STRIPE);
 
         // Then
-        assertNotNull(result);
-        assertEquals(stripeGateway, result);
+        assertNotNull(result, "❌ Test #59 FALLÓ: result no debe ser null");
+        assertEquals(stripeGateway, result, "❌ Test #59 FALLÓ: debe retornar StripeGateway");
         System.out.println("PASÓ: Retornó StripeGateway correctamente");
     }
 
@@ -67,8 +67,8 @@ class GatewayFactoryTest {
         PaymentGateway result = gatewayFactory.getGateway(Payment.PaymentMethod.YAPE);
 
         // Then
-        assertNotNull(result);
-        assertEquals(yapeGateway, result);
+        assertNotNull(result, "❌ Test #60 FALLÓ: result no debe ser null");
+        assertEquals(yapeGateway, result, "❌ Test #60 FALLÓ: debe retornar YapeGateway");
         System.out.println(" PASÓ: Retornó YapeGateway correctamente");
     }
 
@@ -88,8 +88,8 @@ class GatewayFactoryTest {
         PaymentGateway result = gatewayFactory.getGateway(Payment.PaymentMethod.PAYPAL);
 
         // Then
-        assertNotNull(result);
-        assertEquals(paypalGateway, result);
+        assertNotNull(result, "❌ Test #61 FALLÓ: result no debe ser null");
+        assertEquals(paypalGateway, result, "❌ Test #61 FALLÓ: debe retornar PaypalGateway");
         System.out.println("PASÓ: Retornó PaypalGateway correctamente");
     }
 
@@ -115,9 +115,9 @@ class GatewayFactoryTest {
 
         // Verificamos que al menos los casos conocidos funcionan
         assertAll(
-                () -> assertNotNull(gatewayFactory.getGateway(Payment.PaymentMethod.STRIPE)),
-                () -> assertNotNull(gatewayFactory.getGateway(Payment.PaymentMethod.YAPE)),
-                () -> assertNotNull(gatewayFactory.getGateway(Payment.PaymentMethod.PAYPAL)));
+                () -> assertNotNull(gatewayFactory.getGateway(Payment.PaymentMethod.STRIPE), "❌ Test #62 FALLÓ: STRIPE gateway no debe ser null"),
+                () -> assertNotNull(gatewayFactory.getGateway(Payment.PaymentMethod.YAPE), "❌ Test #62 FALLÓ: YAPE gateway no debe ser null"),
+                () -> assertNotNull(gatewayFactory.getGateway(Payment.PaymentMethod.PAYPAL), "❌ Test #62 FALLÓ: PAYPAL gateway no debe ser null"));
 
         System.out.println(" PASÓ: Todos los métodos soportados funcionan correctamente");
     }

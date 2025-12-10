@@ -29,7 +29,7 @@ class PasswordServiceTest extends TestCase
 
         $resultado = $this->passService->validatePassword("Ab1!");
         $esperado = ["La contraseña debe tener al menos 8 caracteres"];
-        $this->assertEquals($esperado, $resultado);
+        $this->assertEquals($esperado, $resultado, '❌ Test #18 FALLÓ: debe rechazar contraseña muy corta');
     }
 
     /**
@@ -45,7 +45,7 @@ class PasswordServiceTest extends TestCase
 
         $resultado = $this->passService->validatePassword("abcdefg1!");
         $esperado = ["La contraseña debe contener al menos una letra mayúscula"];
-        $this->assertEquals($esperado, $resultado);
+        $this->assertEquals($esperado, $resultado, '❌ Test #19 FALLÓ: debe rechazar contraseña sin mayúscula');
     }
 
     /**
@@ -61,7 +61,7 @@ class PasswordServiceTest extends TestCase
 
         $resultado = $this->passService->validatePassword("ABCDEFG1!");
         $esperado = ["La contraseña debe contener al menos una letra minúscula"];
-        $this->assertEquals($esperado, $resultado);
+        $this->assertEquals($esperado, $resultado, '❌ Test #20 FALLÓ: debe rechazar contraseña sin minúscula');
     }
 
     /**
@@ -77,7 +77,7 @@ class PasswordServiceTest extends TestCase
 
         $resultado = $this->passService->validatePassword("Abcdefgh!");
         $esperado = ["La contraseña debe contener al menos un número"];
-        $this->assertEquals($esperado, $resultado);
+        $this->assertEquals($esperado, $resultado, '❌ Test #21 FALLÓ: debe rechazar contraseña sin número');
     }
 
     /**
@@ -93,7 +93,7 @@ class PasswordServiceTest extends TestCase
 
         $resultado = $this->passService->validatePassword("Abcdefg1");
         $esperado = ["La contraseña debe contener al menos un carácter especial"];
-        $this->assertEquals($esperado, $resultado);
+        $this->assertEquals($esperado, $resultado, '❌ Test #22 FALLÓ: debe rechazar contraseña sin carácter especial');
     }
 
     /**
@@ -109,7 +109,7 @@ class PasswordServiceTest extends TestCase
 
         $resultado = $this->passService->validatePassword("Abcdefg1!");
         $esperado = [];
-        $this->assertEquals($esperado, $resultado);
+        $this->assertEquals($esperado, $resultado, '❌ Test #23 FALLÓ: debe aceptar contraseña válida');
     }
 
 
@@ -129,9 +129,9 @@ class PasswordServiceTest extends TestCase
         $hash = $this->passService->hashPassword($password);
 
         // Verificamos que el hash no sea falso ni vacío
-        $this->assertNotFalse($hash);
-        $this->assertNotEmpty($hash);
-        $this->assertIsString($hash);
+        $this->assertNotFalse($hash, '❌ Test #24 FALLÓ: hash no debe ser false');
+        $this->assertNotEmpty($hash, '❌ Test #24 FALLÓ: hash no debe estar vacío');
+        $this->assertIsString($hash, '❌ Test #24 FALLÓ: hash debe ser string');
     }
 
 
@@ -152,7 +152,7 @@ class PasswordServiceTest extends TestCase
         $respuesta = $this->passService->verifyPassword($password, $hash);
 
         // Verificamos que verifyPassword retorne true con el password correcto
-        $this->assertTrue($respuesta);
+        $this->assertTrue($respuesta, '❌ Test #25 FALLÓ: verifyPassword debe retornar true con contraseña correcta');
     }
 
     /**
@@ -171,7 +171,7 @@ class PasswordServiceTest extends TestCase
         $hash =  $this->passService->hashPassword($password);
         $respuesta = $this->passService->verifyPassword($passwordWrong, $hash);
 
-        // Verificamos que verifyPassword retorne true con el password correcto
-        $this->assertFalse($respuesta);
+        // Verificamos que verifyPassword retorne false con el password incorrecto
+        $this->assertFalse($respuesta, '❌ Test #26 FALLÓ: verifyPassword debe retornar false con contraseña incorrecta');
     }
 }

@@ -21,7 +21,8 @@ class AuthControllerTest extends TestCase
      * CÓMO HACER FALLAR ESTE TEST:
      * - Cambiar 'email-invalido-sin-arroba' por 'valid@email.com'
      * - El test fallará porque el email será válido y no será rechazado
-     */
+     */ 
+    //bueno esto es nuevo   
     public function testRegisterRechazaEmailInvalido()
     {
         echo "Test #1: register() debe rechazar email inválido\n";
@@ -38,8 +39,8 @@ class AuthControllerTest extends TestCase
         $resultado = $this->authController->register();
         $data = json_decode($resultado, true);
 
-        $this->assertFalse($data['success']);
-        $this->assertEquals('Email no válido', $data['message']);
+        $this->assertFalse($data['success'], '❌ Test #1 FALLÓ: success debe ser false para email inválido');
+        $this->assertEquals('Email no válido', $data['message'], '❌ Test #1 FALLÓ: mensaje debe ser "Email no válido"');
     }
 
     /**
@@ -68,7 +69,7 @@ class AuthControllerTest extends TestCase
         $data1 = json_decode($resultado1, true);
 
         // Verificar que el primer registro fue exitoso
-        $this->assertTrue($data1['success']);
+        $this->assertTrue($data1['success'], '❌ Test #2 FALLÓ: primer registro debe ser exitoso');
 
         // SEGUNDO: Intentar registrar el mismo email
         $input2 = json_encode([
@@ -83,8 +84,8 @@ class AuthControllerTest extends TestCase
         $data2 = json_decode($resultado2, true);
 
         // Verificar que el segundo registro falla por duplicado
-        $this->assertFalse($data2['success']);
-        $this->assertEquals('El usuario ya existe', $data2['message']);
+        $this->assertFalse($data2['success'], '❌ Test #2 FALLÓ: segundo registro debe fallar por usuario duplicado');
+        $this->assertEquals('El usuario ya existe', $data2['message'], '❌ Test #2 FALLÓ: mensaje debe ser "El usuario ya existe"');
     }
 
     /**
@@ -108,8 +109,8 @@ class AuthControllerTest extends TestCase
         $resultado = $this->authController->login();
         $data = json_decode($resultado, true);
 
-        $this->assertFalse($data['success']);
-        $this->assertEquals('Credenciales inválidas', $data['message']);
+        $this->assertFalse($data['success'], '❌ Test #3 FALLÓ: success debe ser false para credenciales inválidas');
+        $this->assertEquals('Credenciales inválidas', $data['message'], '❌ Test #3 FALLÓ: mensaje debe ser "Credenciales inválidas"');
     }
 
     /**
@@ -138,8 +139,8 @@ class AuthControllerTest extends TestCase
         $resultado = $this->authController->login();
         $data = json_decode($resultado, true);
 
-        $this->assertFalse($data['success']);
-        $this->assertEquals('Usuario desactivado', $data['message']);
+        $this->assertFalse($data['success'], '❌ Test #4 FALLÓ: success debe ser false para usuario inactivo');
+        $this->assertEquals('Usuario desactivado', $data['message'], '❌ Test #4 FALLÓ: mensaje debe ser "Usuario desactivado"');
     }
 
     /**
@@ -168,7 +169,7 @@ class AuthControllerTest extends TestCase
         $resultadoRegistro = $this->authController->register();
         $dataRegistro = json_decode($resultadoRegistro, true);
 
-        $this->assertTrue($dataRegistro['success']);
+        $this->assertTrue($dataRegistro['success'], '❌ Test #5 FALLÓ: registro debe ser exitoso');
 
         // SEGUNDO: Hacer login
         $inputLogin = json_encode([
@@ -180,11 +181,11 @@ class AuthControllerTest extends TestCase
         $resultadoLogin = $this->authController->login();
         $dataLogin = json_decode($resultadoLogin, true);
 
-        $this->assertTrue($dataLogin['success']);
-        $this->assertArrayHasKey('access_token', $dataLogin['data']['tokens']);
-        $this->assertArrayHasKey('refresh_token', $dataLogin['data']['tokens']);
-        $this->assertNotEmpty($dataLogin['data']['tokens']['access_token']);
-        $this->assertNotEmpty($dataLogin['data']['tokens']['refresh_token']);
+        $this->assertTrue($dataLogin['success'], '❌ Test #5 FALLÓ: login debe ser exitoso');
+        $this->assertArrayHasKey('access_token', $dataLogin['data']['tokens'], '❌ Test #5 FALLÓ: debe tener access_token');
+        $this->assertArrayHasKey('refresh_token', $dataLogin['data']['tokens'], '❌ Test #5 FALLÓ: debe tener refresh_token');
+        $this->assertNotEmpty($dataLogin['data']['tokens']['access_token'], '❌ Test #5 FALLÓ: access_token no debe estar vacío');
+        $this->assertNotEmpty($dataLogin['data']['tokens']['refresh_token'], '❌ Test #5 FALLÓ: refresh_token no debe estar vacío');
     }
 
     /**
@@ -212,12 +213,12 @@ class AuthControllerTest extends TestCase
         $resultado = $this->authController->register();
         $data = json_decode($resultado, true);
 
-        $this->assertTrue($data['success']);
-        $this->assertEquals('Usuario registrado exitosamente', $data['message']);
-        $this->assertArrayHasKey('user', $data['data']);
-        $this->assertEquals($email, $data['data']['user']['email']);
-        $this->assertEquals('Juan', $data['data']['user']['first_name']);
-        $this->assertEquals('Pérez', $data['data']['user']['last_name']);
+        $this->assertTrue($data['success'], '❌ Test #6 FALLÓ: registro debe ser exitoso');
+        $this->assertEquals('Usuario registrado exitosamente', $data['message'], '❌ Test #6 FALLÓ: mensaje debe ser "Usuario registrado exitosamente"');
+        $this->assertArrayHasKey('user', $data['data'], '❌ Test #6 FALLÓ: debe tener key "user" en data');
+        $this->assertEquals($email, $data['data']['user']['email'], '❌ Test #6 FALLÓ: email del usuario debe coincidir');
+        $this->assertEquals('Juan', $data['data']['user']['first_name'], '❌ Test #6 FALLÓ: first_name debe ser "Juan"');
+        $this->assertEquals('Pérez', $data['data']['user']['last_name'], '❌ Test #6 FALLÓ: last_name debe ser "Pérez"');
     }
 
     /**
@@ -247,7 +248,7 @@ class AuthControllerTest extends TestCase
         $dataRegistro = json_decode($resultadoRegistro, true);
 
         $userIdRegistro = $dataRegistro['data']['user']['id'];
-        $this->assertTrue($dataRegistro['success']);
+        $this->assertTrue($dataRegistro['success'], '❌ Test #7 FALLÓ: registro debe ser exitoso');
 
         // Hacer login
         $inputLogin = json_encode([
@@ -259,10 +260,10 @@ class AuthControllerTest extends TestCase
         $resultadoLogin = $this->authController->login();
         $dataLogin = json_decode($resultadoLogin, true);
 
-        $this->assertTrue($dataLogin['success']);
-        $this->assertArrayHasKey('user', $dataLogin['data']);
-        $this->assertArrayHasKey('id', $dataLogin['data']['user']);
-        $this->assertEquals($userIdRegistro, $dataLogin['data']['user']['id']);
+        $this->assertTrue($dataLogin['success'], '❌ Test #7 FALLÓ: login debe ser exitoso');
+        $this->assertArrayHasKey('user', $dataLogin['data'], '❌ Test #7 FALLÓ: debe tener key "user" en data');
+        $this->assertArrayHasKey('id', $dataLogin['data']['user'], '❌ Test #7 FALLÓ: user debe tener key "id"');
+        $this->assertEquals($userIdRegistro, $dataLogin['data']['user']['id'], '❌ Test #7 FALLÓ: user_id debe coincidir con el del registro');
     }
 
     /**

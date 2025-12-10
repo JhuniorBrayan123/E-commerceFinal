@@ -59,11 +59,11 @@ class ComentarioViewTest(APITestCase):
         response = self.client.post('/api/comentarios/', data, format='json')
         
         # Verificar que se creó correctamente
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, '❌ Test #27 FALLÓ: status_code debe ser 201 CREATED')
         
         # Verificar que el comentario está asociado al usuario correcto
         comentario = Comentario.objects.get(id=response.data['id'])
-        self.assertEqual(comentario.usuario, self.user)
+        self.assertEqual(comentario.usuario, self.user, '❌ Test #27 FALLÓ: comentario debe estar asociado al usuario autenticado')
 
     def test_get_queryset_filtra_por_sensor_id(self):
         """
@@ -102,13 +102,13 @@ class ComentarioViewTest(APITestCase):
         # Filtrar por sensor 1
         response = self.client.get(f'/api/comentarios/?sensor_id={self.sensor.id}')
         
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, '❌ Test #28 FALLÓ: status_code debe ser 200 OK')
         
         # La respuesta es paginada, los datos están en 'results'
-        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['count'], 1, '❌ Test #28 FALLÓ: debe retornar solo 1 comentario')
         comentario_ids = [c['id'] for c in response.data['results']]
-        self.assertIn(comentario1.id, comentario_ids)
-        self.assertNotIn(comentario2.id, comentario_ids)
+        self.assertIn(comentario1.id, comentario_ids, '❌ Test #28 FALLÓ: debe incluir comentario del sensor filtrado')
+        self.assertNotIn(comentario2.id, comentario_ids, '❌ Test #28 FALLÓ: no debe incluir comentarios de otros sensores')
 
     def test_get_queryset_ordena_por_fecha_creacion_desc(self):
         """
@@ -135,14 +135,14 @@ class ComentarioViewTest(APITestCase):
         # Obtener comentarios (deben estar ordenados por fecha desc)
         response = self.client.get(f'/api/comentarios/?sensor_id={self.sensor.id}')
         
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, '❌ Test #29 FALLÓ: status_code debe ser 200 OK')
         
         # La respuesta es paginada, los datos están en 'results'
-        self.assertEqual(response.data['count'], 2)
+        self.assertEqual(response.data['count'], 2, '❌ Test #29 FALLÓ: debe retornar 2 comentarios')
         results = response.data['results']
-        self.assertGreaterEqual(len(results), 2)
+        self.assertGreaterEqual(len(results), 2, '❌ Test #29 FALLÓ: results debe tener al menos 2 elementos')
         
         # El primer comentario debe ser el más reciente
-        self.assertEqual(results[0]['id'], comentario_nuevo.id)
+        self.assertEqual(results[0]['id'], comentario_nuevo.id, '❌ Test #29 FALLÓ: primer comentario debe ser el más reciente')
         # El segundo debe ser el más antiguo
-        self.assertEqual(results[1]['id'], comentario_antiguo.id)
+        self.assertEqual(results[1]['id'], comentario_antiguo.id, '❌ Test #29 FALLÓ: segundo comentario debe ser el más antiguo')

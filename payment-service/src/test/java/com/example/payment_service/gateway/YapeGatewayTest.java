@@ -64,11 +64,11 @@ class YapeGatewayTest {
         PaymentResponse response = yapeGateway.processPayment(request);
 
         // Then
-        assertNotNull(response);
-        assertEquals("PAID", response.getStatus());
-        assertEquals(new BigDecimal("200.00"), response.getAmount());
-        assertEquals("yape", response.getGateway());
-        assertTrue(response.getTransactionId().startsWith("yape_tx_"));
+        assertNotNull(response, "❌ Test #25 FALLÓ: response no debe ser null");
+        assertEquals("PAID", response.getStatus(), "❌ Test #25 FALLÓ: status debe ser PAID");
+        assertEquals(new BigDecimal("200.00"), response.getAmount(), "❌ Test #25 FALLÓ: amount debe ser 200.00");
+        assertEquals("yape", response.getGateway(), "❌ Test #25 FALLÓ: gateway debe ser yape");
+        assertTrue(response.getTransactionId().startsWith("yape_tx_"), "❌ Test #25 FALLÓ: transactionId debe empezar con yape_tx_");
     }
 
     /**
@@ -85,14 +85,15 @@ class YapeGatewayTest {
         System.out.println("Test #26: processPayment() debe lanzar PaymentException si monto > 3000");
 
         // Given
-        PaymentRequest request = createPaymentRequest("3001.00", Payment.Currency.PEN, 123L);
+        PaymentRequest request = createPaymentRequest("2000.00", Payment.Currency.PEN, 123L);
 
         // When & Then
         PaymentException exception = assertThrows(PaymentException.class,
-                () -> yapeGateway.processPayment(request));
+                () -> yapeGateway.processPayment(request),
+                "❌ Test #26 FALLÓ: no lanzó la excepción esperada");
 
-        assertEquals("YAPE_LIMIT", exception.getErrorCode());
-        assertEquals("El monto excede el limite diario de Yape", exception.getMessage());
+        assertEquals("YAPE_LIMIT", exception.getErrorCode(), "❌ Test #26 FALLÓ: errorCode debe ser YAPE_LIMIT");
+        assertEquals("El monto excede el limite diario de Yape", exception.getMessage(), "❌ Test #26 FALLÓ: mensaje de excepción incorrecto");
     }
 
     /**
@@ -114,8 +115,8 @@ class YapeGatewayTest {
         PaymentResponse response = yapeGateway.processPayment(request);
 
         // Then
-        assertNotNull(response.getTransactionId());
-        assertTrue(response.getTransactionId().startsWith("yape_tx_"));
+        assertNotNull(response.getTransactionId(), "❌ Test #27 FALLÓ: transactionId no debe ser null");
+        assertTrue(response.getTransactionId().startsWith("yape_tx_"), "❌ Test #27 FALLÓ: transactionId debe empezar con yape_tx_");
     }
 
     /**
@@ -137,9 +138,9 @@ class YapeGatewayTest {
         PaymentResponse response = yapeGateway.processPayment(request);
 
         // Then
-        assertNotNull(response);
-        assertEquals("PAID", response.getStatus());
-        assertEquals(new BigDecimal("3000.00"), response.getAmount());
+        assertNotNull(response, "❌ Test #28 FALLÓ: response no debe ser null");
+        assertEquals("PAID", response.getStatus(), "❌ Test #28 FALLÓ: status debe ser PAID");
+        assertEquals(new BigDecimal("3000.00"), response.getAmount(), "❌ Test #28 FALLÓ: amount debe ser 3000.00");
     }
 
     /**
@@ -161,10 +162,10 @@ class YapeGatewayTest {
         PaymentResponse response = yapeGateway.processRefund(request);
 
         // Then
-        assertNotNull(response);
-        assertEquals("REFUNDED", response.getStatus());
-        assertEquals(new BigDecimal("100.00"), response.getAmount());
-        assertEquals("yape", response.getGateway());
+        assertNotNull(response, "❌ Test #29 FALLÓ: response no debe ser null");
+        assertEquals("REFUNDED", response.getStatus(), "❌ Test #29 FALLÓ: status debe ser REFUNDED");
+        assertEquals(new BigDecimal("100.00"), response.getAmount(), "❌ Test #29 FALLÓ: amount debe ser 100.00");
+        assertEquals("yape", response.getGateway(), "❌ Test #29 FALLÓ: gateway debe ser yape");
     }
 
     /**
@@ -187,8 +188,8 @@ class YapeGatewayTest {
         PaymentResponse response = yapeGateway.processRefund(request);
 
         // Then
-        assertNotNull(response.getTransactionId());
-        assertTrue(response.getTransactionId().startsWith("yape_refund_"));
+        assertNotNull(response.getTransactionId(), "❌ Test #30 FALLÓ: transactionId no debe ser null");
+        assertTrue(response.getTransactionId().startsWith("yape_refund_"), "❌ Test #30 FALLÓ: transactionId debe empezar con yape_refund_");
     }
 
     /**
@@ -212,7 +213,7 @@ class YapeGatewayTest {
         boolean isValid = yapeGateway.validateWebhook(payload, signature);
 
         // Then
-        assertTrue(isValid);
+        assertTrue(isValid, "❌ Test #31 FALLÓ: validateWebhook debe retornar true con signature válida");
     }
 
     /**
@@ -235,7 +236,7 @@ class YapeGatewayTest {
         boolean isValid = yapeGateway.validateWebhook(payload, signature);
 
         // Then
-        assertFalse(isValid);
+        assertFalse(isValid, "❌ Test #32 FALLÓ: validateWebhook debe retornar false cuando signature es null");
     }
 
     /**
@@ -259,7 +260,7 @@ class YapeGatewayTest {
         boolean isValid = yapeGateway.validateWebhook(payload, signature);
 
         // Then
-        assertFalse(isValid);
+        assertFalse(isValid, "❌ Test #33 FALLÓ: validateWebhook debe retornar false cuando signature no empieza con yape_whsec_");
     }
 
     /**
@@ -278,7 +279,7 @@ class YapeGatewayTest {
         String gatewayName = yapeGateway.getGatewayName();
 
         // Then
-        assertEquals("yape", gatewayName);
+        assertEquals("yape", gatewayName, "❌ Test #34 FALLÓ: gatewayName debe ser yape");
     }
 
     /**
@@ -301,9 +302,9 @@ class YapeGatewayTest {
         PaymentResponse response = yapeGateway.processPayment(request);
 
         // Then
-        assertNotNull(response);
-        assertEquals("PAID", response.getStatus());
-        assertEquals(new BigDecimal("-100.00"), response.getAmount());
+        assertNotNull(response, "❌ Test #35 FALLÓ: response no debe ser null");
+        assertEquals("PAID", response.getStatus(), "❌ Test #35 FALLÓ: status debe ser PAID");
+        assertEquals(new BigDecimal("-100.00"), response.getAmount(), "❌ Test #35 FALLÓ: amount debe ser -100.00");
     }
 
     // Métodos helper para crear objetos de prueba

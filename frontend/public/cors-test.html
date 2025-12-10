@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Diagnostic Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: # #f0f0f0;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔍 CORS Diagnostic Test for Auth Service</h1>
+    <p>This page tests the connection to <code>http://localhost:8081/api</code> from <code>http://localhost:3000</code>
+        origin.</p>
+
+    <div>
+        <button onclick="testPreflight()">1. Test CORS Preflight (OPTIONS)</button>
+        <button onclick="testLogin()">2. Test Login Request (POST)</button>
+        <button onclick="testRegister()">3. Test Register Request (POST)</button>
+    </div>
+
+    <div id="result" class="result"></div>
+
+    <script>
+        const API_URL = 'http://localhost:8081/api';
+        const resultDiv = document.getElementById('result');
+
+        function log(message, isError = false) {
+            console.log(message);
+            resultDiv.className = `result ${isError ? 'error' : 'success'}`;
+            resultDiv.textContent += message + '\n';
+        }
+
+        function clearLog() {
+            resultDiv.textContent = '';
+            resultDiv.className = 'result';
+        }
+
+        async function testPreflight() {
+            clearLog();
+            log('🔄 Testing CORS Preflight Request...\n');
+
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Origin': window.location.origin,
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'Content-Type'
+                    }
+                });
+
+                log(`✅ Preflight Response Status: ${response.status}`);
+                log(`\n📋 Response Headers:`);
+                response.headers.forEach((value, key) => {
+                    log(`  ${key}: ${value}`);
+                });
+
+            } catch (error) {
+                log(`❌ CORS Preflight FAILED!`, true);
+                log(`Error: ${error.message}`, true);
+                log(`\nThis means the browser blocked the request before it could complete.`, true);
+                log(`The auth-service is either not responding or not sending correct CORS headers.`, true);
+            }
+        }
+
+        async function testLogin() {
+            clearLog();
+            log('🔄 Testing Login POST Request...\n');
+
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        password: 'test123'
+                    })
+                });
+
+                log(`✅ Request Status: ${response.status}`);
+
+                const responseText = await response.text();
+                log(`\n📋 Response Body:`);
+                log(responseText);
+
+                log(`\n📋 Response Headers:`);
+                response.headers.forEach((value, key) => {
+                    log(`  ${key}: ${value}`);
+                });
+
+            } catch (error) {
+                log(`❌ Login Request FAILED!`, true);
+                log(`Error: ${error.message}`, true);
+                log(`\nPossible causes:`, true);
+                log(`1. CORS headers not configured correctly`, true);
+                log(`2. auth-service container is not running`, true);
+                log(`3. Network connectivity issue`, true);
+            }
+        }
+
+        async function testRegister() {
+            clearLog();
+            log('🔄 Testing Register POST Request...\n');
+
+            try {
+                const response = await fetch(`${API_URL}/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'testcors@example.com',
+                        password: 'test123',
+                        first_name: 'Test',
+                        last_name: 'CORS'
+                    })
+                });
+
+                log(`✅ Request Status: ${response.status}`);
+
+                const responseText = await response.text();
+                log(`\n📋 Response Body:`);
+                log(responseText);
+
+                log(`\n📋 Response Headers:`);
+                response.headers.forEach((value, key) => {
+                    log(`  ${key}: ${value}`);
+                });
+
+            } catch (error) {
+                log(`❌ Register Request FAILED!`, true);
+                log(`Error: ${error.message}`, true);
+            }
+        }
+
+        // Auto-run preflight test on load
+        window.addEventListener('load', () => {
+            log('📍 Current Origin: ' + window.location.origin);
+            log('🎯 Target API: ' + API_URL);
+            log('\n👉 Click a button above to test the connection.\n');
+        });
+    </script>
+</body>
+
+</html>

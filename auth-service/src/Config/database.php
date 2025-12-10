@@ -31,7 +31,9 @@ class Database
                 ]
             );
         } catch (PDOException $exception) {
-            echo "Error de conexión: " . $exception->getMessage();
+            error_log("Error de conexión a la base de datos: " . $exception->getMessage());
+            // No hacer echo aquí porque puede interferir con las respuestas JSON
+            throw new Exception("Error de conexión a la base de datos: " . $exception->getMessage());
         }
 
         return $this->conn;

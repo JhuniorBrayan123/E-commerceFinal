@@ -33,15 +33,41 @@ export interface AuthResponse {
 
 export const authService = {
   async login(loginData: LoginData): Promise<AuthResponse> {
-    const response = await fetch(`${API_BASE_URL}/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(loginData),
-    });
+    try {
+      const response = await fetch(`${API_BASE_URL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginData),
+      });
 
-    return await response.json();
+      if (!response.ok) {
+        // Si la respuesta no es OK, intentar parsear el JSON de error
+        try {
+          const errorData = await response.json();
+          return {
+            success: false,
+            message: errorData.message || `Error ${response.status}: ${response.statusText}`,
+          };
+        } catch {
+          return {
+            success: false,
+            message: `Error ${response.status}: ${response.statusText}`,
+          };
+        }
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error: any) {
+      // Capturar errores de red (CORS, conexión, etc.)
+      console.error("Error de red en login:", error);
+      return {
+        success: false,
+        message: error.message || "Error de conexión. Verifica que el servidor esté corriendo.",
+      };
+    }
   },
 
   async register(registerData: RegisterData): Promise<AuthResponse> {

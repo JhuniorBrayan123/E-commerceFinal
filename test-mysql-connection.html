@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Conexión - Auth Service</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>🔐 Prueba de Registro - Auth Service</h2>
+        <p style="color: #666;">Esta prueba creará un usuario en MySQL local a través del auth-service</p>
+
+        <div class="form-group">
+            <label for="username">Usuario:</label>
+            <input type="text" id="username" value="test_mysql_local">
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" value="test_mysql@local.com">
+        </div>
+
+        <div class="form-group">
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" value="Test123456">
+        </div>
+
+        <button onclick="testRegister()">Registrar Usuario en MySQL Local</button>
+
+        <div id="result"></div>
+
+        <div
+            style="margin-top: 30px; padding: 15px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px;">
+            <strong>📋 Instrucciones:</strong>
+            <ol style="margin: 10px 0; padding-left: 20px;">
+                <li>Haz clic en "Registrar Usuario"</li>
+                <li>Abre MySQL Workbench</li>
+                <li>Ejecuta: <code>SELECT * FROM auth_db.users ORDER BY created_at DESC LIMIT 1;</code></li>
+                <li>Deberías ver el usuario recién creado</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        async function testRegister() {
+            const resultDiv = document.getElementById('result');
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Añadir timestamp para hacer el username único
+            const timestamp = Date.now();
+            const uniqueUsername = `${username}_${timestamp}`;
+            const uniqueEmail = `${username}_${timestamp}@local.com`;
+
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'info';
+            resultDiv.innerHTML = '⏳ Enviando solicitud a auth-service...';
+
+            try {
+                const response = await fetch('http://localhost:8081/register.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: uniqueUsername,
+                        email: uniqueEmail,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.className = 'success';
+                    resultDiv.innerHTML = `
+                        <strong>✅ ¡Usuario creado exitosamente!</strong><br><br>
+                        <strong>Usuario:</strong> ${uniqueUsername}<br>
+                        <strong>Email:</strong> ${uniqueEmail}<br><br>
+                        <strong>🎯 Ahora verifica en MySQL Workbench:</strong><br>
+                        <code>SELECT * FROM auth_db.users WHERE username = '${uniqueUsername}';</code>
+                    `;
+                } else {
+                    resultDiv.className = 'error';
+                    resultDiv.innerHTML = `
+                        <strong>❌ Error al crear usuario</strong><br>
+                        Status: ${response.status}<br>
+                        Mensaje: ${data.message || JSON.stringify(data)}
+                    `;
+                }
+            } catch (error) {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <strong>❌ Error de conexión</strong><br>
+                    ${error.message}<br><br>
+                    Verifica que el auth-service esté corriendo en el puerto 8081
+                `;
+            }
+        }
+    </script>
+</body>
+
+</html>

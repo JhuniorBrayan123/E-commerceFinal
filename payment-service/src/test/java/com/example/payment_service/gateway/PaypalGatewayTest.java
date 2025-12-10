@@ -53,10 +53,10 @@ class PaypalGatewayTest {
         PaymentResponse response = paypalGateway.processPayment(request);
 
         // Then
-        assertNotNull(response);
-        assertEquals("PAID", response.getStatus());
-        assertEquals(new BigDecimal("100.00"), response.getAmount());
-        assertEquals("paypal", response.getGateway());
+        assertNotNull(response, "❌ Test #49 FALLÓ: response no debe ser null");
+        assertEquals("PAID", response.getStatus(), "❌ Test #49 FALLÓ: status debe ser PAID");
+        assertEquals(new BigDecimal("100.00"), response.getAmount(), "❌ Test #49 FALLÓ: amount debe ser 100.00");
+        assertEquals("paypal", response.getGateway(), "❌ Test #49 FALLÓ: gateway debe ser paypal");
     }
 
     /**
@@ -81,8 +81,8 @@ class PaypalGatewayTest {
         PaymentResponse response = paypalGateway.processPayment(request);
 
         // Then
-        assertNotNull(response.getTransactionId());
-        assertTrue(response.getTransactionId().startsWith("paypal_tx_"));
+        assertNotNull(response.getTransactionId(), "❌ Test #50 FALLÓ: transactionId no debe ser null");
+        assertTrue(response.getTransactionId().startsWith("paypal_tx_"), "❌ Test #50 FALLÓ: transactionId debe empezar con paypal_tx_");
     }
 
     /**
@@ -113,8 +113,8 @@ class PaypalGatewayTest {
                 paypalGateway.processPayment(request);
             } catch (PaymentException e) {
                 exceptionThrown = true;
-                assertEquals("PAYPAL_TEMPORARY", e.getErrorCode());
-                assertEquals("Paypal temporalmente no disponible", e.getMessage());
+                assertEquals("PAYPAL_TEMPORARY", e.getErrorCode(), "❌ Test #51 FALLÓ: errorCode debe ser PAYPAL_TEMPORARY");
+                assertEquals("Paypal temporalmente no disponible", e.getMessage(), "❌ Test #51 FALLÓ: mensaje de excepción incorrecto");
             }
             attempts++;
         }
@@ -123,7 +123,7 @@ class PaypalGatewayTest {
         // falle es extremadamente baja
         // (0.9^200 ≈ 7.05e-10)
         assertTrue(exceptionThrown,
-                "Se esperaba que se lanzara PaymentException al menos una vez en " + attempts + " intentos. "
+                "❌ Test #51 FALLÓ: Se esperaba que se lanzara PaymentException al menos una vez en " + attempts + " intentos. "
                         + "Probabilidad teórica de fallo: " + (Math.pow(0.9, attempts) * 100) + "%");
     }
 
@@ -147,11 +147,11 @@ class PaypalGatewayTest {
         PaymentResponse response = paypalGateway.processRefund(request);
 
         // Then
-        assertNotNull(response);
-        assertEquals("REFUNDED", response.getStatus());
-        assertEquals(new BigDecimal("75.00"), response.getAmount());
-        assertEquals("paypal", response.getGateway());
-        assertTrue(response.getTransactionId().startsWith("paypal_refund_"));
+        assertNotNull(response, "❌ Test #52 FALLÓ: response no debe ser null");
+        assertEquals("REFUNDED", response.getStatus(), "❌ Test #52 FALLÓ: status debe ser REFUNDED");
+        assertEquals(new BigDecimal("75.00"), response.getAmount(), "❌ Test #52 FALLÓ: amount debe ser 75.00");
+        assertEquals("paypal", response.getGateway(), "❌ Test #52 FALLÓ: gateway debe ser paypal");
+        assertTrue(response.getTransactionId().startsWith("paypal_refund_"), "❌ Test #52 FALLÓ: transactionId debe empezar con paypal_refund_");
     }
 
     /**
@@ -170,8 +170,7 @@ class PaypalGatewayTest {
         String gatewayName = paypalGateway.getGatewayName();
 
         // Then
-        assertEquals("paypal",
-                gatewayName);
+        assertEquals("paypal", gatewayName, "❌ Test #53 FALLÓ: gatewayName debe ser paypal");
     }
 
     /**
@@ -195,8 +194,8 @@ class PaypalGatewayTest {
         PaymentResponse response = paypalGateway.processRefund(request);
 
         // Then
-        assertNotNull(response.getTransactionId());
-        assertTrue(response.getTransactionId().startsWith("paypal_refund_"));
+        assertNotNull(response.getTransactionId(), "❌ Test #54 FALLÓ: transactionId no debe ser null");
+        assertTrue(response.getTransactionId().startsWith("paypal_refund_"), "❌ Test #54 FALLÓ: transactionId debe empezar con paypal_refund_");
     }
 
     /**
@@ -225,8 +224,8 @@ class PaypalGatewayTest {
         Duration maxDelay = (Duration) maxDelayField.get(gatewayWithDelays);
 
         // Then
-        assertEquals(100, minDelay.toMillis());
-        assertEquals(200, maxDelay.toMillis());
+        assertEquals(100, minDelay.toMillis(), "❌ Test #55 FALLÓ: minDelay debe ser 100ms");
+        assertEquals(200, maxDelay.toMillis(), "❌ Test #55 FALLÓ: maxDelay debe ser 200ms");
     }
 
     /**
@@ -245,8 +244,8 @@ class PaypalGatewayTest {
         PaypalGateway gateway = new PaypalGateway(100, 400);
 
         // Then - verificar que se crea correctamente
-        assertNotNull(gateway);
-        assertEquals("paypal", gateway.getGatewayName());
+        assertNotNull(gateway, "❌ Test #56 FALLÓ: gateway no debe ser null");
+        assertEquals("paypal", gateway.getGatewayName(), "❌ Test #56 FALLÓ: gatewayName debe ser paypal");
     }
 
     /**
@@ -270,8 +269,8 @@ class PaypalGatewayTest {
             // When/Then - no debe lanzar excepción
             assertDoesNotThrow(() -> {
                 PaymentResponse response = paypalGateway.processRefund(request);
-                assertNotNull(response);
-                assertEquals("REFUNDED", response.getStatus());
+                assertNotNull(response, "❌ Test #57 FALLÓ: response no debe ser null");
+                assertEquals("REFUNDED", response.getStatus(), "❌ Test #57 FALLÓ: status debe ser REFUNDED");
             });
         }
     }
@@ -308,6 +307,6 @@ class PaypalGatewayTest {
         PaymentResponse response2 = paypalGateway.processPayment(request2);
 
         // Then
-        assertNotEquals(response1.getTransactionId(), response2.getTransactionId());
+        assertNotEquals(response1.getTransactionId(), response2.getTransactionId(), "❌ Test #58 FALLÓ: los transactionIds deben ser únicos");
     }
 }
